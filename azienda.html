@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Silk & Stack — Proposta Progettuale</title>
+		<link rel="icon" type="image/x-icon" href="favicon.ico">
+		<link rel="preload" as="image" href="logo.jpeg">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap"
+			rel="stylesheet">
+		<style>
+			:root {
+				--violet-deep: #1a0a2e;
+				--violet-mid: #2d1254;
+				--violet-light: #4a1d8a;
+				--violet-mist: #7b4db5;
+				--gold: #c9a84c;
+				--gold-bright: #e8c96a;
+				--gold-pale: #f5e4a8;
+				--cream: #fdf8f0;
+				--white: #ffffff;
+				--text-dark: #120821;
+			}
+
+			*,
+			*::before,
+			*::after {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			html {
+				scroll-behavior: smooth;
+			}
+
+			body {
+				background-color: var(--violet-deep);
+				color: var(--cream);
+				font-family: 'DM Sans', sans-serif;
+				font-weight: 300;
+				overflow-x: hidden;
+			}
+
+			/* ── NOISE OVERLAY ── */
+			body::before {
+				content: '';
+				position: fixed;
+				inset: 0;
+				background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+				pointer-events: none;
+				z-index: 1000;
+				opacity: 0.5;
+			}
+
+			/* ── HERO ── */
+			.hero {
+				min-height: 100vh;
+				display: grid;
+				place-items: center;
+				text-align: center;
+				position: relative;
+				overflow: hidden;
+				padding: 4rem 2rem;
+			}
+
+			.hero::before {
+				content: '';
+				position: absolute;
+				width: 700px;
+				height: 700px;
+				background: radial-gradient(circle, rgba(74, 29, 138, 0.6) 0%, transparent 70%);
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				animation: pulse 6s ease-in-out infinite;
+			}
+
+			.hero::after {
+				content: '';
+				position: absolute;
+				width: 400px;
+				height: 400px;
+				background: radial-gradient(circle, rgba(201, 168, 76, 0.15) 0%, transparent 70%);
+				top: 30%;
+				right: 10%;
+				animation: drift 8s ease-in-out infinite alternate;
+			}
+
+			@keyframes pulse {
+
+				0%,
+				100% {
+					transform: translate(-50%, -50%) scale(1);
+				}
+
+				50% {
+					transform: translate(-50%, -50%) scale(1.15);
+				}
+			}
+
+			@keyframes drift {
+				from {
+					transform: translateY(0) rotate(0deg);
+				}
+
+				to {
+					transform: translateY(-40px) rotate(15deg);
+				}
+			}
+
+			.hero-inner {
+				position: relative;
+				z-index: 2;
+			}
+
+			.hero-logo {
+				max-width: 180px;
+				width: min(140px, 35vw);
+				height: auto;
+				border-radius: 50%;
+				margin: 0 auto 2rem;
+				border: 2px solid rgba(201, 168, 76, 0.6);
+				display: block;
+				opacity: 0;
+				animation: fadeUp 1s ease 0.1s both;
+			}
+
+			.hero-logo.logo-large {
+				max-width: 360px;
+				width: min(280px, 70vw);
+			}
+
+			.hero-badge {
+				display: inline-block;
+				border: 1px solid rgba(201, 168, 76, 0.4);
+				color: var(--gold);
+				font-family: 'DM Sans', sans-serif;
+				font-size: 0.7rem;
+				letter-spacing: 0.3em;
+				text-transform: uppercase;
+				padding: 0.5rem 1.5rem;
+				margin-bottom: 2.5rem;
+				animation: fadeUp 1s ease 0.2s both;
+			}
+
+			.hero-title {
+				font-family: 'Cinzel', serif;
+				font-size: clamp(3.5rem, 10vw, 8rem);
+				font-weight: 700;
+				line-height: 0.9;
+				letter-spacing: -0.02em;
+				margin-bottom: 0.5rem;
+				animation: fadeUp 1s ease 0.4s both;
+			}
+
+			.hero-title span {
+				display: block;
+				background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 50%, var(--gold) 100%);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+			}
+
+			.hero-title .amp {
+				font-family: 'Cormorant Garamond', serif;
+				font-style: italic;
+				font-size: 0.6em;
+				background: linear-gradient(135deg, var(--violet-mist), var(--cream));
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				display: inline;
+			}
+
+			.hero-tagline {
+				font-family: 'Cormorant Garamond', serif;
+				font-style: italic;
+				font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+				color: rgba(253, 248, 240, 0.65);
+				margin-top: 1.5rem;
+				letter-spacing: 0.05em;
+				animation: fadeUp 1s ease 0.6s both;
+			}
+
+			.hero-divider {
+				width: 120px;
+				height: 1px;
+				background: linear-gradient(90deg, transparent, var(--gold), transparent);
+				margin: 2.5rem auto;
+				animation: fadeUp 1s ease 0.8s both;
+			}
+
+			.hero-desc {
+				max-width: 560px;
+				margin: 0 auto;
+				font-size: 1rem;
+				line-height: 1.8;
+				color: rgba(253, 248, 240, 0.7);
+				animation: fadeUp 1s ease 1s both;
+			}
+
+			@keyframes fadeUp {
+				from {
+					opacity: 0;
+					transform: translateY(30px);
+				}
+
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			/* ── GEOMETRIC DECO ── */
+			.geo-deco {
+				position: absolute;
+				opacity: 0.07;
+			}
+
+			.geo-deco.tl {
+				top: 5%;
+				left: 3%;
+				width: 200px;
+				height: 200px;
+				border: 1px solid var(--gold);
+				transform: rotate(15deg);
+			}
+
+			.geo-deco.br {
+				bottom: 8%;
+				right: 5%;
+				width: 150px;
+				height: 150px;
+				border: 1px solid var(--gold);
+				border-radius: 50%;
+			}
+
+			.geo-deco.mid {
+				top: 20%;
+				right: 8%;
+				width: 80px;
+				height: 80px;
+				background: var(--gold);
+				clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+			}
+
+			/* ── SECTION BASE ── */
+			section {
+				padding: 6rem 2rem;
+				max-width: 1100px;
+				margin: 0 auto;
+			}
+
+			.section-label {
+				font-family: 'DM Sans', sans-serif;
+				font-size: 0.68rem;
+				letter-spacing: 0.35em;
+				text-transform: uppercase;
+				color: var(--gold);
+				margin-bottom: 1rem;
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+			}
+
+			.section-label::before {
+				content: '';
+				width: 40px;
+				height: 1px;
+				background: var(--gold);
+				opacity: 0.5;
+				flex-shrink: 0;
+			}
+
+			.section-title {
+				font-family: 'Cormorant Garamond', serif;
+				font-size: clamp(2rem, 5vw, 3.2rem);
+				font-weight: 300;
+				line-height: 1.15;
+				margin-bottom: 1.5rem;
+				color: var(--cream);
+			}
+
+			.section-title em {
+				font-style: italic;
+				color: var(--gold-pale);
+			}
+
+			/* ── MOSTRA SECTION ── */
+			.mostra {
+				background: linear-gradient(135deg, rgba(45, 18, 84, 0.5), rgba(26, 10, 46, 0.8));
+				border: 1px solid rgba(201, 168, 76, 0.15);
+				border-radius: 2px;
+				padding: 4rem 3rem;
+				max-width: 1100px;
+				margin: 0 auto 2rem;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.mostra::before {
+				content: '"Lo sguardo che racconta"';
+				position: absolute;
+				right: -20px;
+				top: 50%;
+				transform: translateY(-50%) rotate(90deg);
+				font-family: 'Cormorant Garamond', serif;
+				font-style: italic;
+				font-size: 0.75rem;
+				letter-spacing: 0.2em;
+				color: rgba(201, 168, 76, 0.15);
+				white-space: nowrap;
+				transform-origin: right center;
+			}
+
+			.mostra-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 3rem;
+				align-items: start;
+			}
+
+			.mostra-text p {
+				font-size: 1.05rem;
+				line-height: 1.9;
+				color: rgba(253, 248, 240, 0.75);
+				margin-bottom: 1.2rem;
+			}
+
+			.mostra-highlight {
+				font-family: 'Cormorant Garamond', serif;
+				font-size: 1.4rem;
+				font-style: italic;
+				color: var(--gold-pale);
+				line-height: 1.6;
+				border-left: 2px solid var(--gold);
+				padding-left: 1.5rem;
+				margin: 2rem 0;
+			}
+
+			/* ── STATI OPERE ── */
+			.stati-grid {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 1rem;
+			}
+
+			.stato-card {
+				padding: 1.5rem;
+				border: 1px solid rgba(201, 168, 76, 0.1);
+				background: rgba(255, 255, 255, 0.02);
+				position: relative;
+				overflow: hidden;
+				transition: border-color 0.3s;
+			}
+
+			.stato-card:hover {
+				border-color: rgba(201, 168, 76, 0.35);
+			}
+
+			.stato-dot {
+				width: 10px;
+				height: 10px;
+				border-radius: 50%;
+				margin-bottom: 0.8rem;
+				position: relative;
+			}
+
+			.stato-dot::after {
+				content: '';
+				position: absolute;
+				inset: -4px;
+				border-radius: 50%;
+				opacity: 0.3;
+			}
+
+			.disponibile .stato-dot {
+				background: #4ade80;
+			}
+
+			.disponibile .stato-dot::after {
+				background: #4ade80;
+			}
+
+			.prenotato .stato-dot {
+				background: var(--gold-bright);
+			}
+
+			.prenotato .stato-dot::after {
+				background: var(--gold-bright);
+			}
+
+			.venduto .stato-dot {
+				background: #f87171;
+			}
+
+			.venduto .stato-dot::after {
+				background: #f87171;
+			}
+
+			.non-disponibile .stato-dot {
+				background: #94a3b8;
+			}
+
+			.non-disponibile .stato-dot::after {
+				background: #94a3b8;
+			}
+
+			.stato-name {
+				font-family: 'Cinzel', serif;
+				font-size: 0.8rem;
+				letter-spacing: 0.15em;
+				color: var(--cream);
+				margin-bottom: 0.4rem;
+			}
+
+			.stato-desc {
+				font-size: 0.8rem;
+				color: rgba(253, 248, 240, 0.5);
+				line-height: 1.6;
+			}
+
+			/* ── DIVIDER ── */
+			.full-divider {
+				width: 100%;
+				height: 1px;
+				background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.3), transparent);
+				margin: 0;
+			}
+
+			/* ── TEAM ── */
+			.team-section {
+				padding: 6rem 2rem;
+				max-width: 1100px;
+				margin: 0 auto;
+			}
+
+			.team-grid {
+				display: grid;
+				grid-template-columns: repeat(4, 1fr);
+				gap: 1.5rem;
+				margin-top: 3rem;
+			}
+
+			.team-card {
+				position: relative;
+				padding: 2rem 1.5rem 2rem;
+				border: 1px solid rgba(201, 168, 76, 0.1);
+				background: linear-gradient(160deg, rgba(74, 29, 138, 0.15), rgba(26, 10, 46, 0.4));
+				overflow: hidden;
+				transition: transform 0.4s ease, border-color 0.4s;
+				cursor: default;
+			}
+
+			.team-card::after {
+				content: '';
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				width: 100%;
+				height: 3px;
+				background: linear-gradient(90deg, var(--gold), var(--violet-mist));
+				transform: scaleX(0);
+				transition: transform 0.4s ease;
+				transform-origin: left;
+			}
+
+			.team-card:hover {
+				transform: translateY(-6px);
+				border-color: rgba(201, 168, 76, 0.3);
+			}
+
+			.team-card:hover::after {
+				transform: scaleX(1);
+			}
+
+			.team-initial {
+				font-family: 'Cinzel', serif;
+				font-size: 2.8rem;
+				font-weight: 700;
+				color: rgba(201, 168, 76, 0.2);
+				line-height: 1;
+				margin-bottom: 1.2rem;
+				transition: color 0.3s;
+			}
+
+			.team-card:hover .team-initial {
+				color: rgba(201, 168, 76, 0.5);
+			}
+
+			.team-name {
+				font-family: 'Cinzel', serif;
+				font-size: 0.95rem;
+				letter-spacing: 0.1em;
+				color: var(--gold-pale);
+				margin-bottom: 0.3rem;
+			}
+
+			.team-role {
+				font-family: 'Cormorant Garamond', serif;
+				font-style: italic;
+				font-size: 1rem;
+				color: var(--gold);
+				margin-bottom: 0.6rem;
+			}
+
+			.team-resp {
+				font-size: 0.72rem;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				color: rgba(253, 248, 240, 0.35);
+				border-top: 1px solid rgba(201, 168, 76, 0.1);
+				padding-top: 0.8rem;
+				margin-top: 0.8rem;
+			}
+
+			/* ── PALETTE SHOWCASE ── */
+			.palette-strip {
+				display: flex;
+				height: 6px;
+				width: 100%;
+				margin: 2rem 0;
+				overflow: hidden;
+			}
+
+			.palette-strip div {
+				flex: 1;
+			}
+
+			.p1 {
+				background: var(--violet-deep);
+			}
+
+			.p2 {
+				background: var(--violet-mid);
+			}
+
+			.p3 {
+				background: var(--violet-light);
+			}
+
+			.p4 {
+				background: var(--violet-mist);
+			}
+
+			.p5 {
+				background: var(--gold);
+			}
+
+			.p6 {
+				background: var(--gold-bright);
+			}
+
+			.p7 {
+				background: var(--gold-pale);
+			}
+
+			.p8 {
+				background: var(--cream);
+			}
+
+			/* ── FOOTER ── */
+			footer {
+				border-top: 1px solid rgba(201, 168, 76, 0.1);
+				padding: 3rem 2rem;
+				text-align: center;
+			}
+
+			.footer-logo {
+				font-family: 'Cinzel', serif;
+				font-size: 1.4rem;
+				letter-spacing: 0.2em;
+				background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				margin-bottom: 0.5rem;
+			}
+
+			.footer-sub {
+				font-size: 0.72rem;
+				letter-spacing: 0.25em;
+				text-transform: uppercase;
+				color: rgba(253, 248, 240, 0.3);
+				margin-bottom: 1.5rem;
+			}
+
+			.footer-note {
+				font-family: 'Cormorant Garamond', serif;
+				font-style: italic;
+				font-size: 0.9rem;
+				color: rgba(253, 248, 240, 0.3);
+			}
+
+			/* ── ORNAMENT ── */
+			.ornament {
+				text-align: center;
+				color: rgba(201, 168, 76, 0.3);
+				font-size: 1.2rem;
+				letter-spacing: 0.5em;
+				margin: 1rem 0;
+			}
+
+			/* ── RESPONSIVE ── */
+			@media (max-width: 768px) {
+				.mostra-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.team-grid {
+					grid-template-columns: 1fr 1fr;
+				}
+
+				.stati-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.mostra {
+					padding: 2.5rem 1.5rem;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.team-grid {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<!-- HERO -->
+		<div class="hero">
+			<div class="geo-deco tl"></div>
+			<div class="geo-deco br"></div>
+			<div class="geo-deco mid"></div>
+
+		<div class="hero-inner">
+			<img src="logo.jpeg" alt="Logo Silk & Stack" class="hero-logo logo-large">
+			<div class="hero-badge">Proposta Progettuale · 2026</div>
+				<h1 class="hero-title">
+					<span>SILK</span>
+					<span class="amp">&</span>
+					<span>STACK</span>
+				</h1>
+				<p class="hero-tagline">Programmiamo esperienze per chi non accetta compromessi</p>
+				<div class="hero-divider"></div>
+				<p class="hero-desc">
+					Sviluppo software di eccellenza per aziende con una clientela d'élite.
+					Dove la raffinatezza dell'interfaccia incontra la solidità dell'architettura.
+				</p>
+			</div>
+		</div>
+
+		<div class="full-divider" style="max-width:1100px;margin:3rem auto;"></div>
+
+		<!-- TEAM -->
+		<div class="team-section">
+			<div class="section-label">Il Team</div>
+			<h2 class="section-title">Le persone<br><em>dietro ogni riga di codice</em></h2>
+			<p style="max-width:520px;font-size:0.95rem;line-height:1.8;color:rgba(253,248,240,0.6);margin-top:-0.5rem;">
+				Quattro professionisti con responsabilità chiare e visione condivisa.
+				Un'organizzazione snella pensata per reagire con precisione.
+			</p>
+
+			<div class="team-grid">
+				<!-- Riccardo -->
+				<div class="team-card">
+					<div class="team-name">Riccardo</div>
+					<div class="team-role">Chief Executive</div>
+					<div class="team-resp">Responsabile Generale</div>
+				</div>
+				<!-- Alex -->
+				<div class="team-card">
+					<div class="team-name">Alex</div>
+					<div class="team-role">Database & Tecnico</div>
+					<div class="team-resp">Responsabile Back-End</div>
+				</div>
+				<!-- Luigi -->
+				<div class="team-card">
+					<div class="team-name">Luigi</div>
+					<div class="team-role">Marketing & Social</div>
+					<div class="team-resp">Responsabile Rapporti Umani</div>
+				</div>
+				<!-- Furio -->
+				<div class="team-card">
+					<div class="team-name">Furio</div>
+					<div class="team-role">Design & Architettura</div>
+					<div class="team-resp">Responsabile Front-End</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- PALETTE
+		<div style="max-width:1100px;margin:0 auto 4rem;padding:0 2rem;">
+			<div class="section-label">Identità Visiva</div>
+			<p
+				style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;color:rgba(253,248,240,0.5);margin-bottom:1.5rem;">
+				Violetto profondo · Oro antico — una palette che evoca lusso senza ostentazione
+			</p>
+			<div class="palette-strip">
+				<div class="p1"></div>
+				<div class="p2"></div>
+				<div class="p3"></div>
+				<div class="p4"></div>
+				<div class="p5"></div>
+				<div class="p6"></div>
+				<div class="p7"></div>
+				<div class="p8"></div>
+			</div>
+		</div> -->
+
+		<!-- FOOTER -->
+		<footer>
+			<div class="ornament">· · ◆ · ·</div>
+			<div class="footer-logo">SILK & STACK</div>
+			<div class="footer-sub">Sviluppo Software · Alta Gamma</div>
+			<div class="footer-note">Progetto Doisneau — Pordenone 2025</div>
+		</footer>
+
+	</body>
+
+</html>
