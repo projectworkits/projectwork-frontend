@@ -112,19 +112,6 @@
   font-style: italic; font-size: 1.15rem; line-height: 1.6;
   color: rgba(240,236,228,0.85);
 }
-.bio-timeline { padding: 0 2.5rem 4rem; }
-.tl-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.4rem; font-weight: 400; margin-bottom: 2rem;
-}
-.tl-item {
-  display: grid; grid-template-columns: 80px 1fr; gap: 1.5rem;
-  padding: 1rem 0; border-bottom: 0.5px solid rgba(200,180,130,0.1);
-  align-items: start;
-}
-.tl-year { font-family: 'Playfair Display', serif; font-size: 1rem; color: #c8b482; padding-top: 2px; }
-.tl-desc { font-size: 15px; color: rgba(240,236,228,0.72); line-height: 1.6; }
-
 /* ── PAGE: LA MOSTRA ── */
 .mostra-intro {
   padding: 4rem 2.5rem 0;
