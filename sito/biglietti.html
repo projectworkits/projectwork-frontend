@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biglietti — Doisneau Bologna</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<div class="site">
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="navbar.js"></script>
+  <script>renderNavbar("biglietti");</script>
+
+  <div class="page active" id="page-biglietti">
+    <div class="biglietti-page">
+
+      <div class="biglietti-header">
+        <p class="eyebrow">Prenota ora</p>
+        <h2 class="section-title">Scegli il tuo biglietto</h2>
+      </div>
+
+      <div class="ticket-grid">
+        <div class="ticket-card">
+          <div class="ticket-type">Ridotto</div>
+          <div class="ticket-price">€9</div>
+          <div class="ticket-note">Under 26 · Over 65 · Disabili</div>
+          <ul class="ticket-features">
+            <li>Accesso alle 5 sale</li>
+            <li>Mappa del percorso</li>
+            <li>Prenotazione online</li>
+          </ul>
+          <button class="ticket-btn" onclick="handleTicket('Ridotto', 9)">Acquista</button>
+        </div>
+        <div class="ticket-card featured">
+          <div class="ticket-badge">Più scelto</div>
+          <div class="ticket-type">Intero</div>
+          <div class="ticket-price">€14</div>
+          <div class="ticket-note">Accesso completo alla mostra</div>
+          <ul class="ticket-features">
+            <li>Accesso alle 5 sale</li>
+            <li>Audio guida inclusa</li>
+            <li>Catalogo in omaggio</li>
+            <li>Prenotazione online</li>
+          </ul>
+          <button class="ticket-btn" onclick="handleTicket('Intero', 14)">Acquista</button>
+        </div>
+        <div class="ticket-card">
+          <div class="ticket-type">Famiglia</div>
+          <div class="ticket-price">€32</div>
+          <div class="ticket-note">2 adulti + 2 bambini under 12</div>
+          <ul class="ticket-features">
+            <li>Accesso alle 5 sale</li>
+            <li>Laboratorio per bambini</li>
+            <li>Mappa del percorso</li>
+            <li>Prenotazione online</li>
+          </ul>
+          <button class="ticket-btn" onclick="handleTicket('Famiglia', 32)">Acquista</button>
+        </div>
+      </div>
+
+      <div class="ticket-info">
+        <div>
+          <div class="ti-label">Dove</div>
+          <div class="ti-val">Palazzo delle Esposizioni<br>Via Milano 1, Bologna</div>
+        </div>
+        <div>
+          <div class="ti-label">Orari</div>
+          <div class="ti-val">Mar – Dom: 10:00 – 19:30<br>Lunedì chiuso</div>
+        </div>
+        <div>
+          <div class="ti-label">Durata della mostra</div>
+          <div class="ti-val">Dal 15 aprile al 30 giugno 2026</div>
+        </div>
+        <div>
+          <div class="ti-label">Contatti</div>
+          <div class="ti-val">info@mostradoisneau.it<br>+39 051 000 0000</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span>© 2026 Mostra Doisneau — Bologna</span>
+    <span>Privacy · Accessibilità</span>
+  </footer>
+
+</div>
+<script>
+function handleTicket(tipo, prezzo) {
+  if (!isUser()) {
+    toast("Accedi come utente per acquistare", "error");
+    return;
+  }
+  toast(`Biglietto ${tipo} (€${prezzo}) aggiunto — funzione di pagamento in arrivo`);
+}
+</script>
+</body>
+</html>

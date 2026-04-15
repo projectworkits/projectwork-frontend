@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fotografia — Admin</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    .form-card { max-width: 680px; padding: 0 2.5rem 5rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+    .img-preview { width: 100%; max-height: 220px; object-fit: contain; margin-top: 0.5rem; filter: grayscale(40%); }
+    .back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: rgba(240,236,228,0.4); font-size: 13px; letter-spacing: 0.08em; text-decoration: none; margin: 1.5rem 2.5rem 0; transition: color 0.2s; }
+    .back-link:hover { color: #c8b482; }
+    body.light-mode .back-link { color: rgba(31,31,31,0.4); }
+    body.light-mode .back-link:hover { color: #9a3636; }
+    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } .form-card { padding: 0 1rem 4rem; } }
+  </style>
+</head>
+<body>
+<div class="site">
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="navbar.js"></script>
+  <script>renderNavbar("admin");</script>
+
+  <a href="admin-photos.html" class="back-link">← Torna all'elenco fotografie</a>
+
+  <div id="denied" style="display:none;padding:3rem 2.5rem;text-align:center;color:rgba(240,236,228,0.4)">Accesso riservato agli amministratori.</div>
+
+  <div id="main" style="display:none">
+    <div class="page-header">
+      <p class="eyebrow" id="form-eyebrow">Admin · Fotografie</p>
+      <h1 class="section-title" id="form-title">Nuova fotografia</h1>
+    </div>
+    <div class="form-card">
+      <div class="form-group">
+        <label class="form-label">Titolo *</label>
+        <input type="text" class="form-input" id="f-title" placeholder="es. Il Bacio">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Titolo originale</label>
+        <input type="text" class="form-input" id="f-orig" placeholder="es. Le Baiser de l'Hôtel de Ville">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Anno *</label>
+          <input type="number" class="form-input" id="f-year" placeholder="1950" min="1900" max="2000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Luogo *</label>
+          <input type="text" class="form-input" id="f-place" placeholder="Parigi, Francia">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrizione</label>
+        <textarea class="form-textarea" id="f-desc" rows="5" placeholder="Descrizione della fotografia…"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Prezzo (€) *</label>
+          <input type="number" class="form-input" id="f-price" placeholder="4800" min="0">
+        </div>
+        <div class="form-group" id="state-group" style="display:none">
+          <label class="form-label">Stato</label>
+          <select class="form-select" id="f-state">
+            <option value="disponibile">Disponibile</option>
+            <option value="prenotata">Prenotata</option>
+            <option value="venduta">Venduta</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">URL immagine</label>
+        <input type="url" class="form-input" id="f-img" placeholder="https://…" oninput="updatePreview()">
+        <img id="img-preview" class="img-preview" style="display:none" alt="Anteprima">
+      </div>
+      <div style="display:flex;gap:1rem;margin-top:1rem">
+        <button class="btn btn-solid" onclick="handleSubmit()">Salva fotografia</button>
+        <a href="admin-photos.html" class="btn btn-ghost">Annulla</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span>© 2026 Mostra Doisneau — Bologna</span>
+    <span>Privacy · Accessibilità</span>
+  </footer>
+
+</div>
+<script>
+const params = new URLSearchParams(location.search);
+const editId = params.get("id") ? parseInt(params.get("id")) : null;
+let editPhoto = null;
+
+function updatePreview() {
+  const url = document.getElementById("f-img").value.trim();
+  const img = document.getElementById("img-preview");
+  if (url) { img.src = url; img.style.display = "block"; }
+  else { img.style.display = "none"; }
+}
+
+function populate(p) {
+  editPhoto = p;
+  document.getElementById("form-eyebrow").textContent = "Admin · Fotografie · Modifica";
+  document.getElementById("form-title").textContent = p.title;
+  document.getElementById("f-title").value = p.title;
+  document.getElementById("f-orig").value = p.originalTitle || "";
+  document.getElementById("f-year").value = p.year;
+  document.getElementById("f-place").value = p.place;
+  document.getElementById("f-desc").value = p.description;
+  document.getElementById("f-price").value = p.price;
+  document.getElementById("f-state").value = p.state;
+  document.getElementById("state-group").style.display = "block";
+  if (p.img) { document.getElementById("f-img").value = p.img; updatePreview(); }
+}
+
+function validate() {
+  const required = [
+    ["f-title", "Il titolo è obbligatorio"],
+    ["f-year",  "L'anno è obbligatorio"],
+    ["f-place", "Il luogo è obbligatorio"],
+    ["f-price", "Il prezzo è obbligatorio"],
+  ];
+  for (const [id, msg] of required) {
+    if (!document.getElementById(id).value.trim()) { toast(msg, "error"); return false; }
+  }
+  return true;
+}
+
+function handleSubmit() {
+  if (!validate()) return;
+  const data = {
+    title:         document.getElementById("f-title").value.trim(),
+    originalTitle: document.getElementById("f-orig").value.trim(),
+    year:          parseInt(document.getElementById("f-year").value),
+    place:         document.getElementById("f-place").value.trim(),
+    description:   document.getElementById("f-desc").value.trim(),
+    price:         parseFloat(document.getElementById("f-price").value),
+    img:           document.getElementById("f-img").value.trim() || null,
+    state:         document.getElementById("f-state").value || "disponibile",
+  };
+
+  const action = editId ? API.updatePhoto(editId, data) : API.createPhoto(data);
+  action.then(() => {
+    toast(editId ? "Fotografia aggiornata" : "Fotografia creata");
+    setTimeout(() => location.href = "admin-photos.html", 1000);
+  }).catch(err => toast(err, "error"));
+}
+
+function init() {
+  if (!isAdmin()) {
+    document.getElementById("denied").style.display = "block"; return;
+  }
+  document.getElementById("main").style.display = "block";
+  if (editId) API.getPhoto(editId).then(p => { if (p) populate(p); else toast("Fotografia non trovata", "error"); });
+}
+init();
+</script>
+</body>
+</html>

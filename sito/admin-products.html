@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prodotti — Admin</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    .avail-low { color: #c8a048; }
+    .avail-out { color: #c84848; }
+    body.light-mode .avail-low { color: #a07020; }
+    body.light-mode .avail-out { color: #9a3636; }
+  </style>
+</head>
+<body>
+<div class="site">
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="navbar.js"></script>
+  <script>renderNavbar("admin");</script>
+
+  <div class="page-header" style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <p class="eyebrow">Admin · Prodotti</p>
+      <h1 class="section-title">Elenco prodotti</h1>
+    </div>
+    <a href="admin-product-create.html" class="btn btn-gold">+ Aggiungi</a>
+  </div>
+
+  <div id="denied" style="display:none;padding:3rem 2.5rem;text-align:center;color:rgba(240,236,228,0.4)">Accesso riservato agli amministratori.</div>
+
+  <div id="main" style="display:none">
+    <div class="filter-bar">
+      <input type="text" class="form-input" id="search" placeholder="Cerca per nome…" oninput="applyFilters()">
+      <select class="form-select" id="avail-filter" onchange="applyFilters()" style="width:auto">
+        <option value="">Tutti</option>
+        <option value="available">Disponibili</option>
+        <option value="low">Scorta bassa (≤5)</option>
+        <option value="out">Esauriti</option>
+      </select>
+    </div>
+    <div class="content">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Prezzo</th>
+            <th>Disponibili</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+      <div class="pager" id="pager"></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span>© 2026 Mostra Doisneau — Bologna</span>
+    <span>Privacy · Accessibilità</span>
+  </footer>
+
+</div>
+<script>
+const PER_PAGE = 10;
+let currentPage = 1;
+let allProducts = [];
+let filtered = [];
+
+function availCell(n) {
+  if (n === 0) return `<span class="avail-out">Esaurito</span>`;
+  if (n <= 5)  return `<span class="avail-low">${n} ⚠</span>`;
+  return `${n}`;
+}
+
+function applyFilters() {
+  const q = document.getElementById("search").value.toLowerCase();
+  const av = document.getElementById("avail-filter").value;
+  filtered = allProducts.filter(p => {
+    const matchQ = !q || p.name.toLowerCase().includes(q);
+    const matchAv = !av
+      || (av === "available" && p.available > 5)
+      || (av === "low"       && p.available > 0 && p.available <= 5)
+      || (av === "out"       && p.available === 0);
+    return matchQ && matchAv;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+function renderTable() {
+  const { items, total } = paginate(filtered, currentPage, PER_PAGE);
+  const tbody = document.getElementById("table-body");
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:2rem;color:rgba(240,236,228,0.3)">Nessun risultato.</td></tr>`;
+    renderPager(document.getElementById("pager"), 1, 1, () => {});
+    return;
+  }
+  tbody.innerHTML = items.map(p => `
+    <tr>
+      <td>
+        <div style="font-size:0.95rem">${p.name}</div>
+        <div style="font-size:12px;color:rgba(240,236,228,0.4)">${truncate(p.description, 60)}</div>
+      </td>
+      <td>${formatPrice(p.price)}</td>
+      <td>${availCell(p.available)}</td>
+      <td>
+        <div class="actions">
+          <a href="shop-detail.html?id=${p.id}" class="btn btn-ghost btn-sm">Vedi</a>
+          <a href="admin-product-create.html?id=${p.id}" class="btn btn-gold btn-sm">Modifica</a>
+          <button class="btn btn-danger btn-sm" onclick="handleDelete(${p.id})">Elimina</button>
+        </div>
+      </td>
+    </tr>`).join("");
+  renderPager(document.getElementById("pager"), currentPage, total, (p) => { currentPage = p; renderTable(); window.scrollTo({top:0,behavior:"smooth"}); });
+}
+
+function handleDelete(id) {
+  const p = allProducts.find(x => x.id === id);
+  confirmDialog(`Eliminare «${p.name}»?`).then(ok => {
+    if (!ok) return;
+    API.deleteProduct(id).then(() => {
+      allProducts = allProducts.filter(x => x.id !== id);
+      toast("Prodotto eliminato");
+      applyFilters();
+    });
+  });
+}
+
+function refreshPageForRole(role) {
+  document.getElementById("denied").style.display = role !== "admin" ? "block" : "none";
+  document.getElementById("main").style.display = role === "admin" ? "block" : "none";
+}
+
+if (isAdmin()) {
+  document.getElementById("main").style.display = "block";
+  API.getProducts().then(products => { allProducts = products; filtered = products; renderTable(); });
+} else {
+  document.getElementById("denied").style.display = "block";
+}
+</script>
+</body>
+</html>

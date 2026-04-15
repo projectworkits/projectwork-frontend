@@ -7,17 +7,101 @@
   <title>Silk & Stack — Doisneau: La Strada Come Teatro</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="shared.css">
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,600&display=swap"
     rel="stylesheet">
   <style>
     :root {
-      --onyx: #111117;
+      --onyx: #0a0a0a;
       --vivid-royal: #2d1ba1;
       --blue-violet: #803cc4;
-      /* --golden-glow: #e0c931; */
-      --golden-glow: #c0ac2b;
-      --alabaster-grey: #e0e0e0;
+      --golden-glow: #c8b482;
+      /* --golden-glow: #c0ac2b; */
+      --alabaster-grey: #f0ece4;
+    }
+
+    body.light-mode {
+      --onyx: #f4efe6 !important;
+      /* Sfondo chiaro crema */
+      --alabaster-grey: #1f1f1f !important;
+      /* Testo scuro principale */
+      background-color: #f4efe6;
+      color: #1f1f1f;
+    }
+
+
+    body.light-mode .Robert,
+    body.light-mode .hero-desc,
+    body.light-mode .about-body,
+
+    body.light-mode .dates-banner {
+      color: #1f1f1f;
+    }
+
+    body.light-mode .ticker-item {
+      color: #303030;
+    }
+
+    body.light-mode .ticker-dot {
+      background-color: #9a3636;
+    }
+
+    body.light-mode .quote-author {
+      color: #9a3636;
+    }
+
+    body.light-mode .footer-logo {
+      color: #803cc4;
+    }
+
+
+    body.light-mode .hero-subtitle,
+    body.light-mode .stat-desc,
+    body.light-mode .ticket-desc,
+    body.light-mode .about-text p,
+    body.light-mode .ticket-note,
+    body.light-mode .footer-copy,
+    body.light-mode .ticket-features li {
+      color: rgba(31, 31, 31, 0.7) !important;
+    }
+
+    /* 3. Colori dei bottoni in Light Mode */
+    body.light-mode .btn-primary,
+    body.light-mode .btn-ticket {
+      background-color: var(--golden-glow) !important;
+      color: #0a0a0a !important;
+      /* Testo chiaro sul bottone scuro */
+    }
+
+    body.light-mode .btn-ghost {
+      color: #1f1f1f !important;
+      border-color: rgba(31, 31, 31, 0.3) !important;
+    }
+
+    body.light-mode .btn-ghost:hover {
+      background-color: rgba(31, 31, 31, 0.05) !important;
+    }
+
+    /* 4. Sfondo delle card dei biglietti per farle staccare dal fondo */
+    body.light-mode .ticket-box {
+      background: rgba(0, 0, 0, 0.03) !important;
+      border-color: rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* 5. Tasto per il cambio tema */
+    body.light-mode .theme-toggle-btn {
+      border-color: #9a3636 !important;
+      color: #9a3636 !important;
+    }
+
+    /* Eccezione per le icone: ridiamo il colore di accento */
+    body.light-mode svg,
+    body.light-mode .icon,
+    body.light-mode i {
+      color: var(--golden-glow) !important;
+      fill: var(--golden-glow) !important;
     }
 
     *,
@@ -38,6 +122,9 @@
       font-family: 'Cormorant Garamond', serif;
       overflow-x: hidden;
       cursor: default;
+
+      margin: 0 !important;
+      padding-top: 0 !important;
     }
 
     /* ── NOISE OVERLAY ── */
@@ -79,7 +166,25 @@
     }
 
     /* ── NAV ── */
-    nav {
+    .navbar,
+    .navbar a,
+    .nb-cta,
+    .role-switcher {
+      font-family: 'Cormorant Garamond', serif !important;
+      /* Usa il font del sito */
+      font-weight: 400 !important;
+      /* Riporta lo spessore alla normalità (togliendo il 300) */
+      font-size: 16px !important;
+      /* Forza la grandezza standard */
+      letter-spacing: normal !important;
+    }
+
+    .nb-logo {
+      font-family: 'Playfair Display', serif !important;
+      font-weight: 400 !important;
+    }
+
+    /* nav {
       position: fixed;
       top: 0;
       left: 0;
@@ -90,14 +195,6 @@
       align-items: center;
       padding: 1.5rem 4rem;
       mix-blend-mode: normal;
-    }
-
-    nav::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to bottom, rgba(17, 17, 23, 0.9) 0%, transparent 100%);
-      z-index: -1;
     }
 
     .nav-logo {
@@ -128,7 +225,7 @@
     .nav-links a:hover {
       opacity: 1;
       color: var(--golden-glow);
-    }
+    } */
 
     /* ── HERO ── */
     .hero {
@@ -1118,6 +1215,14 @@
       opacity: 0.5;
     }
 
+    body {
+      padding-top: 0;
+    }
+
+    .hero {
+      margin-top: -56px;
+    }
+
     @keyframes tickerMove {
       from {
         transform: translateX(0);
@@ -1137,22 +1242,26 @@
   <div class="cursor-ring" id="cursorRing"></div>
 
   <!-- Nav -->
-  <nav>
+  <!-- <nav>
+    <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()"
+      style="position: fixed; top: 20px; right: 20px; z-index: 1000; background: transparent; border: 1px solid var(--golden-glow); color: var(--golden-glow); cursor: pointer; padding: 5px 10px;">
+      ☀
+    </button>
     <div class="nav-logo">Silk &amp; Stack</div>
     <ul class="nav-links">
-      <li><a href="#about">Mostra</a></li>
+      <li><a href="mostra-index.html">Mostra</a></li>
       <li><a href="#highlights">Opere</a></li>
       <li><a href="#location">Visita</a></li>
       <li><a href="#tickets">Biglietti</a></li>
     </ul>
-  </nav>
+  </nav> -->
 
   <!-- Hero -->
   <section class="hero">
     <div class="hero-left">
       <p class="hero-eyebrow">Primavera 2025</p>
       <h1 class="hero-title">
-        <span>Robert</span>
+        <span class="Robert">Robert</span>
         <span class="line-italic">Doisneau</span>
         <span class="line-outlined">Pordenone</span>
       </h1>
@@ -1161,7 +1270,7 @@
         Amore, ironia e umanità catturati nell'attimo fuggente.
       </p>
       <div class="hero-cta-group">
-        <a href="#tickets" class="btn-primary">Acquista biglietti</a>
+        <a href="login.html" class="btn-primary">Accedi per prenotare</a>
         <a href="#about" class="btn-ghost">Scopri la mostra</a>
       </div>
     </div>
@@ -1391,17 +1500,17 @@
     <div class="ticket-container">
 
       <div class="ticket-box">
-        <div class="ticket-price">€12 <span>Intero</span></div>
+        <div class="ticket-price">€12 <span class="ticket-desc">Intero</span></div>
         <div class="ticket-note">Per chiunque voglia visitare l'allestimento</div>
         <a href="#" class="btn-ticket">Prenota ora →</a>
       </div>
       <div class="ticket-box">
-        <div class="ticket-price">€9 <span>Ridotto</span></div>
+        <div class="ticket-price">€9 <span class="ticket-desc">Ridotto</span></div>
         <div class="ticket-note">Under 24 · Over 65 · Disabili</div>
         <a href="#" class="btn-ticket">Prenota ora →</a>
       </div>
       <div class="ticket-box">
-        <div class="ticket-price">€5 <span>Studenti</span></div>
+        <div class="ticket-price">€5 <span class="ticket-desc">Studenti</span></div>
         <div class="ticket-note">Prezzo ridotto per studenti</div>
         <a href="#" class="btn-ticket">Prenota ora →</a>
       </div>
@@ -1419,7 +1528,6 @@
     </ul> -->
     <div class="footer-copy">© 2025 Silk & Stack. Tutti i diritti riservati.</div>
   </footer>
-
   <script>
     // Cursor
     const cursor = document.getElementById('cursor');
@@ -1441,6 +1549,14 @@
       entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
     }, { threshold: 0.15 });
     reveals.forEach(el => obs.observe(el));
+  </script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="navbar.js"></script>
+  <script>
+    renderNavbar("home");
+
+    applyTheme();
   </script>
 
 </body>

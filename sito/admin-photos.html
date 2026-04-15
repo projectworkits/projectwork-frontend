@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fotografie — Admin</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    .thumb { width: 56px; height: 40px; object-fit: cover; filter: grayscale(60%); display: block; }
+    .thumb-placeholder { width: 56px; height: 40px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; opacity: 0.3; }
+    body.light-mode .thumb-placeholder { background: #e8e0d0; }
+  </style>
+</head>
+<body>
+<div class="site">
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="navbar.js"></script>
+  <script>renderNavbar("admin");</script>
+
+  <div class="page-header" style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <p class="eyebrow">Admin · Fotografie</p>
+      <h1 class="section-title">Elenco fotografie</h1>
+    </div>
+    <a href="admin-photo-create.html" class="btn btn-gold">+ Aggiungi</a>
+  </div>
+
+  <div id="denied" style="display:none;padding:3rem 2.5rem;text-align:center;color:rgba(240,236,228,0.4)">Accesso riservato agli amministratori.</div>
+
+  <div id="main" style="display:none">
+    <div class="filter-bar">
+      <input type="text" class="form-input" id="search" placeholder="Cerca per titolo, luogo, anno…" oninput="applyFilters()">
+      <select class="form-select" id="state-filter" onchange="applyFilters()" style="width:auto">
+        <option value="">Tutti gli stati</option>
+        <option value="disponibile">Disponibile</option>
+        <option value="prenotata">Prenotata</option>
+        <option value="venduta">Venduta</option>
+      </select>
+    </div>
+    <div class="content">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Titolo</th>
+            <th>Anno</th>
+            <th>Luogo</th>
+            <th>Stato</th>
+            <th>Prezzo</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+      <div class="pager" id="pager"></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span>© 2026 Mostra Doisneau — Bologna</span>
+    <span>Privacy · Accessibilità</span>
+  </footer>
+
+</div>
+<script>
+const PER_PAGE = 10;
+let currentPage = 1;
+let allPhotos = [];
+let filtered = [];
+
+function applyFilters() {
+  const q = document.getElementById("search").value.toLowerCase();
+  const st = document.getElementById("state-filter").value;
+  filtered = allPhotos.filter(p => {
+    const matchQ = !q || p.title.toLowerCase().includes(q) || p.place.toLowerCase().includes(q) || String(p.year).includes(q) || p.originalTitle.toLowerCase().includes(q);
+    const matchSt = !st || p.state === st;
+    return matchQ && matchSt;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+function renderTable() {
+  const { items, total } = paginate(filtered, currentPage, PER_PAGE);
+  const tbody = document.getElementById("table-body");
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:rgba(240,236,228,0.3)">Nessun risultato.</td></tr>`;
+    renderPager(document.getElementById("pager"), 1, 1, () => {});
+    return;
+  }
+  tbody.innerHTML = items.map(p => `
+    <tr>
+      <td>${p.img ? `<img src="${p.img}" class="thumb" alt="">` : `<div class="thumb-placeholder">◫</div>`}</td>
+      <td>
+        <div style="font-family:'Playfair Display',serif;font-size:0.95rem">${p.title}</div>
+        <div style="font-size:12px;color:rgba(240,236,228,0.4);font-style:italic">${p.originalTitle}</div>
+      </td>
+      <td>${p.year}</td>
+      <td>${p.place}</td>
+      <td>${stateBadge(p.state)}</td>
+      <td>${formatPrice(p.price)}</td>
+      <td>
+        <div class="actions">
+          <a href="mostra-detail.html?id=${p.id}" class="btn btn-ghost btn-sm">Vedi</a>
+          <a href="admin-photo-edit.html?id=${p.id}" class="btn btn-gold btn-sm">Modifica</a>
+          <button class="btn btn-danger btn-sm" onclick="handleDelete(${p.id})">Elimina</button>
+        </div>
+      </td>
+    </tr>`).join("");
+  renderPager(document.getElementById("pager"), currentPage, total, (p) => { currentPage = p; renderTable(); window.scrollTo({top:0,behavior:"smooth"}); });
+}
+
+function handleDelete(id) {
+  const p = allPhotos.find(x => x.id === id);
+  confirmDialog(`Eliminare «${p.title}»? L'operazione è irreversibile.`).then(ok => {
+    if (!ok) return;
+    API.deletePhoto(id).then(() => {
+      allPhotos = allPhotos.filter(x => x.id !== id);
+      toast("Fotografia eliminata");
+      applyFilters();
+    });
+  });
+}
+
+function refreshPageForRole(role) {
+  document.getElementById("denied").style.display = role !== "admin" ? "block" : "none";
+  document.getElementById("main").style.display = role === "admin" ? "block" : "none";
+}
+
+if (isAdmin()) {
+  document.getElementById("main").style.display = "block";
+  API.getPhotos().then(photos => { allPhotos = photos; filtered = photos; renderTable(); });
+} else {
+  document.getElementById("denied").style.display = "block";
+}
+</script>
+</body>
+</html>

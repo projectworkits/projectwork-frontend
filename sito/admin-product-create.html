@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prodotto — Admin</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    .form-card { max-width: 620px; padding: 0 2.5rem 5rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+    .back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: rgba(240,236,228,0.4); font-size: 13px; letter-spacing: 0.08em; text-decoration: none; margin: 1.5rem 2.5rem 0; transition: color 0.2s; }
+    .back-link:hover { color: #c8b482; }
+    body.light-mode .back-link { color: rgba(31,31,31,0.4); }
+    body.light-mode .back-link:hover { color: #9a3636; }
+    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } .form-card { padding: 0 1rem 4rem; } }
+  </style>
+</head>
+<body>
+<div class="site">
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="navbar.js"></script>
+  <script>renderNavbar("admin");</script>
+
+  <a href="admin-products.html" class="back-link">← Torna all'elenco prodotti</a>
+
+  <div id="denied" style="display:none;padding:3rem 2.5rem;text-align:center;color:rgba(240,236,228,0.4)">Accesso riservato agli amministratori.</div>
+
+  <div id="main" style="display:none">
+    <div class="page-header">
+      <p class="eyebrow" id="form-eyebrow">Admin · Prodotti</p>
+      <h1 class="section-title" id="form-title">Nuovo prodotto</h1>
+    </div>
+    <div class="form-card">
+      <div class="form-group">
+        <label class="form-label">Nome *</label>
+        <input type="text" class="form-input" id="f-name" placeholder="es. Catalogo ufficiale della mostra">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrizione *</label>
+        <textarea class="form-textarea" id="f-desc" rows="5" placeholder="Descrizione dettagliata del prodotto…"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Prezzo (€) *</label>
+          <input type="number" class="form-input" id="f-price" placeholder="38" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Disponibilità *</label>
+          <input type="number" class="form-input" id="f-available" placeholder="50" min="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">URL immagine (opzionale)</label>
+        <input type="url" class="form-input" id="f-img" placeholder="https://…">
+      </div>
+      <div style="display:flex;gap:1rem;margin-top:1rem">
+        <button class="btn btn-solid" onclick="handleSubmit()">Salva prodotto</button>
+        <a href="admin-products.html" class="btn btn-ghost">Annulla</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span>© 2026 Mostra Doisneau — Bologna</span>
+    <span>Privacy · Accessibilità</span>
+  </footer>
+
+</div>
+<script>
+const params = new URLSearchParams(location.search);
+const editId = params.get("id") ? parseInt(params.get("id")) : null;
+
+function populate(p) {
+  document.getElementById("form-eyebrow").textContent = "Admin · Prodotti · Modifica";
+  document.getElementById("form-title").textContent = p.name;
+  document.getElementById("f-name").value = p.name;
+  document.getElementById("f-desc").value = p.description;
+  document.getElementById("f-price").value = p.price;
+  document.getElementById("f-available").value = p.available;
+  document.getElementById("f-img").value = p.img || "";
+}
+
+function validate() {
+  const required = [
+    ["f-name",      "Il nome è obbligatorio"],
+    ["f-desc",      "La descrizione è obbligatoria"],
+    ["f-price",     "Il prezzo è obbligatorio"],
+    ["f-available", "La disponibilità è obbligatoria"],
+  ];
+  for (const [id, msg] of required) {
+    if (!document.getElementById(id).value.toString().trim()) { toast(msg, "error"); return false; }
+  }
+  return true;
+}
+
+function handleSubmit() {
+  if (!validate()) return;
+  const data = {
+    name:        document.getElementById("f-name").value.trim(),
+    description: document.getElementById("f-desc").value.trim(),
+    price:       parseFloat(document.getElementById("f-price").value),
+    available:   parseInt(document.getElementById("f-available").value),
+    img:         document.getElementById("f-img").value.trim() || null,
+  };
+  const action = editId ? API.updateProduct(editId, data) : API.createProduct(data);
+  action.then(() => {
+    toast(editId ? "Prodotto aggiornato" : "Prodotto creato");
+    setTimeout(() => location.href = "admin-products.html", 1000);
+  }).catch(err => toast(err, "error"));
+}
+
+function init() {
+  if (!isAdmin()) {
+    document.getElementById("denied").style.display = "block"; return;
+  }
+  document.getElementById("main").style.display = "block";
+  if (editId) API.getProduct(editId).then(p => { if (p) populate(p); else toast("Prodotto non trovato", "error"); });
+}
+init();
+</script>
+</body>
+</html>

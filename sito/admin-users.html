@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Utenti — Admin</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    .role-pill {
+      display: inline-block; font-size: 10px; letter-spacing: 0.2em;
+      text-transform: uppercase; padding: 0.2rem 0.6rem;
+      border: 0.5px solid;
+    }
+    .role-pill.collaboratore { border-color: #c8b482; color: #c8b482; }
+    .role-pill.utente { border-color: rgba(240,236,228,0.25); color: rgba(240,236,228,0.5); }
+    body.light-mode .role-pill.collaboratore { border-color: #9a3636; color: #9a3636; }
+    body.light-mode .role-pill.utente { border-color: rgba(31,31,31,0.2); color: rgba(31,31,31,0.45); }
+  </style>
+</head>
+<body>
+<div class="site">
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="navbar.js"></script>
+  <script>renderNavbar("admin");</script>
+
+  <div class="page-header">
+    <p class="eyebrow">Admin · Utenti</p>
+    <h1 class="section-title">Gestione utenti</h1>
+  </div>
+
+  <div id="denied" style="display:none;padding:3rem 2.5rem;text-align:center;color:rgba(240,236,228,0.4)">Accesso riservato agli amministratori.</div>
+
+  <div id="main" style="display:none">
+    <div class="filter-bar">
+      <input type="text" class="form-input" id="search" placeholder="Cerca per nome o email…" oninput="applyFilters()">
+      <select class="form-select" id="role-filter" onchange="applyFilters()" style="width:auto">
+        <option value="">Tutti i ruoli</option>
+        <option value="utente">Utente</option>
+        <option value="collaboratore">Collaboratore</option>
+      </select>
+    </div>
+    <div class="content">
+      <table class="data-table" id="users-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Ruolo</th>
+            <th>Azione</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+      <div id="summary" style="margin-top:1.5rem;font-size:13px;color:rgba(240,236,228,0.35);letter-spacing:0.06em"></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span>© 2026 Mostra Doisneau — Bologna</span>
+    <span>Privacy · Accessibilità</span>
+  </footer>
+
+</div>
+<script>
+let allUsers = [];
+let filtered = [];
+
+function applyFilters() {
+  const q  = document.getElementById("search").value.toLowerCase();
+  const rf = document.getElementById("role-filter").value;
+  filtered = allUsers.filter(u => {
+    const matchQ  = !q  || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
+    const matchRf = !rf || u.role === rf;
+    return matchQ && matchRf;
+  });
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById("table-body");
+  const collab = allUsers.filter(u => u.role === "collaboratore").length;
+  document.getElementById("summary").textContent =
+    `${allUsers.length} utenti totali · ${collab} collaboratori · ${allUsers.length - collab} utenti standard`;
+
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:2rem;color:rgba(240,236,228,0.3)">Nessun utente trovato.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(u => `
+    <tr id="user-row-${u.id}">
+      <td style="color:rgba(240,236,228,0.3)">${u.id}</td>
+      <td>${u.name}</td>
+      <td style="color:rgba(240,236,228,0.55)">${u.email}</td>
+      <td><span class="role-pill ${u.role}">${u.role}</span></td>
+      <td>
+        <button class="btn btn-sm ${u.role === 'collaboratore' ? 'btn-ghost' : 'btn-gold'}"
+          onclick="handleToggle(${u.id})">
+          ${u.role === "collaboratore" ? "Rimuovi collaboratore" : "Rendi collaboratore"}
+        </button>
+      </td>
+    </tr>`).join("");
+}
+
+function handleToggle(id) {
+  API.toggleCollaboratore(id).then(updated => {
+    const i = allUsers.findIndex(u => u.id === id);
+    if (i >= 0) allUsers[i] = updated;
+    toast(`${updated.name} → ${updated.role}`);
+    applyFilters();
+  }).catch(err => toast(err, "error"));
+}
+
+function refreshPageForRole(role) {
+  document.getElementById("denied").style.display = role !== "admin" ? "block" : "none";
+  document.getElementById("main").style.display = role === "admin" ? "block" : "none";
+}
+
+if (isAdmin()) {
+  document.getElementById("main").style.display = "block";
+  API.getUsers().then(users => { allUsers = users; filtered = users; renderTable(); });
+} else {
+  document.getElementById("denied").style.display = "block";
+}
+</script>
+</body>
+</html>

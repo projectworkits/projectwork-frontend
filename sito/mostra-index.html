@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galleria — Doisneau Bologna</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    .gallery-index-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 2px;
+    }
+    .photo-tile {
+      position: relative; overflow: hidden;
+      aspect-ratio: 4/3; background: #111; cursor: pointer;
+      display: block; text-decoration: none;
+    }
+    .photo-tile img {
+      width: 100%; height: 100%; object-fit: cover;
+      filter: grayscale(70%) contrast(1.05);
+      transition: filter 0.4s, transform 0.5s;
+    }
+    .photo-tile:hover img { filter: grayscale(10%); transform: scale(1.05); }
+    .photo-tile-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 55%, transparent 100%);
+      opacity: 0; transition: opacity 0.35s;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 1.2rem;
+    }
+    .photo-tile:hover .photo-tile-overlay { opacity: 1; }
+    .photo-tile-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 400; color: #f0ece4; margin-bottom: 0.2rem; }
+    .photo-tile-year { font-size: 11px; letter-spacing: 0.12em; color: rgba(240,236,228,0.6); }
+    .photo-tile-state { position: absolute; top: 0.7rem; right: 0.7rem; }
+    .filter-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .filter-chip {
+      padding: 0.3rem 0.9rem; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+      border: 0.5px solid rgba(200,180,130,0.25); color: rgba(240,236,228,0.5);
+      background: transparent; cursor: pointer; transition: all 0.2s;
+    }
+    .filter-chip:hover, .filter-chip.active { border-color: #c8b482; color: #c8b482; background: rgba(200,180,130,0.07); }
+    body.light-mode .photo-tile { background: #e8e0d0; }
+    body.light-mode .filter-chip { border-color: rgba(133,121,111,0.25); color: rgba(31,31,31,0.5); }
+    body.light-mode .filter-chip:hover, body.light-mode .filter-chip.active { border-color: #9a3636; color: #9a3636; background: rgba(154,54,54,0.05); }
+    @media (max-width: 700px) { .gallery-index-grid { grid-template-columns: repeat(2,1fr); } }
+  </style>
+</head>
+<body>
+<div class="site">
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="navbar.js"></script>
+  <script>renderNavbar("mostra");</script>
+
+  <div class="page-header">
+    <p class="eyebrow">Opere in mostra</p>
+    <h1 class="section-title">Galleria fotografica</h1>
+  </div>
+
+  <div class="content">
+    <div class="filter-row" id="filter-row">
+      <button class="filter-chip active" data-filter="tutti" onclick="setFilter('tutti',this)">Tutti</button>
+      <button class="filter-chip" data-filter="disponibile" onclick="setFilter('disponibile',this)">Disponibili</button>
+      <button class="filter-chip" data-filter="prenotata" onclick="setFilter('prenotata',this)">Prenotate</button>
+      <button class="filter-chip" data-filter="venduta" onclick="setFilter('venduta',this)">Vendute</button>
+    </div>
+    <div class="gallery-index-grid" id="gallery-grid"></div>
+    <div class="pager" id="pager"></div>
+  </div>
+
+  <footer class="footer">
+    <span>© 2026 Mostra Doisneau — Bologna</span>
+    <span>Privacy · Accessibilità</span>
+  </footer>
+
+</div>
+<script>
+const PER_PAGE = 10;
+let currentPage = 1;
+let allPhotos = [];
+let activeFilter = "tutti";
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
+  btn.classList.add("active");
+  currentPage = 1;
+  loadPage(1);
+}
+
+function filteredPhotos() {
+  if (activeFilter === "tutti") return allPhotos;
+  return allPhotos.filter(p => p.state === activeFilter);
+}
+
+function renderGrid(photos) {
+  const grid = document.getElementById("gallery-grid");
+  if (!photos.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">◻</div><p>Nessuna fotografia.</p></div>';
+    return;
+  }
+  grid.innerHTML = photos.map(p => `
+    <a href="mostra-detail.html?id=${p.id}" class="photo-tile">
+      <img src="${p.img}" alt="${p.title}">
+      <div class="photo-tile-overlay">
+        <div class="photo-tile-title">${p.title}</div>
+        <div class="photo-tile-year">${p.year} · ${p.place}</div>
+      </div>
+      <div class="photo-tile-state">${stateBadge(p.state)}</div>
+    </a>
+  `).join("");
+}
+
+function loadPage(page) {
+  currentPage = page;
+  const filtered = filteredPhotos();
+  const { items, total } = paginate(filtered, page, PER_PAGE);
+  renderGrid(items);
+  renderPager(document.getElementById("pager"), page, total, loadPage);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+API.getPhotos().then(photos => {
+  allPhotos = photos;
+  loadPage(1);
+});
+</script>
+</body>
+</html>
