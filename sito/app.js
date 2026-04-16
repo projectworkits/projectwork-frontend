@@ -1,104 +1,25 @@
-// ── SHARED APP UTILS ──
+// Utenti salvati in localStorage da fare collegamento API
 
-// ── AUTH / SESSION ──
-// Utenti salvati in localStorage (in produzione: API + JWT)
-// Struttura sessione: { id, name, email, role }
 
 function getSession() {
   try { return JSON.parse(localStorage.getItem("doisneau_session")) || null; }
   catch { return null; }
 }
-function setSession(user) {
-  localStorage.setItem("doisneau_session", JSON.stringify(user));
-}
-function clearSession() {
-  localStorage.removeItem("doisneau_session");
-}
 
-function getRegisteredUsers() {
-  try { return JSON.parse(localStorage.getItem("doisneau_users")) || []; }
-  catch { return []; }
-}
-function saveRegisteredUsers(users) {
-  localStorage.setItem("doisneau_users", JSON.stringify(users));
-}
-
-// Utenti di default (seed) — in produzione vengono dal backend
-function seedUsers() {
-  const existing = getRegisteredUsers();
-  if (existing.length > 0) return;
-  saveRegisteredUsers([
-    { id: 1, name: "Admin Demo", email: "admin@demo.it", password: "admin123", role: "admin" },
-    { id: 2, name: "Utente Demo", email: "utente@demo.it", password: "utente123", role: "user" },
-  ]);
-}
-seedUsers();
-
-// Shorthand helpers
 function currentUser() { return getSession(); }
 function isLoggedIn() { return !!getSession(); }
-function getRole() { const s = getSession(); return s ? s.role : "guest"; }
+function getRole() 
+{ 
+  // const s = getSession(); return s ? s.role : "guest"; 
+  return "admin"; // forzo l'essere admin, da cancellare dopo i test
+}
 function isAdmin() { return getRole() === "admin"; }
 function isUser() { return getRole() === "user" || getRole() === "admin"; }
 
-// Compatibilità con il vecchio sistema role-select (ora ignorato — usa la sessione)
-function setRole() { } // no-op, tenuto per compatibilità
+function setRole() { }
 function renderRoleBadge() {
   const el = document.getElementById("role-select");
   if (el) el.value = getRole();
-}
-
-// ── AUTH ACTIONS ──
-function authLogin(email, password) {
-  const users = getRegisteredUsers();
-  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
-  if (!user) return { ok: false, error: "Email o password non corretti." };
-  const { password: _pw, ...safe } = user;
-  setSession(safe);
-  return { ok: true, user: safe };
-}
-
-function authRegister(name, email, password) {
-  const users = getRegisteredUsers();
-  if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
-    return { ok: false, error: "Esiste già un account con questa email." };
-  }
-  const newUser = { id: Date.now(), name, email, password, role: "user" };
-  users.push(newUser);
-  saveRegisteredUsers(users);
-  const { password: _pw, ...safe } = newUser;
-  setSession(safe);
-  return { ok: true, user: safe };
-}
-
-function authLogout() {
-  console.log("Eseguo il logout...");
-
-  // 1. Pulizia dei dati di autenticazione
-  localStorage.removeItem("doisneau_user"); // Rimuove i dati dell'utente (se li hai)
-  localStorage.setItem("doisneau_role", "guest"); // Riporta il ruolo a guest
-
-  // 2. Feedback visivo (opzionale se usi i toast)
-  if (typeof toast === "function") toast("Logout effettuato", "success");
-
-  // 3. Reindirizzamento alla Home (fondamentale per resettare la navbar)
-  // Usiamo un piccolo ritardo se vogliamo far vedere il toast, altrimenti immediato
-  setTimeout(() => {
-    window.location.href = "landingPage.html";
-  }, 300);
-}
-// Aggiungi o sostituisci questa funzione in app.js
-function handleLogout() {
-  // 1. Cancella la sessione (dati utente)
-  clearSession();
-
-  // 2. Resetta il ruolo a guest nel localStorage e nella variabile globale
-  // Usiamo setRole se presente, oppure resettiamo manualmente
-  localStorage.setItem("doisneau_role", "guest");
-  currentRole = "guest";
-
-  // 3. Reindirizza alla home o ricarica
-  window.location.href = "biglietti.html";
 }
 
 // ── NAV ACTIVE ──
@@ -188,7 +109,7 @@ function confirmDialog(msg) {
   });
 }
 
-// ── THEME ──
+// Light Mode
 function toggleTheme() {
   const body = document.body;
   const btn = document.getElementById("theme-toggle");
