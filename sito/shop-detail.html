@@ -70,7 +70,7 @@
   <div id="page-content"></div>
 
   <footer class="footer">
-    <span>© 2026 Mostra Doisneau — Bologna</span>
+    <span>© 2026 Mostra Doisneau — Pordenone</span>
     <span>Privacy · Accessibilità</span>
   </footer>
 
@@ -130,7 +130,7 @@ function refreshPageForRole() { if (product) render(product); }
 
 API.getProduct(productId).then(p => {
   if (!p) { document.getElementById("page-content").innerHTML = '<p style="padding:3rem 2.5rem">Prodotto non trovato.</p>'; return; }
-  document.title = `${p.name} — Doisneau Bologna`;
+  document.title = `${p.name} — Doisneau Pordenone`;
   render(p);
 }).catch(() => toast("Errore nel caricamento", "error"));
 </script>

@@ -8,8 +8,7 @@ function getSession() {
 
 function currentUser() { return getSession(); }
 function isLoggedIn() { return !!getSession(); }
-function getRole() 
-{ 
+function getRole() {
   // const s = getSession(); return s ? s.role : "guest"; 
   return "admin"; // forzo l'essere admin, da cancellare dopo i test
 }
@@ -128,8 +127,44 @@ function applyTheme() {
     if (btn) { btn.innerHTML = "☾"; btn.title = "Passa al tema scuro"; }
   }
 }
+function injectCursor() {
+  // 1. Creazione degli elementi
+  const cursorEl = document.createElement('div');
+  cursorEl.className = 'cursor';
+  cursorEl.id = 'cursor';
+
+  const ringEl = document.createElement('div');
+  ringEl.className = 'cursor-ring';
+  ringEl.id = 'cursorRing';
+
+  document.body.appendChild(cursorEl);
+  document.body.appendChild(ringEl);
+
+  // 2. Logica di animazione (la tua versione migliorata)
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => { 
+    mx = e.clientX; 
+    my = e.clientY; 
+  });
+
+  function animCursor() {
+    // Usiamo cursorEl e ringEl direttamente invece di cercarli nel DOM ogni frame
+    cursorEl.style.transform = `translate(${mx - 4}px, ${my - 4}px)`;
+    
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    
+    ringEl.style.transform = `translate(${rx - 16}px, ${ry - 16}px)`;
+    
+    requestAnimationFrame(animCursor);
+  }
+
+  animCursor();
+}
 
 // ── INIT ──
 document.addEventListener("DOMContentLoaded", () => {
+  injectCursor();
   applyTheme();
 });
