@@ -116,12 +116,12 @@
 			if (!result.ok) {
 				showGlobalError(result.error);
 				if(result.status === 401) {
-					showGlobalError("Credenziali errate. Riprova.<br>" + result.error);
+					showGlobalError("Credenziali errate. Riprova.");
 				}
 				return;
 			}
 
-			toast(`Benvenuto, ${result.user.name.split(" ")[0]}!`);
+			toast(`Benvenuto, ${username.split(" ")[0]}!`);
 			const redirect = new URLSearchParams(location.search).get("from") || "biglietti";
 			setTimeout(() => location.href = redirect, 700);
 		}
