@@ -128,7 +128,6 @@ function applyTheme() {
   }
 }
 function injectCursor() {
-  // 1. Creazione degli elementi
   const cursorEl = document.createElement('div');
   cursorEl.className = 'cursor';
   cursorEl.id = 'cursor';
@@ -140,7 +139,6 @@ function injectCursor() {
   document.body.appendChild(cursorEl);
   document.body.appendChild(ringEl);
 
-  // 2. Logica di animazione (la tua versione migliorata)
   let mx = 0, my = 0, rx = 0, ry = 0;
 
   document.addEventListener('mousemove', e => { 
@@ -149,7 +147,6 @@ function injectCursor() {
   });
 
   function animCursor() {
-    // Usiamo cursorEl e ringEl direttamente invece di cercarli nel DOM ogni frame
     cursorEl.style.transform = `translate(${mx - 4}px, ${my - 4}px)`;
     
     rx += (mx - rx) * 0.12;

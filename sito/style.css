@@ -540,7 +540,6 @@
   --brown-red: #9a3636;
 }
 
-/* Stile del bottone Dark/Light mode */
 .theme-toggle-btn {
   margin-left: 1rem;
   background: transparent;
@@ -597,7 +596,6 @@ body.light-mode .nb-cta:hover {
   color: var(--soft-linen);
 }
 
-/* Testi ed elementi grafici */
 body.light-mode .bio-name {
   color: var(--soft-linen)
 }
@@ -692,7 +690,6 @@ body.light-mode .ticket-features li::before {
   color: var(--brown-red);
 }
 
-/* Colori del bottone in Light Mode */
 body.light-mode .theme-toggle-btn {
   border-color: var(--brown-red);
   color: var(--brown-red);
@@ -718,7 +715,6 @@ body.light-mode .rm-item.rm-highlight .rm-dot {
 
 body.light-mode .rm-line {
   background: rgba(154, 54, 54, 0.25);
-  /* Un rosso-marrone in trasparenza per la linea */
 }
 
 body.light-mode .rm-tag {
@@ -733,32 +729,26 @@ body.light-mode .rm-desc {
   color: var(--carbon-black);
 }
 
-/* --- LIGHT MODE ADAPTATION --- */
 body.light-mode .ticket-card {
-  /* Bordo base più scuro per contrastare col fondo chiaro */
   border-color: rgba(133, 121, 111, 0.2);
 }
 
 body.light-mode .ticket-card:hover {
-  /* Usiamo il bordeaux/rosso mattone per i lati */
   border-left-color: #851919;
   border-right-color: #851919;
 }
 
 body.light-mode .ticket-card::before,
 body.light-mode .ticket-card::after {
-  /* Cambiamo il gradiente dell'animazione sopra e sotto */
   background: linear-gradient(90deg, #851919, #851919);
 }
 
 body.light-mode .ticket-badge {
-  /* Il badge diventa rosso con testo chiaro */
   background: #851919;
   color: #f0ece4;
 }
 
 body.light-mode .ticket-card.featured {
-  /* La card in evidenza ha il bordo rosso invece che oro */
   border-color: #851919;
 }
 
@@ -766,7 +756,7 @@ body.light-mode .ticket-card.featured {
 .cursor {
   width: 8px;
   height: 8px;
-  background: var(--golden-glow);
+  background: #c8b482;
   border-radius: 50%;
   position: fixed;
   top: 0;
@@ -779,7 +769,7 @@ body.light-mode .ticket-card.featured {
 .cursor-ring {
   width: 32px;
   height: 32px;
-  border: 1px solid rgba(224, 201, 49, 0.4);
+  border: 1.5px solid rgba(224, 201, 49, 0.4);
   border-radius: 50%;
   position: fixed;
   top: 0;
