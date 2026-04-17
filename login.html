@@ -166,7 +166,7 @@
 					})
 				});
 				console.log("Login response:", response);
-				return response.json();
+				return response;
 			}catch(e){
 				showGlobalError("Si è verificato un errore. Riprova più tardi.");
 				return;
