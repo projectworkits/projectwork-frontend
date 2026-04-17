@@ -33,7 +33,7 @@
 
 				<div class="form-group">
 					<label class="form-label" for="username">username</label>
-					<input type="username" class="form-input" id="username" placeholder="nome@esempio.it"
+					<input type="username" class="form-input" id="username" placeholder="username"
 						autocomplete="username">
 					<div class="form-error" id="username-err"></div>
 				</div>
@@ -61,18 +61,6 @@
 					<a href="register.html">Registrati</a>
 				</div>
 
-				<div class="auth-demo">
-					<div class="auth-demo-title">Account di demo</div>
-					<div class="auth-demo-row">
-						Admin — admin@demo.it / admin123
-						<button onclick="fillDemo('admin@demo.it','admin123')">Usa</button>
-					</div>
-					<div class="auth-demo-row">
-						Utente — utente@demo.it / utente123
-						<button onclick="fillDemo('utente@demo.it','utente123')">Usa</button>
-					</div>
-				</div>
-
 			</div>
 		</main>
 
@@ -88,12 +76,6 @@
 			const btn = document.getElementById("eye-btn");
 			inp.type = inp.type === "password" ? "text" : "password";
 			btn.textContent = inp.type === "password" ? "👁" : "🙈";
-		}
-
-		function fillDemo(username, pw) {
-			document.getElementById("username").value = username;
-			document.getElementById("password").value = pw;
-			clearErrors();
 		}
 
 		function clearErrors() {
