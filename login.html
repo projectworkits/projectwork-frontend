@@ -134,7 +134,7 @@
 			if (!result.ok) {
 				showGlobalError(result.error);
 				if(result.status === 401) {
-					showGlobalError("Credenziali errate. Riprova.");
+					showGlobalError("Credenziali errate. Riprova.<br>" + result.error);
 				}
 				return;
 			}
