@@ -133,6 +133,9 @@
 			const result = authLogin(username, password);
 			if (!result.ok) {
 				showGlobalError(result.error);
+				if(result.status === 401) {
+					alert("Credenziali errate. Riprova.");
+				}
 				return;
 			}
 
