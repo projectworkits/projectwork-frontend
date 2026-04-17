@@ -1,5 +1,5 @@
 - [X] login layout
-- [-] login logica (teoriacamente finito, servono dei test con utenti reali)
+- [-] login logica (accesso completato, manca reindirizamento in caso di utente già loggato)
 - [X] register layout
 - [ ] register logica
 - [X] azienda
