@@ -114,7 +114,7 @@
 			card.style.animation = "shake 0.4s ease";
 		}
 
-		function handleLogin() {
+		async function handleLogin() {
 			clearErrors();
 			const username = document.getElementById("username").value.trim();
 			const password = document.getElementById("password").value;
@@ -130,7 +130,7 @@
 			}
 			if (!valid) return;
 
-			const result = authLogin(username, password);
+			const result = await authLogin(username, password);
 			if (!result.ok) {
 				showGlobalError(result.error);
 				if(result.status === 401) {
