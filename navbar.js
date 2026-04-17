@@ -66,14 +66,6 @@ function renderNavbar(activePage) {
         <li id="admin-nav-item" style="display:none">${adminLink}</li>
       </ul>
       <div style="display:flex;align-items:center;gap:0.8rem;">
-        <div class="role-switcher">
-          <span class="role-label">Ruolo</span>
-          <select id="role-select" onchange="setRole(this.value); location.reload();">
-            <option value="guest" ${getRole() === 'guest' ? 'selected' : ''}>Guest</option>
-            <option value="user" ${getRole() === 'user' ? 'selected' : ''}>Utente</option>
-            <option value="admin" ${getRole() === 'admin' ? 'selected' : ''}>Admin</option>
-          </select>
-        </div>
         ${ctaButton}
         <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()">☀</button>
       </div>
