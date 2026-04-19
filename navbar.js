@@ -30,7 +30,7 @@ function renderNavbar(activePage) {
 
   // 3. Definizione Link Standard
   const pages = [
-    { id: "home", label: "Home", href: "landingPage.html" },
+    { id: "home", label: "Home", href: "home.html" },
     { id: "shop", label: "Shop", href: "shop-index.html" },
     { id: "mostra", label: "Galleria", href: "mostra-index.html" },
     { id: "biglietti", label: "Biglietti", href: "biglietti.html" },
