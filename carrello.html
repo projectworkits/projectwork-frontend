@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carrello — Doisneau, Lo sguardo che racconta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+
+    /* ── AUTH WALL ── */
+    .auth-wall {
+      min-height: calc(100vh - 56px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 3rem 1.5rem;
+      position: relative; overflow: hidden;
+    }
+    .auth-wall-bg {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        linear-gradient(135deg, rgba(10,10,10,0.97) 0%, rgba(20,15,10,0.95) 100%),
+        url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Robert_Doisneau_Le_Baiser_de_l%27H%C3%B4tel_de_Ville.jpg/400px-Robert_Doisneau_Le_Baiser_de_l%27H%C3%B4tel_de_Ville.jpg') center/cover;
+      filter: grayscale(80%) contrast(0.7);
+    }
+    .auth-wall-card {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 460px;
+      background: rgba(10,10,10,0.94);
+      border: 0.5px solid rgba(200,180,130,0.2);
+      padding: 3rem 2.8rem;
+      backdrop-filter: blur(14px);
+      animation: fadeUp 0.5s ease both;
+      text-align: center;
+    }
+    .auth-wall-icon {
+      font-size: 2.2rem; margin-bottom: 1.4rem;
+      display: block; line-height: 1;
+    }
+    .auth-wall-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem; font-weight: 400; line-height: 1.15;
+      margin-bottom: 0.6rem;
+    }
+    .auth-wall-sub {
+      font-size: 15px; color: rgba(240,236,228,0.45);
+      line-height: 1.6; margin-bottom: 2rem;
+    }
+    .auth-wall-btns {
+      display: flex; flex-direction: column; gap: 0.8rem;
+    }
+    .aw-btn-primary {
+      display: block; padding: 0.9rem;
+      background: #c8b482; color: #0a0a0a;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px; letter-spacing: 0.2em; text-transform: uppercase;
+      text-decoration: none; transition: background 0.2s;
+    }
+    .aw-btn-primary:hover { background: #b8a472; }
+    .aw-btn-ghost {
+      display: block; padding: 0.85rem;
+      background: transparent;
+      border: 0.5px solid rgba(200,180,130,0.25);
+      color: rgba(240,236,228,0.6);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px; letter-spacing: 0.2em; text-transform: uppercase;
+      text-decoration: none; transition: border-color 0.2s, color 0.2s;
+    }
+    .aw-btn-ghost:hover { border-color: #c8b482; color: #c8b482; }
+    .auth-wall-note {
+      margin-top: 1.5rem; font-size: 12px;
+      color: rgba(240,236,228,0.25); line-height: 1.5;
+    }
+
+    /* ── CARRELLO LAYOUT ── */
+    .carrello-page { display: none; }
+
+    .cart-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 2.5rem;
+      padding: 0 2.5rem 5rem;
+      align-items: start;
+    }
+
+    /* ── SEZIONI ITEMS ── */
+    .cart-section { margin-bottom: 2.5rem; }
+    .cart-section-title {
+      font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+      color: #c8b482; margin-bottom: 1.2rem;
+      padding-bottom: 0.7rem;
+      border-bottom: 0.5px solid rgba(200,180,130,0.2);
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .cart-section-title .count {
+      background: rgba(200,180,130,0.12);
+      border: 0.5px solid rgba(200,180,130,0.25);
+      color: #c8b482; padding: 0.1rem 0.45rem;
+      font-size: 10px;
+    }
+
+    /* ── CART ITEM ── */
+    .cart-item {
+      display: grid;
+      grid-template-columns: 72px 1fr auto;
+      gap: 1.2rem;
+      padding: 1.2rem 0;
+      border-bottom: 0.5px solid rgba(240,236,228,0.06);
+      align-items: start;
+      animation: fadeUp 0.35s ease both;
+    }
+    .cart-item:last-child { border-bottom: none; }
+
+    .cart-item-thumb {
+      width: 72px; height: 56px;
+      background: #1a1a1a; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .cart-item-thumb img { width:100%; height:100%; object-fit:cover; filter:grayscale(60%); }
+    .cart-item-thumb .thumb-placeholder {
+      font-size: 1.6rem; opacity: 0.15;
+    }
+
+    /* Biglietto thumb speciale */
+    .cart-item-thumb.ticket-thumb {
+      background: rgba(200,180,130,0.08);
+      border: 0.5px solid rgba(200,180,130,0.2);
+      flex-direction: column; gap: 0.15rem;
+    }
+    .ticket-thumb-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 700; color: #c8b482; line-height: 1;
+    }
+    .ticket-thumb-label {
+      font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: rgba(200,180,130,0.5);
+    }
+
+    .cart-item-info { flex: 1; }
+    .cart-item-type {
+      font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: #c8b482; margin-bottom: 0.25rem;
+    }
+    .cart-item-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem; font-weight: 400; line-height: 1.25;
+      margin-bottom: 0.3rem;
+    }
+    .cart-item-detail {
+      font-size: 13px; color: rgba(240,236,228,0.4); line-height: 1.4;
+    }
+    .cart-item-date-row {
+      margin-top: 0.5rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .date-input {
+      background: rgba(255,255,255,0.03);
+      border: 0.5px solid rgba(200,180,130,0.2);
+      color: #f0ece4; font-family: 'Cormorant Garamond', serif;
+      font-size: 13px; padding: 0.3rem 0.6rem;
+      outline: none; transition: border-color 0.2s;
+      cursor: pointer;
+    }
+    .date-input:focus { border-color: #c8b482; }
+    .date-label-sm {
+      font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: rgba(240,236,228,0.35);
+    }
+
+    .cart-item-right {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 0.6rem;
+      min-width: 100px;
+    }
+    .cart-item-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 700; color: #f0ece4;
+    }
+    .cart-item-qty {
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .qty-btn {
+      width: 26px; height: 26px;
+      background: transparent;
+      border: 0.5px solid rgba(200,180,130,0.25);
+      color: rgba(240,236,228,0.6); font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .qty-btn:hover { border-color: #c8b482; color: #c8b482; }
+    .qty-val {
+      font-size: 14px; min-width: 20px; text-align: center;
+      color: rgba(240,236,228,0.8);
+    }
+    .remove-btn {
+      background: transparent; border: none;
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(200,100,100,0.45); cursor: pointer;
+      transition: color 0.2s; padding: 0;
+    }
+    .remove-btn:hover { color: #c84848; }
+
+    /* ── EMPTY SECTION ── */
+    .section-empty {
+      padding: 1.5rem;
+      border: 0.5px dashed rgba(200,180,130,0.1);
+      text-align: center;
+      color: rgba(240,236,228,0.2);
+      font-size: 13px; letter-spacing: 0.06em;
+    }
+
+    /* ── RIEPILOGO ── */
+    .cart-summary {
+      background: #0e0e0e;
+      border: 0.5px solid rgba(200,180,130,0.18);
+      padding: 2rem;
+      position: sticky; top: 72px;
+    }
+    .summary-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem; font-weight: 400;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 0.5px solid rgba(200,180,130,0.15);
+    }
+    .summary-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 0.8rem; font-size: 14px;
+      color: rgba(240,236,228,0.65);
+    }
+    .summary-row.total {
+      margin-top: 1.2rem; padding-top: 1.2rem;
+      border-top: 0.5px solid rgba(200,180,130,0.2);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; color: #f0ece4; font-weight: 400;
+    }
+    .summary-row.total .sum-label { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(240,236,228,0.5); font-family:'Cormorant Garamond',serif; align-self: center; }
+    .summary-val { font-weight: 400; }
+
+    .checkout-btn {
+      width: 100%; padding: 1rem;
+      background: #c8b482; color: #0a0a0a;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px; letter-spacing: 0.2em; text-transform: uppercase;
+      border: none; cursor: pointer; margin-top: 1.5rem;
+      transition: background 0.2s; position: relative; overflow: hidden;
+    }
+    .checkout-btn:hover { background: #b8a472; }
+    .checkout-btn:disabled { background: rgba(200,180,130,0.25); color: rgba(240,236,228,0.35); cursor: default; }
+
+    .checkout-note {
+      margin-top: 1rem;
+      font-size: 12px; color: rgba(240,236,228,0.25);
+      text-align: center; line-height: 1.5;
+    }
+    .checkout-note span { color: rgba(200,180,130,0.5); }
+
+    .assurance-list {
+      margin-top: 1.5rem; padding-top: 1.5rem;
+      border-top: 0.5px solid rgba(200,180,130,0.1);
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .assurance-row-s {
+      font-size: 11px; letter-spacing: 0.06em;
+      color: rgba(240,236,228,0.28);
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .assurance-row-s span { color: rgba(200,180,130,0.45); }
+
+    /* ── PAGE HEADER ── */
+    .cart-header {
+      padding: 3rem 2.5rem 2rem;
+      border-bottom: 0.5px solid rgba(200,180,130,0.12);
+      margin-bottom: 2.5rem;
+    }
+
+    /* ── CHECKOUT OVERLAY ── */
+    .checkout-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 8000;
+      background: rgba(0,0,0,0.75);
+      align-items: center; justify-content: center;
+      padding: 1.5rem;
+    }
+    .checkout-overlay.open { display: flex; animation: fadeIn 0.3s ease; }
+    .checkout-modal {
+      background: #111; border: 0.5px solid rgba(200,180,130,0.25);
+      padding: 2.5rem; max-width: 520px; width: 100%;
+      animation: fadeUp 0.35s ease;
+    }
+    .checkout-modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; margin-bottom: 0.5rem;
+    }
+    .checkout-modal-sub {
+      font-size: 14px; color: rgba(240,236,228,0.45);
+      margin-bottom: 2rem; line-height: 1.5;
+    }
+    .modal-order-list { margin-bottom: 2rem; }
+    .modal-order-row {
+      display: flex; justify-content: space-between;
+      font-size: 14px; padding: 0.5rem 0;
+      border-bottom: 0.5px solid rgba(240,236,228,0.06);
+      color: rgba(240,236,228,0.7);
+    }
+    .modal-order-row:last-child { border-bottom: none; }
+    .modal-total {
+      display: flex; justify-content: space-between;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; padding-top: 1rem;
+      border-top: 0.5px solid rgba(200,180,130,0.2);
+      margin-bottom: 2rem;
+    }
+    .modal-form-group { margin-bottom: 1.2rem; }
+    .modal-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #c8b482; margin-bottom: 0.4rem; display: block; }
+    .modal-input {
+      width: 100%; background: rgba(255,255,255,0.03);
+      border: 0.5px solid rgba(200,180,130,0.25);
+      color: #f0ece4; font-family: 'Cormorant Garamond', serif;
+      font-size: 15px; padding: 0.65rem 0.85rem; outline: none;
+      transition: border-color 0.2s;
+    }
+    .modal-input:focus { border-color: #c8b482; }
+    .modal-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .modal-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; }
+    .modal-btn-cancel {
+      flex: 1; padding: 0.85rem;
+      background: transparent; border: 0.5px solid rgba(200,180,130,0.2);
+      color: rgba(240,236,228,0.5);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase;
+      cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .modal-btn-cancel:hover { border-color: #c8b482; color: #c8b482; }
+    .modal-btn-pay {
+      flex: 2; padding: 0.85rem;
+      background: #c8b482; color: #0a0a0a; border: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .modal-btn-pay:hover { background: #b8a472; }
+
+    /* ── SUCCESS STATE ── */
+    .success-state {
+      display: none; text-align: center; padding: 4rem 2rem;
+    }
+    .success-icon { font-size: 3rem; margin-bottom: 1.5rem; }
+    .success-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem; margin-bottom: 0.7rem;
+    }
+    .success-sub { font-size: 15px; color: rgba(240,236,228,0.5); line-height: 1.6; margin-bottom: 2rem; }
+    .success-order-num {
+      font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+      color: #c8b482; margin-bottom: 0.3rem;
+    }
+    .success-order-val {
+      font-family: 'Playfair Display', serif; font-size: 1.4rem;
+      margin-bottom: 2rem;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(16px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity:0; } to { opacity:1; }
+    }
+
+    /* ── LIGHT MODE ── */
+    body.light-mode .auth-wall-card { background: rgba(244,239,230,0.97); border-color: rgba(133,121,111,0.2); }
+    body.light-mode .auth-wall-sub  { color: rgba(31,31,31,0.5); }
+    body.light-mode .auth-wall-note { color: rgba(31,31,31,0.25); }
+    body.light-mode .aw-btn-ghost   { border-color: rgba(133,121,111,0.25); color: rgba(31,31,31,0.55); }
+    body.light-mode .aw-btn-ghost:hover { border-color: #9a3636; color: #9a3636; }
+    body.light-mode .cart-summary   { background: #fff; border-color: rgba(133,121,111,0.2); }
+    body.light-mode .cart-item-detail { color: rgba(31,31,31,0.45); }
+    body.light-mode .summary-row    { color: rgba(31,31,31,0.6); }
+    body.light-mode .summary-row.total { color: #1f1f1f; }
+    body.light-mode .checkout-note  { color: rgba(31,31,31,0.28); }
+    body.light-mode .assurance-row-s { color: rgba(31,31,31,0.3); }
+    body.light-mode .section-empty  { color: rgba(31,31,31,0.22); border-color: rgba(133,121,111,0.12); }
+    body.light-mode .date-input     { background: #fff; border-color: rgba(133,121,111,0.25); color: #1f1f1f; }
+    body.light-mode .date-label-sm  { color: rgba(31,31,31,0.35); }
+    body.light-mode .remove-btn     { color: rgba(154,54,54,0.35); }
+    body.light-mode .remove-btn:hover { color: #9a3636; }
+    body.light-mode .cart-section-title { color: #9a3636; border-bottom-color: rgba(133,121,111,0.15); }
+    body.light-mode .cart-item-type { color: #9a3636; }
+    body.light-mode .cart-item-price { color: #1f1f1f; }
+    body.light-mode .checkout-btn  { background: #9a3636; }
+    body.light-mode .checkout-btn:hover { background: #7a2626; }
+    body.light-mode .checkout-btn:disabled { background: rgba(154,54,54,0.15); color: rgba(31,31,31,0.3); }
+    body.light-mode .aw-btn-primary { background: #9a3636; }
+    body.light-mode .aw-btn-primary:hover { background: #7a2626; }
+    body.light-mode .ticket-thumb-price { color: #9a3636; }
+    body.light-mode .cart-item-thumb.ticket-thumb { border-color: rgba(154,54,54,0.2); background: rgba(154,54,54,0.04); }
+    body.light-mode .qty-btn:hover { border-color: #9a3636; color: #9a3636; }
+    body.light-mode .summary-row.total .sum-label { color: rgba(31,31,31,0.4); }
+    body.light-mode .checkout-modal { background: #fff; border-color: rgba(133,121,111,0.2); }
+    body.light-mode .modal-label   { color: #9a3636; }
+    body.light-mode .modal-input   { background: #fff; border-color: rgba(133,121,111,0.25); color: #1f1f1f; }
+    body.light-mode .modal-input:focus { border-color: #9a3636; }
+    body.light-mode .modal-order-row { color: rgba(31,31,31,0.65); border-bottom-color: rgba(133,121,111,0.1); }
+    body.light-mode .modal-total   { color: #1f1f1f; border-top-color: rgba(133,121,111,0.2); }
+    body.light-mode .modal-btn-pay { background: #9a3636; }
+    body.light-mode .modal-btn-pay:hover { background: #7a2626; }
+    body.light-mode .modal-btn-cancel { border-color: rgba(133,121,111,0.2); color: rgba(31,31,31,0.5); }
+    body.light-mode .cart-header { border-bottom-color: rgba(133,121,111,0.15); }
+    body.light-mode .cart-item   { border-bottom-color: rgba(133,121,111,0.08); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 860px) {
+      .cart-layout { grid-template-columns: 1fr; }
+      .cart-summary { position: static; }
+      .cart-layout { padding: 0 1rem 4rem; }
+      .cart-header { padding: 2rem 1rem 1.5rem; }
+    }
+    @media (max-width: 500px) {
+      .cart-item { grid-template-columns: 56px 1fr; }
+      .cart-item-right { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; }
+      .modal-row2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="site">
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="navbar.js"></script>
+  <script>renderNavbar("carrello");</script>
+
+  <!-- ══════════════════════════════════════
+       AUTH WALL — visibile se non loggato
+  ══════════════════════════════════════════ -->
+  <div id="auth-wall" class="auth-wall" style="display:none;">
+    <div class="auth-wall-bg"></div>
+    <div class="auth-wall-card">
+      <span class="auth-wall-icon">🔒</span>
+      <h1 class="auth-wall-title">Accesso richiesto</h1>
+      <p class="auth-wall-sub">
+        Per visualizzare il carrello e completare l'acquisto di biglietti,
+        stampe fotografiche e prodotti dello shop devi essere registrato e aver effettuato l'accesso.
+      </p>
+      <div class="auth-wall-btns">
+        <a href="login.html" class="aw-btn-primary">Accedi al tuo account</a>
+        <a href="register.html" class="aw-btn-ghost">Crea un account gratuito</a>
+      </div>
+      <p class="auth-wall-note">
+        Già hai un biglietto? Accedi per visualizzare i tuoi ordini.<br>
+        <span style="color:rgba(200,180,130,0.4);">I tuoi articoli saranno salvati.</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       CARRELLO — visibile se loggato
+  ══════════════════════════════════════════ -->
+  <div id="carrello-page" class="carrello-page">
+
+    <!-- Header -->
+    <div class="cart-header">
+      <p class="eyebrow">Il tuo carrello</p>
+      <h1 class="section-title">Riepilogo ordine</h1>
+    </div>
+
+    <!-- Stato vuoto globale -->
+    <div id="cart-empty-global" style="display:none; text-align:center; padding:5rem 2rem;">
+      <div style="font-size:2.5rem; margin-bottom:1.2rem; opacity:0.2">◻</div>
+      <p style="font-size:16px; color:rgba(240,236,228,0.3); letter-spacing:0.06em;">Il carrello è vuoto</p>
+      <div style="display:flex; gap:1rem; justify-content:center; margin-top:2rem; flex-wrap:wrap;">
+        <a href="biglietti.html" class="btn btn-gold">Acquista biglietti</a>
+        <a href="shop-index.html" class="btn btn-gold">Vai allo shop</a>
+        <a href="mostra-index.html" class="btn btn-gold">Sfoglia la galleria</a>
+      </div>
+    </div>
+
+    <!-- Layout principale -->
+    <div class="cart-layout" id="cart-main-layout">
+
+      <!-- Colonna sinistra: items -->
+      <div id="cart-items-col">
+
+        <!-- Biglietti -->
+        <div class="cart-section" id="section-biglietti">
+          <div class="cart-section-title">
+            Biglietti d'ingresso
+            <span class="count" id="count-biglietti">0</span>
+          </div>
+          <div id="list-biglietti"></div>
+        </div>
+
+        <!-- Fotografie mostra -->
+        <div class="cart-section" id="section-foto">
+          <div class="cart-section-title">
+            Stampe fotografiche
+            <span class="count" id="count-foto">0</span>
+          </div>
+          <div id="list-foto"></div>
+        </div>
+
+        <!-- Prodotti shop -->
+        <div class="cart-section" id="section-shop">
+          <div class="cart-section-title">
+            Shop / Merchandising
+            <span class="count" id="count-shop">0</span>
+          </div>
+          <div id="list-shop"></div>
+        </div>
+
+      </div>
+
+      <!-- Colonna destra: riepilogo -->
+      <div class="cart-summary">
+        <div class="summary-title">Riepilogo</div>
+
+        <div class="summary-row">
+          <span>Biglietti</span>
+          <span class="summary-val" id="sum-biglietti">€0</span>
+        </div>
+        <div class="summary-row">
+          <span>Stampe fotografiche</span>
+          <span class="summary-val" id="sum-foto">€0</span>
+        </div>
+        <div class="summary-row">
+          <span>Shop</span>
+          <span class="summary-val" id="sum-shop">€0</span>
+        </div>
+
+        <div class="summary-row total">
+          <span class="sum-label">Totale</span>
+          <span id="sum-total">€0</span>
+        </div>
+
+        <button class="checkout-btn" id="checkout-btn" onclick="openCheckout()">
+          Procedi all'acquisto
+        </button>
+        <p class="checkout-note">
+          <span>✓</span> Pagamento sicuro &nbsp;·&nbsp; <span>✓</span> Nessun sovrapprezzo
+        </p>
+
+        <div class="assurance-list">
+          <div class="assurance-row-s"><span>✓</span> Cancellazione gratuita 24h prima</div>
+          <div class="assurance-row-s"><span>✓</span> QR code via email immediata</div>
+          <div class="assurance-row-s"><span>✓</span> Assistenza clienti inclusa</div>
+        </div>
+      </div>
+
+    </div><!-- /cart-layout -->
+
+    <!-- SUCCESS STATE -->
+    <div class="success-state" id="success-state">
+      <div class="success-icon">✦</div>
+      <h2 class="success-title">Prenotazione confermata</h2>
+      <p class="success-sub">Riceverai una email di conferma con i tuoi QR code e le istruzioni per la visita.</p>
+      <div class="success-order-num">Numero ordine</div>
+      <div class="success-order-val" id="success-order-num">#DOI-000000</div>
+      <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+        <a href="home.html" class="btn btn-gold">Torna alla home</a>
+        <a href="biglietti.html" class="btn btn-ghost">Aggiungi altri biglietti</a>
+      </div>
+    </div>
+
+  </div><!-- /carrello-page -->
+
+  <!-- ══════════════════════════════════════
+       CHECKOUT MODAL
+  ══════════════════════════════════════════ -->
+  <div class="checkout-overlay" id="checkout-overlay">
+    <div class="checkout-modal">
+      <h2 class="checkout-modal-title">Completa l'acquisto</h2>
+      <p class="checkout-modal-sub">Verifica il tuo ordine e inserisci i dati di pagamento.</p>
+
+      <div class="modal-order-list" id="modal-order-list"></div>
+      <div class="modal-total">
+        <span>Totale</span>
+        <span id="modal-total-val">€0</span>
+      </div>
+
+      <div class="modal-form-group">
+        <label class="modal-label">Nome e cognome</label>
+        <input class="modal-input" type="text" id="pay-name" placeholder="Mario Rossi" />
+      </div>
+      <div class="modal-form-group">
+        <label class="modal-label">Email di conferma</label>
+        <input class="modal-input" type="email" id="pay-email" placeholder="mario@esempio.it" />
+      </div>
+      <div class="modal-row2">
+        <div class="modal-form-group">
+          <label class="modal-label">Numero carta</label>
+          <input class="modal-input" type="text" id="pay-card" placeholder="•••• •••• •••• ••••" maxlength="19" />
+        </div>
+        <div class="modal-form-group">
+          <label class="modal-label">Scadenza</label>
+          <input class="modal-input" type="text" id="pay-exp" placeholder="MM/AA" maxlength="5" />
+        </div>
+      </div>
+      <div class="modal-form-group" style="max-width:160px;">
+        <label class="modal-label">CVV</label>
+        <input class="modal-input" type="text" id="pay-cvv" placeholder="•••" maxlength="3" />
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn-cancel" onclick="closeCheckout()">Annulla</button>
+        <button class="modal-btn-pay" onclick="confirmPurchase()">Paga ora →</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span>© 2026 Mostra Doisneau — Pordenone</span>
+    <span>Privacy · Accessibilità</span>
+  </footer>
+
+</div><!-- /site -->
+
+<script>
+// ══════════════════════════════════════════════
+//  STATO DEL CARRELLO
+// ══════════════════════════════════════════════
+
+/**
+ * Struttura carrello salvata in localStorage:
+ * {
+ *   biglietti: [ { id, tipo, prezzo, qty, data } ],
+ *   foto:      [ { id, titolo, anno, prezzo, img, qty } ],
+ *   shop:      [ { id, nome, prezzo, qty } ]
+ * }
+ */
+const CART_KEY = "doisneau_cart";
+
+function loadCart() {
+  try { return JSON.parse(localStorage.getItem(CART_KEY)) || { biglietti:[], foto:[], shop:[] }; }
+  catch { return { biglietti:[], foto:[], shop:[] }; }
+}
+
+function saveCart(cart) {
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+}
+
+// API pubblica usata da altre pagine
+window.cartAPI = {
+  addBiglietto(tipo, prezzo) {
+    const cart = loadCart();
+    const existing = cart.biglietti.find(b => b.tipo === tipo);
+    if (existing) { existing.qty++; }
+    else { cart.biglietti.push({ id: Date.now(), tipo, prezzo, qty: 1, data: "" }); }
+    saveCart(cart);
+    return cart;
+  },
+  addFoto(foto) {
+    const cart = loadCart();
+    const existing = cart.foto.find(f => f.id === foto.id);
+    if (existing) { existing.qty++; }
+    else { cart.foto.push({ ...foto, qty: 1 }); }
+    saveCart(cart);
+    return cart;
+  },
+  addShop(prod) {
+    const cart = loadCart();
+    const existing = cart.shop.find(p => p.id === prod.id);
+    if (existing) { existing.qty++; }
+    else { cart.shop.push({ ...prod, qty: 1 }); }
+    saveCart(cart);
+    return cart;
+  },
+  count() {
+    const c = loadCart();
+    return c.biglietti.reduce((s,b)=>s+b.qty,0)
+          + c.foto.reduce((s,f)=>s+f.qty,0)
+          + c.shop.reduce((s,p)=>s+p.qty,0);
+  },
+  clear() { saveCart({ biglietti:[], foto:[], shop:[] }); }
+};
+
+// ══════════════════════════════════════════════
+//  AUTH GUARD
+// ══════════════════════════════════════════════
+document.addEventListener("DOMContentLoaded", () => {
+  // isUser() è definita in app.js e legge la sessione
+  if (!isUser()) {
+    document.getElementById("auth-wall").style.display = "flex";
+    document.getElementById("carrello-page").style.display = "none";
+  } else {
+    document.getElementById("auth-wall").style.display = "none";
+    document.getElementById("carrello-page").style.display = "block";
+    initCart();
+  }
+});
+
+// ══════════════════════════════════════════════
+//  RENDER CARRELLO
+// ══════════════════════════════════════════════
+function initCart() {
+  const cart = loadCart();
+  const isEmpty = cart.biglietti.length === 0 && cart.foto.length === 0 && cart.shop.length === 0;
+
+  if (isEmpty) {
+    document.getElementById("cart-empty-global").style.display = "block";
+    document.getElementById("cart-main-layout").style.display = "none";
+    return;
+  }
+
+  // Precarica sample data se il carrello ha item mostra o shop
+  renderBiglietti(cart);
+  renderFoto(cart);
+  renderShop(cart);
+  updateSummary(cart);
+}
+
+// ── Biglietti ──
+function renderBiglietti(cart) {
+  const container = document.getElementById("list-biglietti");
+  const count = document.getElementById("count-biglietti");
+  const total = cart.biglietti.reduce((s,b)=>s+b.qty,0);
+  count.textContent = total;
+
+  if (!cart.biglietti.length) {
+    container.innerHTML = `<div class="section-empty">Nessun biglietto nel carrello — <a href="biglietti.html" style="color:#c8b482;text-decoration:none;">aggiungi</a></div>`;
+    return;
+  }
+
+  container.innerHTML = cart.biglietti.map((b, idx) => `
+    <div class="cart-item">
+      <div class="cart-item-thumb ticket-thumb">
+        <div class="ticket-thumb-price">€${b.prezzo}</div>
+        <div class="ticket-thumb-label">${b.tipo}</div>
+      </div>
+      <div class="cart-item-info">
+        <div class="cart-item-type">Biglietto d'ingresso</div>
+        <div class="cart-item-name">${b.tipo}</div>
+        <div class="cart-item-detail">Galleria Harry Bertoia, Pordenone</div>
+        <div class="cart-item-date-row">
+          <span class="date-label-sm">Data visita</span>
+          <input class="date-input" type="date" value="${b.data}" min="${new Date().toISOString().split('T')[0]}" max="2026-04-26"
+            onchange="setBigliettoData(${idx}, this.value)" />
+        </div>
+      </div>
+      <div class="cart-item-right">
+        <div class="cart-item-price">€${(b.prezzo * b.qty).toFixed(0)}</div>
+        <div class="cart-item-qty">
+          <button class="qty-btn" onclick="changeBigliettoQty(${idx},-1)">−</button>
+          <span class="qty-val">${b.qty}</span>
+          <button class="qty-btn" onclick="changeBigliettoQty(${idx},+1)">+</button>
+        </div>
+        <button class="remove-btn" onclick="removeBiglietto(${idx})">Rimuovi</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+// ── Foto mostra ──
+function renderFoto(cart) {
+  const container = document.getElementById("list-foto");
+  const count = document.getElementById("count-foto");
+  const total = cart.foto.reduce((s,f)=>s+f.qty,0);
+  count.textContent = total;
+
+  if (!cart.foto.length) {
+    container.innerHTML = `<div class="section-empty">Nessuna stampa selezionata — <a href="mostra-index.html" style="color:#c8b482;text-decoration:none;">sfoglia la galleria</a></div>`;
+    return;
+  }
+
+  container.innerHTML = cart.foto.map((f, idx) => `
+    <div class="cart-item">
+      <div class="cart-item-thumb">
+        ${f.img ? `<img src="${f.img}" alt="${f.titolo}">` : `<div class="thumb-placeholder">◻</div>`}
+      </div>
+      <div class="cart-item-info">
+        <div class="cart-item-type">Stampa fotografica originale</div>
+        <div class="cart-item-name">${f.titolo}</div>
+        <div class="cart-item-detail">${f.anno || ''} ${f.luogo ? '· '+f.luogo : ''}</div>
+      </div>
+      <div class="cart-item-right">
+        <div class="cart-item-price">€${formatNum(f.prezzo * f.qty)}</div>
+        <div class="cart-item-qty">
+          <button class="qty-btn" onclick="changeFotoQty(${idx},-1)">−</button>
+          <span class="qty-val">${f.qty}</span>
+          <button class="qty-btn" onclick="changeFotoQty(${idx},+1)">+</button>
+        </div>
+        <button class="remove-btn" onclick="removeFoto(${idx})">Rimuovi</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+// ── Shop ──
+function renderShop(cart) {
+  const container = document.getElementById("list-shop");
+  const count = document.getElementById("count-shop");
+  const total = cart.shop.reduce((s,p)=>s+p.qty,0);
+  count.textContent = total;
+
+  if (!cart.shop.length) {
+    container.innerHTML = `<div class="section-empty">Nessun prodotto — <a href="shop-index.html" style="color:#c8b482;text-decoration:none;">vai allo shop</a></div>`;
+    return;
+  }
+
+  container.innerHTML = cart.shop.map((p, idx) => `
+    <div class="cart-item">
+      <div class="cart-item-thumb">
+        ${p.img ? `<img src="${p.img}" alt="${p.nome}">` : `<div class="thumb-placeholder">◻</div>`}
+      </div>
+      <div class="cart-item-info">
+        <div class="cart-item-type">Prodotto shop</div>
+        <div class="cart-item-name">${p.nome}</div>
+        <div class="cart-item-detail">${p.desc ? p.desc.slice(0,60)+'…' : ''}</div>
+      </div>
+      <div class="cart-item-right">
+        <div class="cart-item-price">€${formatNum(p.prezzo * p.qty)}</div>
+        <div class="cart-item-qty">
+          <button class="qty-btn" onclick="changeShopQty(${idx},-1)">−</button>
+          <span class="qty-val">${p.qty}</span>
+          <button class="qty-btn" onclick="changeShopQty(${idx},+1)">+</button>
+        </div>
+        <button class="remove-btn" onclick="removeShop(${idx})">Rimuovi</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+// ══════════════════════════════════════════════
+//  RIEPILOGO PREZZI
+// ══════════════════════════════════════════════
+function updateSummary(cart) {
+  const totB = cart.biglietti.reduce((s,b)=>s+(b.prezzo*b.qty),0);
+  const totF = cart.foto.reduce((s,f)=>s+(Number(f.prezzo)*f.qty),0);
+  const totS = cart.shop.reduce((s,p)=>s+(Number(p.prezzo)*p.qty),0);
+  const tot  = totB + totF + totS;
+
+  document.getElementById("sum-biglietti").textContent = `€${formatNum(totB)}`;
+  document.getElementById("sum-foto").textContent      = `€${formatNum(totF)}`;
+  document.getElementById("sum-shop").textContent      = `€${formatNum(totS)}`;
+  document.getElementById("sum-total").textContent     = `€${formatNum(tot)}`;
+
+  const btn = document.getElementById("checkout-btn");
+  if (btn) btn.disabled = tot === 0;
+}
+
+function formatNum(n) {
+  return Number(n).toLocaleString("it-IT", { minimumFractionDigits: 0 });
+}
+
+function rerender() {
+  const cart = loadCart();
+  const isEmpty = cart.biglietti.length === 0 && cart.foto.length === 0 && cart.shop.length === 0;
+  if (isEmpty) {
+    document.getElementById("cart-empty-global").style.display = "block";
+    document.getElementById("cart-main-layout").style.display = "none";
+  } else {
+    renderBiglietti(cart);
+    renderFoto(cart);
+    renderShop(cart);
+    updateSummary(cart);
+  }
+}
+
+// ══════════════════════════════════════════════
+//  AZIONI SUI BIGLIETTI
+// ══════════════════════════════════════════════
+function changeBigliettoQty(idx, delta) {
+  const cart = loadCart();
+  cart.biglietti[idx].qty = Math.max(1, cart.biglietti[idx].qty + delta);
+  saveCart(cart); rerender();
+}
+function setBigliettoData(idx, val) {
+  const cart = loadCart();
+  cart.biglietti[idx].data = val;
+  saveCart(cart);
+}
+function removeBiglietto(idx) {
+  const cart = loadCart();
+  cart.biglietti.splice(idx, 1);
+  saveCart(cart); rerender();
+}
+
+// ══════════════════════════════════════════════
+//  AZIONI SULLE FOTO
+// ══════════════════════════════════════════════
+function changeFotoQty(idx, delta) {
+  const cart = loadCart();
+  cart.foto[idx].qty = Math.max(1, cart.foto[idx].qty + delta);
+  saveCart(cart); rerender();
+}
+function removeFoto(idx) {
+  const cart = loadCart();
+  cart.foto.splice(idx, 1);
+  saveCart(cart); rerender();
+}
+
+// ══════════════════════════════════════════════
+//  AZIONI SULLO SHOP
+// ══════════════════════════════════════════════
+function changeShopQty(idx, delta) {
+  const cart = loadCart();
+  cart.shop[idx].qty = Math.max(1, cart.shop[idx].qty + delta);
+  saveCart(cart); rerender();
+}
+function removeShop(idx) {
+  const cart = loadCart();
+  cart.shop.splice(idx, 1);
+  saveCart(cart); rerender();
+}
+
+// ══════════════════════════════════════════════
+//  CHECKOUT MODAL
+// ══════════════════════════════════════════════
+function openCheckout() {
+  const cart = loadCart();
+
+  // Populate modal order list
+  const rows = [];
+  cart.biglietti.forEach(b => rows.push({ label:`Biglietto ${b.tipo} × ${b.qty}`, val: b.prezzo*b.qty }));
+  cart.foto.forEach(f     => rows.push({ label:`${f.titolo} × ${f.qty}`, val: Number(f.prezzo)*f.qty }));
+  cart.shop.forEach(p     => rows.push({ label:`${p.nome} × ${p.qty}`, val: Number(p.prezzo)*p.qty }));
+  const tot = rows.reduce((s,r)=>s+r.val,0);
+
+  document.getElementById("modal-order-list").innerHTML = rows.map(r=>`
+    <div class="modal-order-row">
+      <span>${r.label}</span>
+      <span>€${formatNum(r.val)}</span>
+    </div>
+  `).join("");
+  document.getElementById("modal-total-val").textContent = `€${formatNum(tot)}`;
+
+  // Pre-fill con dati sessione se disponibili
+  const session = getSession ? getSession() : null;
+  if (session) {
+    const nameEl = document.getElementById("pay-name");
+    const emailEl = document.getElementById("pay-email");
+    if (nameEl && session.name) nameEl.value = session.name;
+    if (emailEl && session.email) emailEl.value = session.email;
+  }
+
+  document.getElementById("checkout-overlay").classList.add("open");
+}
+
+function closeCheckout() {
+  document.getElementById("checkout-overlay").classList.remove("open");
+}
+
+function confirmPurchase() {
+  const name  = document.getElementById("pay-name").value.trim();
+  const email = document.getElementById("pay-email").value.trim();
+  const card  = document.getElementById("pay-card").value.replace(/\s/g,"");
+  const exp   = document.getElementById("pay-exp").value.trim();
+  const cvv   = document.getElementById("pay-cvv").value.trim();
+
+  if (!name || !email) { toast("Inserisci nome ed email di conferma", "error"); return; }
+  if (!email.includes("@")) { toast("Email non valida", "error"); return; }
+  if (card.length < 12)   { toast("Numero carta non valido", "error"); return; }
+  if (!exp.match(/^\d{2}\/\d{2}$/)) { toast("Formato scadenza: MM/AA", "error"); return; }
+  if (cvv.length < 3)     { toast("CVV non valido", "error"); return; }
+
+  // Simulazione pagamento
+  closeCheckout();
+
+  const orderNum = "#DOI-" + Math.floor(100000 + Math.random() * 900000);
+  document.getElementById("success-order-num").textContent = orderNum;
+
+  // Svuota carrello
+  cartAPI.clear();
+
+  // Mostra success
+  document.getElementById("cart-main-layout").style.display = "none";
+  document.getElementById("cart-empty-global").style.display = "none";
+  document.getElementById("success-state").style.display = "block";
+
+  toast(`Ordine ${orderNum} confermato! Controlla la tua email.`, "success");
+
+  // Chiama API per confermare prenotazioni foto
+  const cart = loadCart(); // già svuotato, ma in un'app reale: passare i dati prima di clear
+}
+
+// ══════════════════════════════════════════════
+//  CARD NUMBER FORMATTING
+// ══════════════════════════════════════════════
+document.getElementById("pay-card")?.addEventListener("input", function() {
+  this.value = this.value.replace(/\D/g,"").replace(/(.{4})/g,"$1 ").trim();
+});
+document.getElementById("pay-exp")?.addEventListener("input", function() {
+  this.value = this.value.replace(/\D/g,"").replace(/^(\d{2})(\d)/,"$1/$2").slice(0,5);
+});
+
+// Chiudi modal cliccando fuori
+document.getElementById("checkout-overlay")?.addEventListener("click", function(e) {
+  if (e.target === this) closeCheckout();
+});
+
+// ══════════════════════════════════════════════
+//  DEMO: precarica un biglietto se carrello vuoto
+//  (solo per test — rimuovere in produzione)
+// ══════════════════════════════════════════════
+// (function demoPreload() {
+//   const cart = loadCart();
+//   const hasItems = cart.biglietti.length || cart.foto.length || cart.shop.length;
+//   if (!hasItems) {
+//     // Aggiunge dati demo solo se il carrello è vuoto
+//     cart.biglietti.push({ id:1, tipo:"Intero",   prezzo:12, qty:2, data:"2026-04-20" });
+//     cart.biglietti.push({ id:2, tipo:"Studenti", prezzo:5,  qty:1, data:"2026-04-20" });
+//     cart.foto.push({
+//       id:1, titolo:"Il Bacio", anno:1950, luogo:"Parigi",
+//       prezzo:4800, qty:1,
+//       img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Robert_Doisneau_Le_Baiser_de_l%27H%C3%B4tel_de_Ville.jpg/400px-Robert_Doisneau_Le_Baiser_de_l%27H%C3%B4tel_de_Ville.jpg"
+//     });
+//     cart.shop.push({ id:1, nome:"Catalogo ufficiale della mostra", prezzo:38, qty:1, desc:"240 pagine, carta patinata, oltre 180 riproduzioni fotografiche.", img:null });
+//     saveCart(cart);
+//   }
+// })();
+</script>
+</body>
+</html>

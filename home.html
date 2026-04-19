@@ -84,24 +84,14 @@
       background-color: rgba(31, 31, 31, 0.05) !important;
     }
 
-    /* 4. Sfondo delle card dei biglietti per farle staccare dal fondo */
     body.light-mode .ticket-box {
       background: rgba(0, 0, 0, 0.03) !important;
       border-color: rgba(0, 0, 0, 0.1) !important;
     }
 
-    /* 5. Tasto per il cambio tema */
     body.light-mode .theme-toggle-btn {
       border-color: #9a3636 !important;
       color: #9a3636 !important;
-    }
-
-    /* Eccezione per le icone: ridiamo il colore di accento */
-    body.light-mode svg,
-    body.light-mode .icon,
-    body.light-mode i {
-      color: var(--golden-glow) !important;
-      fill: var(--golden-glow) !important;
     }
 
     *,
@@ -137,68 +127,6 @@
       z-index: 9999;
       opacity: 0.4;
     }
-
-    /* ── NAV ── */
-    .navbar,
-    .navbar a,
-    .nb-cta,
-    .role-switcher {
-      font-family: 'Cormorant Garamond', serif !important;
-      /* Usa il font del sito */
-      font-weight: 400 !important;
-      /* Riporta lo spessore alla normalità (togliendo il 300) */
-      font-size: 16px !important;
-      /* Forza la grandezza standard */
-      letter-spacing: normal !important;
-    }
-
-    .nb-logo {
-      font-family: 'Playfair Display', serif !important;
-      font-weight: 400 !important;
-    }
-
-    /* nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.5rem 4rem;
-      mix-blend-mode: normal;
-    }
-
-    .nav-logo {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--golden-glow);
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 3rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--alabaster-grey);
-      text-decoration: none;
-      opacity: 0.6;
-      transition: opacity 0.3s, color 0.3s;
-    }
-
-    .nav-links a:hover {
-      opacity: 1;
-      color: var(--golden-glow);
-    } */
 
     /* ── HERO ── */
     .hero {
@@ -1057,47 +985,39 @@
     }
 
     /* ── FOOTER ── */
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Gestione dell'icona */
+    .icon-logo {
+      height: 50px;
+      width: auto;
+      display: block;
+    }
+
+    .footer-logo-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--golden-glow);
+      text-decoration: none;
+      transition: opacity 0.3s;
+    }
+
+    .footer-logo-text:hover {
+      opacity: 0.8;
+    }
+
     footer {
       padding: 4rem;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-
-    .footer-logo {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--golden-glow);
-    }
-
-    .footer-copy {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.15em;
-      color: rgba(224, 224, 224, 0.25);
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-
-    .footer-links a {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(224, 224, 224, 0.35);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-
-    .footer-links a:hover {
-      color: var(--golden-glow);
     }
 
     /* ── ANIMATIONS ── */
@@ -1431,30 +1351,29 @@
       <div class="ticket-box">
         <div class="ticket-price">€12 <span class="ticket-desc">Intero</span></div>
         <div class="ticket-note">Per chiunque voglia visitare l'allestimento</div>
-        <a href="#" class="btn-ticket">Prenota ora →</a>
+        <a href="biglietti.html" class="btn-ticket">Acquista ora →</a>
       </div>
       <div class="ticket-box">
         <div class="ticket-price">€9 <span class="ticket-desc">Ridotto</span></div>
         <div class="ticket-note">Under 24 · Over 65 · Disabili</div>
-        <a href="#" class="btn-ticket">Prenota ora →</a>
+        <a href="biglietti.html" class="btn-ticket">Acquista ora →</a>
       </div>
       <div class="ticket-box">
         <div class="ticket-price">€5 <span class="ticket-desc">Studenti</span></div>
         <div class="ticket-note">Prezzo ridotto per studenti</div>
-        <a href="#" class="btn-ticket">Prenota ora →</a>
+        <a href="biglietti.html" class="btn-ticket">Acquista ora →</a>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
   <footer>
-    <a class="footer-logo" href="../azienda.html">Silk &amp; Stack</a>
-    <!-- <ul class="footer-links">
-      <li><a href="#">Press</a></li>
-      <li><a href="#">Accessibilità</a></li>
-      <li><a href="#">Privacy</a></li>
-      <li><a href="#">Contatti</a></li>
-    </ul> -->
+    <div class="footer-brand">
+      <img src="logosenzabg.png" alt="Silk & Stack" class="icon-logo">
+
+      <a class="footer-logo-text" href="azienda.html">Silk &amp; Stack</a>
+    </div>
+
     <div class="footer-copy">© 2025 Silk & Stack. Tutti i diritti riservati.</div>
   </footer>
   <script>
