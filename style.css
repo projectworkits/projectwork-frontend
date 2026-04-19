@@ -1,0 +1,788 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.site {
+  font-family: 'Cormorant Garamond', serif;
+  background: #0a0a0a;
+  color: #f0ece4;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── NAVBAR ── */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2.5rem;
+  height: 56px;
+  background: rgba(10, 10, 10, 0.95);
+  border-bottom: 0.5px solid rgba(200, 180, 130, 0.25);
+  backdrop-filter: blur(8px);
+}
+
+.nb-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #c8b482;
+  text-decoration: none;
+}
+
+.nb-links {
+  display: flex;
+  gap: 0;
+  list-style: none;
+}
+
+.nb-links a {
+  display: block;
+  padding: 0 1.1rem;
+  height: 56px;
+  line-height: 56px;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(240, 236, 228, 0.55);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.nb-links a:hover,
+.nb-links a.active {
+  color: #c8b482;
+  border-bottom-color: #c8b482;
+}
+
+.nb-cta {
+  padding: 0.45rem 1.4rem;
+  border: 0.5px solid #c8b482;
+  background: transparent;
+  color: #c8b482;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  text-decoration: none;
+}
+
+.nb-cta:hover {
+  background: #c8b482;
+  color: #0a0a0a;
+}
+
+/* ── PAGES ── */
+.page {
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+
+.page.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── SHARED ── */
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #c8b482;
+  margin-bottom: 0.8rem;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  font-weight: 400;
+  line-height: 1.15;
+  margin-bottom: 1.2rem;
+}
+
+.section-body {
+  font-size: 17px;
+  line-height: 1.8;
+  color: rgba(240, 236, 228, 0.75);
+}
+
+.mostra-intro {
+  padding: 4rem 2.5rem 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.mostra-intro-img {
+  height: 320px;
+  background: #1a1a1a;
+  overflow: hidden;
+  position: relative;
+}
+
+.mostra-intro-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(60%) contrast(1.05);
+}
+
+.mostra-sections {
+  padding: 3rem 2.5rem;
+}
+
+.ms-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.ms-card {
+  padding: 1.6rem;
+  border: 0.5px solid rgba(200, 180, 130, 0.2);
+  background: rgba(200, 180, 130, 0.03);
+}
+
+.ms-card-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  color: rgba(200, 180, 130, 0.2);
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  line-height: 1;
+}
+
+.ms-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  margin-bottom: 0.6rem;
+}
+
+.ms-card-body {
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(240, 236, 228, 0.6);
+}
+
+.mostra-atmosfera {
+  margin: 0 2.5rem 4rem;
+  padding: 2.5rem;
+  background: #0e0e0e;
+  border: 0.5px solid rgba(200, 180, 130, 0.15);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+}
+
+.atm-label {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #c8b482;
+  margin-bottom: 1rem;
+}
+
+.atm-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+}
+
+.atm-body {
+  font-size: 16px;
+  line-height: 1.75;
+  color: rgba(240, 236, 228, 0.7);
+}
+
+.atm-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.atm-tag {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border: 0.5px solid rgba(200, 180, 130, 0.35);
+  color: #c8b482;
+}
+
+.atm-numbers {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.atm-num-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #c8b482;
+  line-height: 1;
+}
+
+.atm-num-label {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: rgba(240, 236, 228, 0.5);
+  margin-top: 0.3rem;
+}
+
+/* ── PAGE: GALLERIA ── */
+.galleria-header {
+  padding: 3rem 2.5rem 2rem;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  padding: 0 2.5rem 4rem;
+}
+
+.gallery-item {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+  background: #1a1a1a;
+  cursor: pointer;
+}
+
+.gallery-item.tall {
+  grid-row: span 2;
+  aspect-ratio: auto;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(70%) contrast(1.1);
+  transition: filter 0.4s, transform 0.4s;
+}
+
+.gallery-item:hover img {
+  filter: grayscale(0%);
+  transform: scale(1.04);
+}
+
+.gallery-cap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.8rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: rgba(240, 236, 228, 0.8);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.gallery-item:hover .gallery-cap {
+  opacity: 1;
+}
+
+/* ── PAGE: BIGLIETTI ── */
+.biglietti-page {
+  padding: 3.5rem 2.5rem;
+}
+
+.biglietti-header {
+  margin-bottom: 3rem;
+}
+
+.ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.ticket-card {
+  padding: 2rem;
+  border: 1px solid rgba(200, 180, 130, 0.25);
+  background: transparent;
+  transition:
+    border-left-color 0.1s ease 0.4s,
+    border-right-color 0.1s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.ticket-card:hover {
+  border-left-color: #c8b482;
+  border-right-color: #c8b482;
+  transition:
+    border-left-color 0.1s ease,
+    border-right-color 0.1s ease 0.42s;
+}
+
+.ticket-card.featured {
+  border-color: #c8b482;
+}
+
+.ticket-badge {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #c8b482;
+  color: #0a0a0a;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.9rem;
+  white-space: nowrap;
+}
+
+.ticket-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #c8b482, #c8b482);
+  transform: scaleX(0);
+  transform-origin: left;
+  z-index: 3;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.ticket-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #c8b482, #c8b482);
+  transform: scaleX(0);
+  transform-origin: left;
+  z-index: 3;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.ticket-card:hover::before,
+.ticket-card:hover::after {
+  transform: scaleX(1);
+}
+
+.ticket-type {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #c8b482;
+  margin-bottom: 1rem;
+}
+
+.ticket-price {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  line-height: 1;
+}
+
+.ticket-note {
+  font-size: 13px;
+  color: rgba(240, 236, 228, 0.45);
+  margin-bottom: 1.5rem;
+}
+
+.ticket-features {
+  list-style: none;
+  margin-bottom: 2rem;
+}
+
+.ticket-features li {
+  font-size: 14px;
+  color: rgba(240, 236, 228, 0.65);
+  padding: 0.4rem 0 0.4rem 1rem;
+  border-bottom: 0.5px solid rgba(240, 236, 228, 0.06);
+  position: relative;
+}
+
+.ticket-features li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: #c8b482;
+}
+
+.ticket-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background: transparent;
+  border: 0.5px solid rgba(200, 180, 130, 0.4);
+  color: #c8b482;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.ticket-card.featured .ticket-btn {
+  background: #c8b482;
+  color: #0a0a0a;
+  border-color: #c8b482;
+}
+
+.ticket-btn:hover {
+  background: #c8b482;
+  color: #0a0a0a;
+}
+
+.ticket-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  padding: 2rem;
+  border: 0.5px solid rgba(200, 180, 130, 0.15);
+  background: #0e0e0e;
+}
+
+.ti-label {
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #c8b482;
+  margin-bottom: 0.5rem;
+}
+
+.ti-val {
+  font-size: 15px;
+  color: rgba(240, 236, 228, 0.75);
+  line-height: 1.6;
+}
+
+/* ── FOOTER ── */
+.footer {
+  padding: 1.8rem 2.5rem;
+  border-top: 0.5px solid rgba(200, 180, 130, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: rgba(240, 236, 228, 0.35);
+  letter-spacing: 0.06em;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+
+  .bio-body,
+  .mostra-intro,
+  .mostra-atmosfera {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .ms-grid,
+  .ticket-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .gallery-item.tall {
+    grid-row: span 1;
+    aspect-ratio: 4/3;
+  }
+
+  .ticket-info {
+    grid-template-columns: 1fr;
+  }
+}
+
+:root {
+  --soft-linen: #f4efe6;
+  --carbon-black: #1f1f1f;
+  --taupe: #726356;
+  --soft-fawn: #9f8657;
+  --brown-red: #9a3636;
+}
+
+.theme-toggle-btn {
+  margin-left: 1rem;
+  background: transparent;
+  border: 1px solid #c8b482;
+  color: #c8b482;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: #c8b482;
+  color: #0a0a0a;
+}
+
+/* ── REGOLE LIGHT MODE ── */
+body.light-mode .site {
+  background: var(--soft-linen);
+  color: var(--carbon-black);
+}
+
+body.light-mode .navbar {
+  background: rgba(244, 239, 230, 0.95);
+  border-bottom-color: var(--taupe);
+}
+
+body.light-mode .nb-logo {
+  color: var(--brown-red);
+}
+
+body.light-mode .nb-links a {
+  color: var(--taupe);
+}
+
+body.light-mode .nb-links a:hover,
+body.light-mode .nb-links a.active {
+  color: var(--brown-red);
+  border-bottom-color: var(--brown-red);
+}
+
+body.light-mode .nb-cta {
+  color: var(--brown-red);
+  border-color: var(--brown-red);
+}
+
+body.light-mode .nb-cta:hover {
+  background: var(--brown-red);
+  color: var(--soft-linen);
+}
+
+body.light-mode .bio-name {
+  color: var(--soft-linen)
+}
+
+body.light-mode .bio-stat-label,
+body.light-mode .atm-label,
+body.light-mode .ti-label,
+body.light-mode .ticket-type {
+  color: var(--soft-fawn);
+}
+
+body.light-mode .section-body,
+body.light-mode .bio-text p,
+body.light-mode .ms-card-body,
+body.light-mode .atm-body,
+body.light-mode .tl-desc,
+body.light-mode .bio-stat-value,
+body.light-mode .ti-val {
+  color: var(--carbon-black);
+}
+
+body.light-mode .bio-dates,
+body.light-mode .atm-num-label,
+body.light-mode .ticket-note,
+body.light-mode .footer {
+  color: var(--taupe);
+}
+
+/* Strutture e card */
+body.light-mode .bio-stat,
+body.light-mode .tl-item {
+  border-color: rgba(133, 121, 111, 0.2);
+}
+
+body.light-mode .pullquote {
+  border-left-color: var(--brown-red);
+  color: var(--carbon-black);
+}
+
+body.light-mode .tl-year {
+  color: var(--brown-red);
+}
+
+body.light-mode .ms-card,
+body.light-mode .mostra-atmosfera,
+body.light-mode .ticket-info {
+  background: #ffffff;
+  border-color: rgba(133, 121, 111, 0.2);
+}
+
+body.light-mode .ms-card-num,
+body.light-mode .atm-num-val,
+body.light-mode .ticket-price {
+  color: var(--soft-fawn);
+}
+
+body.light-mode .atm-tag {
+  color: var(--carbon-black);
+  border-color: var(--taupe);
+}
+
+body.light-mode .ticket-card {
+  border-color: rgba(133, 121, 111, 0.2);
+}
+
+body.light-mode .ticket-card.featured {
+  border-color: var(--brown-red);
+}
+
+body.light-mode .ticket-badge {
+  background: var(--brown-red);
+  color: var(--soft-linen);
+}
+
+body.light-mode .ticket-btn {
+  color: var(--brown-red);
+  border-color: var(--brown-red);
+}
+
+body.light-mode .ticket-btn:hover,
+body.light-mode .ticket-card.featured .ticket-btn {
+  background: var(--brown-red);
+  color: var(--soft-linen);
+}
+
+body.light-mode .ticket-features li {
+  color: var(--carbon-black);
+  border-bottom-color: rgba(133, 121, 111, 0.1);
+}
+
+body.light-mode .ticket-features li::before {
+  color: var(--brown-red);
+}
+
+body.light-mode .theme-toggle-btn {
+  border-color: var(--brown-red);
+  color: var(--brown-red);
+}
+
+body.light-mode .theme-toggle-btn:hover {
+  background: var(--brown-red);
+  color: var(--soft-linen);
+}
+
+body.light-mode .rm-year {
+  color: var(--brown-red);
+}
+
+body.light-mode .rm-dot {
+  border-color: var(--brown-red);
+  background: var(--soft-linen);
+}
+
+body.light-mode .rm-item.rm-highlight .rm-dot {
+  background: var(--brown-red);
+}
+
+body.light-mode .rm-line {
+  background: rgba(154, 54, 54, 0.25);
+}
+
+body.light-mode .rm-tag {
+  color: var(--brown-red);
+}
+
+body.light-mode .rm-item.rm-highlight .rm-tag {
+  background: rgba(154, 54, 54, 0.12);
+}
+
+body.light-mode .rm-desc {
+  color: var(--carbon-black);
+}
+
+body.light-mode .ticket-card {
+  border-color: rgba(133, 121, 111, 0.2);
+}
+
+body.light-mode .ticket-card:hover {
+  border-left-color: #851919;
+  border-right-color: #851919;
+}
+
+body.light-mode .ticket-card::before,
+body.light-mode .ticket-card::after {
+  background: linear-gradient(90deg, #851919, #851919);
+}
+
+body.light-mode .ticket-badge {
+  background: #851919;
+  color: #f0ece4;
+}
+
+body.light-mode .ticket-card.featured {
+  border-color: #851919;
+}
+
+/* ── CUSTOM CURSOR ── */
+.cursor {
+  width: 8px;
+  height: 8px;
+  background: #c8b482;
+  border-radius: 50%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 10000;
+  transition: transform 0.1s ease;
+}
+
+.cursor-ring {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid rgba(224, 201, 49, 0.4);
+  border-radius: 50%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9998;
+  transition: all 0.18s ease;
+}
+
+.light-mode .cursor-ring {
+  border-color: #cc7b7b;
+}
+
+.light-mode .cursor {
+  background: #b65656;
+}
