@@ -9,7 +9,7 @@
 <script>
   // Redirect a create con id — riusa lo stesso form
   const id = new URLSearchParams(location.search).get("id");
-  location.replace("admin-photo-create.html" + (id ? "?id=" + id : ""));
+  location.window.href = "admin-photo-create.html" + (id ? "?id=" + id : "");
 </script>
 </body>
 </html>
