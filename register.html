@@ -173,10 +173,6 @@ async function handleRegister() {
       toast(`Benvenuto`);
     }
 
-
-    // Salva la sessione localmente
-    localStorage.setItem("doisneau_session", JSON.stringify(data));
-
     return { ok: true, user: data.user || data };
   } catch (err) {
     return { ok: false, error: "Errore di connessione al server." };
