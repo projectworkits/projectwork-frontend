@@ -155,12 +155,12 @@ async function handleRegister() {
   toast(`Benvenuto, ${result.user.name.split(" ")[0]}!`);
   setTimeout(() => location.href = "biglietti.html", 700);
 
-  async function authRegister(name, email, password) {
+  async function authRegister(username, email, password) {
   try {
     const response = await fetch("https://localhost/api/users/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password })
+      body: JSON.stringify({ username: username, email: email, password: password })
     });
 
     if (!response.ok) {
