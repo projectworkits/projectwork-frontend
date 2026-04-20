@@ -132,7 +132,7 @@ function setFieldError(id, msg) {
   el.textContent = msg; el.style.display = "block";
 }
 
-function handleRegister() {
+async function handleRegister() {
   clearErrors();
   const name     = document.getElementById("name").value.trim();
   const email    = document.getElementById("email").value.trim();
@@ -146,7 +146,7 @@ function handleRegister() {
   if (password !== confirm) { setFieldError("confirm-err", "Le password non coincidono."); valid = false; }
   if (!valid) return;
 
-  const result = authRegister(name, email, password);
+  const result = await authRegister(name, email, password);
   if (!result.ok) {
     showGlobalError(result.error);
     return;
@@ -154,6 +154,33 @@ function handleRegister() {
 
   toast(`Benvenuto, ${result.user.name.split(" ")[0]}!`);
   setTimeout(() => location.href = "biglietti.html", 700);
+
+  async function authRegister(name, email, password) {
+  try {
+    const response = await fetch("https://localhost/api/users/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      return {
+        ok: false,
+        error: errorData?.message || `Registrazione fallita (${response.status})`
+      };
+    }
+
+    const data = await response.json();
+
+    // Salva la sessione localmente
+    localStorage.setItem("doisneau_session", JSON.stringify(data));
+
+    return { ok: true, user: data.user || data };
+  } catch (err) {
+    return { ok: false, error: "Errore di connessione al server." };
+  }
+}
 }
 
 document.addEventListener("DOMContentLoaded", () => {
