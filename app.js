@@ -8,12 +8,18 @@ function getSession() {
 
 function currentUser() { return getSession(); }
 function isLoggedIn() { return !!getSession(); }
+
 function getRole() {
-  // const s = getSession(); return s ? s.role : "guest"; 
-  return "admin"; // forzo l'essere admin, da cancellare dopo i test
+  const s = getSession();
+  if (!s) return "guest";
+  if (s.admin === 1) return "admin";
+  if (s.collaborator === 1) return "collaborator";
+  return "user";
 }
+
 function isAdmin() { return getRole() === "admin"; }
-function isUser() { return getRole() === "user" || getRole() === "admin"; }
+function isCollaborator() { return getRole() === "collaborator" || getRole() === "admin"; }
+function isUser() { return isLoggedIn(); }
 
 function setRole() { }
 function renderRoleBadge() {

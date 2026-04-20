@@ -69,12 +69,19 @@
 let allUsers = [];
 let filtered = [];
 
+function getRoleLabel(u) {
+  if (u.admin === 1) return "admin";
+  if (u.collaborator === 1) return "collaboratore";
+  return "utente";
+}
+
 function applyFilters() {
   const q  = document.getElementById("search").value.toLowerCase();
   const rf = document.getElementById("role-filter").value;
   filtered = allUsers.filter(u => {
-    const matchQ  = !q  || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
-    const matchRf = !rf || u.role === rf;
+    const role = getRoleLabel(u);
+    const matchQ  = !q  || u.username.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
+    const matchRf = !rf || role === rf;
     return matchQ && matchRf;
   });
   renderTable();
@@ -82,7 +89,7 @@ function applyFilters() {
 
 function renderTable() {
   const tbody = document.getElementById("table-body");
-  const collab = allUsers.filter(u => u.role === "collaboratore").length;
+  const collab = allUsers.filter(u => u.collaborator === 1).length;
   document.getElementById("summary").textContent =
     `${allUsers.length} utenti totali · ${collab} collaboratori · ${allUsers.length - collab} utenti standard`;
 
@@ -90,27 +97,30 @@ function renderTable() {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:2rem;color:rgba(240,236,228,0.3)">Nessun utente trovato.</td></tr>`;
     return;
   }
-  tbody.innerHTML = filtered.map(u => `
-    <tr id="user-row-${u.id}">
-      <td style="color:rgba(240,236,228,0.3)">${u.id}</td>
-      <td>${u.name}</td>
+  tbody.innerHTML = filtered.map(u => {
+    const role = getRoleLabel(u);
+    const id = u.user_id || u.id;
+    return `
+    <tr id="user-row-${id}">
+      <td style="color:rgba(240,236,228,0.3)">${id}</td>
+      <td>${u.username}</td>
       <td style="color:rgba(240,236,228,0.55)">${u.email}</td>
-      <td><span class="role-pill ${u.role}">${u.role}</span></td>
+      <td><span class="role-pill ${role}">${role}</span></td>
       <td>
-        <button class="btn btn-sm ${u.role === 'collaboratore' ? 'btn-ghost' : 'btn-gold'}"
-          onclick="handleToggle(${u.id})">
-          ${u.role === "collaboratore" ? "Rimuovi collaboratore" : "Rendi collaboratore"}
-        </button>
+        ${u.admin === 1 ? '<span style="font-size:11px;opacity:0.5">Gestione disabilitata</span>' : `
+        <button class="btn btn-sm ${u.collaborator === 1 ? 'btn-ghost' : 'btn-gold'}"
+          onclick="handleToggle(${id})">
+          ${u.collaborator === 1 ? "Rimuovi collaboratore" : "Rendi collaboratore"}
+        </button>`}
       </td>
-    </tr>`).join("");
+    </tr>`;
+  }).join("");
 }
 
 function handleToggle(id) {
-  API.toggleCollaboratore(id).then(updated => {
-    const i = allUsers.findIndex(u => u.id === id);
-    if (i >= 0) allUsers[i] = updated;
-    toast(`${updated.name} → ${updated.role}`);
-    applyFilters();
+  API.toggleCollaboratore(id).then(() => {
+    toast(`Utente aggiornato`);
+    API.getUsers().then(users => { allUsers = users; applyFilters(); });
   }).catch(err => toast(err, "error"));
 }
 

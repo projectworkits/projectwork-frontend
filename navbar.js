@@ -82,10 +82,9 @@ function renderNavbar(activePage) {
   `;
   document.head.appendChild(style);
 
-  const userRole = localStorage.getItem("doisneau_role") || "guest";
+  const userRole = typeof getRole === "function" ? getRole() : "guest";
   const user = typeof currentUser === "function" ? currentUser() : null;
-  const session = getSession();
-  const loggedIn = !!session;
+  const loggedIn = !!user;
 
   // 3. Definizione Link Standard
   const pages = [
@@ -103,18 +102,18 @@ function renderNavbar(activePage) {
   const adminLink = `<li><a href="admin-dashboard.html" data-page="admin" class="${activePage === "admin" ? "active" : ""}">Admin</a></li>`;
 
   const ctaButton = loggedIn
-    ? `<a class="nb-cta" href="#" onclick="handleLogout(); return false;">Esci</a>`
+    ? `<a class="nb-cta" href="#" onclick="API.logout(); return false;">Esci</a>`
     : `<a class="nb-cta" href="login.html">Accedi</a>`;
 
   // 4. Sezione Utente (Login/Logout)
-  const userArea = (user || userRole !== "guest")
+  const userArea = (user)
     ? `<div class="nb-user" style="display:flex; align-items:center; gap: 1rem;">
          <span class="nb-username" style="font-size: 13px; opacity: 0.7;">
-           ${user ? user.name.split(" ")[0] : "Account"}
+           ${user.username || "Account"}
          </span>
-         <button class="nb-cta" style="cursor:pointer;" onclick="authLogout()">Esci</button>
+         <button class="nb-cta" style="cursor:pointer;" onclick="API.logout()">Esci</button>
        </div>`
-    : `...`;
+    : ``;
 
   const html = `
     <nav class="navbar">
