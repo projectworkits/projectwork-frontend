@@ -72,8 +72,8 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">URL immagine</label>
-        <input type="url" class="form-input" id="f-img" placeholder="https://…" oninput="updatePreview()">
+        <label class="form-label">File Immagine *</label>
+        <input type="file" class="form-input" id="f-file" accept="image/*" onchange="updatePreview()">
         <img id="img-preview" class="img-preview" style="display:none" alt="Anteprima">
       </div>
       <div style="display:flex;gap:1rem;margin-top:1rem">
@@ -95,10 +95,17 @@ const editId = params.get("id") ? parseInt(params.get("id")) : null;
 let editPhoto = null;
 
 function updatePreview() {
-  const url = document.getElementById("f-img").value.trim();
+  const file = document.getElementById("f-file").files[0];
   const img = document.getElementById("img-preview");
-  if (url) { img.src = url; img.style.display = "block"; }
-  else { img.style.display = "none"; }
+  if (file) {
+    img.src = URL.createObjectURL(file);
+    img.style.display = "block";
+  } else if (editPhoto && editPhoto.img) {
+    img.src = editPhoto.img;
+    img.style.display = "block";
+  } else {
+    img.style.display = "none";
+  }
 }
 
 function populate(p) {
@@ -113,7 +120,7 @@ function populate(p) {
   document.getElementById("f-price").value = p.price;
   document.getElementById("f-state").value = p.state;
   document.getElementById("state-group").style.display = "block";
-  if (p.img) { document.getElementById("f-img").value = p.img; updatePreview(); }
+  if (p.img) { updatePreview(); }
 }
 
 function validate() {
@@ -131,18 +138,35 @@ function validate() {
 
 function handleSubmit() {
   if (!validate()) return;
-  const data = {
-    title:         document.getElementById("f-title").value.trim(),
-    originalTitle: document.getElementById("f-orig").value.trim(),
-    year:          parseInt(document.getElementById("f-year").value),
-    place:         document.getElementById("f-place").value.trim(),
-    description:   document.getElementById("f-desc").value.trim(),
-    price:         parseFloat(document.getElementById("f-price").value),
-    img:           document.getElementById("f-img").value.trim() || null,
-    state:         document.getElementById("f-state").value || "disponibile",
-  };
-
-  const action = editId ? API.updatePhoto(editId, data) : API.createPhoto(data);
+  let action;
+  if (editId) {
+    const data = {
+      id:            editId,
+      title:         document.getElementById("f-title").value.trim(),
+      originalTitle: document.getElementById("f-orig").value.trim(),
+      year:          parseInt(document.getElementById("f-year").value),
+      place:         document.getElementById("f-place").value.trim(),
+      description:   document.getElementById("f-desc").value.trim(),
+      price:         parseFloat(document.getElementById("f-price").value),
+      state:         document.getElementById("f-state").value || "disponibile",
+      img:           editPhoto.img // Keep existing path if not handled by PUT with file
+    };
+    action = API.updatePhoto(editId, data);
+  } else {
+    const formData = new FormData();
+    formData.append("title", document.getElementById("f-title").value.trim());
+    formData.append("originalTitle", document.getElementById("f-orig").value.trim());
+    formData.append("year", parseInt(document.getElementById("f-year").value));
+    formData.append("place", document.getElementById("f-place").value.trim());
+    formData.append("description", document.getElementById("f-desc").value.trim());
+    formData.append("price", parseFloat(document.getElementById("f-price").value));
+    formData.append("state", "available");
+    const file = document.getElementById("f-file").files[0];
+    if (file) formData.append("photo", file);
+    else { toast("Seleziona un'immagine", "error"); return; }
+    
+    action = API.createPhoto(formData);
+  }
   action.then(() => {
     toast(editId ? "Fotografia aggiornata" : "Fotografia creata");
     setTimeout(() => location.href = "admin-photos.html", 1000);

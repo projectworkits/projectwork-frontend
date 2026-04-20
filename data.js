@@ -1,141 +1,189 @@
+const BASE_URL = "/api";
 
-const DB = {
-
-  // ── PHOTOS ──
-  photos: [
-    {
-      id: 1,
-      title: "Il Bacio",
-      originalTitle: "Le Baiser de l'Hôtel de Ville",
-      year: 1950,
-      place: "Parigi, Francia",
-      description: "Una delle fotografie più iconiche del Novecento. Scattata in Place de l'Hôtel de Ville durante il fiorire della Parigi del dopoguerra, ritrae una coppia che si bacia in mezzo alla folla indifferente. Doisneau la realizzò su commissione per Life Magazine, ma divenne il simbolo universale dell'amore parigino.",
-      state: "disponibile", // disponibile | prenotata | venduta
-      price: 4800,
-      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Robert_Doisneau_Le_Baiser_de_l%27H%C3%B4tel_de_Ville.jpg/400px-Robert_Doisneau_Le_Baiser_de_l%27H%C3%B4tel_de_Ville.jpg",
-      bookedBy: null,
-    },
-  ],
-
-  // ── PRODUCTS ──
-  products: [
-    {
-      id: 1,
-      name: "Catalogo ufficiale della mostra",
-      description: "Il catalogo completo della retrospettiva. 240 pagine, carta patinata, oltre 180 riproduzioni fotografiche in alta qualità. Testi critici di Brigitte Ollier e Jean-François Chevrier. Edizione numerata e firmata disponibile su richiesta.",
-      price: 38,
-      available: 45,
-      img: null,
-    },
-  ],
-
-  // ── USERS ──
-  users: [
-    { id: 1, name: "Giulia Ferretti", email: "giulia@example.com", role: "collaboratore" },
-    { id: 2, name: "Marco Santini",   email: "marco@example.com",   role: "utente" },
-  ],
-
-  // ── BOOKINGS ──
-  bookings: [
-    { id: 1, type: "photo",   itemId: 2, userId: "user", qty: 1, date: "2026-04-01" },
-    { id: 2, type: "photo",   itemId: 8, userId: "user", qty: 1, date: "2026-04-03" },
-    { id: 3, type: "product", itemId: 3, userId: "user", qty: 2, date: "2026-04-05" },
-  ],
-
-};
-
-// da sostituire con API reali, mock API
 const API = {
-  
-  // Photos
-  getPhotos: () => Promise.resolve([...DB.photos]),
-  getPhoto:  (id) => Promise.resolve(DB.photos.find(p => p.id === id) || null),
-  createPhoto: (data) => {
-    const stringint = `${data.price}`;
-    const p = { ...data, id: Date.now(), price: stringint, state: "disponibile", bookedBy: null };
-    DB.photos.push(p);
-    return Promise.resolve(p);
-  },
-  updatePhoto: (id, data) => {
-    const i = DB.photos.findIndex(p => p.id === id);
-    if (i < 0) return Promise.reject("not found");
-
-    if (data.price){
-      data.price = `${data.price}`;
+  // Helper for fetch
+  _fetch: async (url, options = {}) => {
+    const res = await fetch(BASE_URL + url, {
+      ...options,
+      headers: {
+        'Accept': 'application/json',
+        ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
+        ...options.headers,
+      },
+    });
+    if (res.status === 204) return null;
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: res.statusText }));
+      throw err.message || "Errore API";
     }
+    return res.json();
+  },
 
-    DB.photos[i] = { ...DB.photos[i], ...data };
-    return Promise.resolve(DB.photos[i]);
+  // State Mapping Helpers
+  _mapPhotoToFrontend: (p) => {
+    const stateMap = { available: "disponibile", booked: "prenotata", sold: "venduta" };
+    return {
+      ...p,
+      id: p.photo_id,
+      originalTitle: p.original_title,
+      img: p.path,
+      state: stateMap[p.state] || p.state,
+      bookedBy: p.booked_by
+    };
   },
-  deletePhoto: (id) => {
-    DB.photos = DB.photos.filter(p => p.id !== id);
-    return Promise.resolve();
+
+  _mapPhotoToBackend: (p) => {
+    const stateMap = { disponibile: "available", prenotata: "booked", venduta: "sold" };
+    return {
+      photo_id: p.id,
+      original_title: p.originalTitle,
+      path: p.img,
+      title: p.title,
+      year: p.year,
+      place: p.place,
+      description: p.description,
+      price: p.price,
+      state: stateMap[p.state] || p.state,
+      booked_by: p.bookedBy
+    };
   },
-  bookPhoto: (id) => {
-    const p = DB.photos.find(x => x.id === id);
-    if (!p || p.state !== "disponibile") return Promise.reject("non disponibile");
-    p.state = "prenotata";
-    p.bookedBy = "user";
-    DB.bookings.push({ id: Date.now(), type: "photo", itemId: id, userId: "user", qty: 1, date: new Date().toISOString().slice(0,10) });
-    return Promise.resolve(p);
+
+  _mapProductToFrontend: (p) => ({
+    ...p,
+    id: p.product_id
+  }),
+
+  // Auth
+  login: async (username, password) => {
+    const data = await API._fetch("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username, password })
+    });
+    // In un'app reale il backend ritorna i cookie HttpOnly automaticamente.
+    // Qui ci serve salvare lo user per i helper di app.js
+    const user = await API.getCurrentUser();
+    localStorage.setItem("doisneau_session", JSON.stringify(user));
+    return user;
   },
-  cancelPhotoBooking: (id) => {
-    const p = DB.photos.find(x => x.id === id);
-    if (!p) return Promise.reject("not found");
-    p.state = "disponibile";
-    p.bookedBy = null;
-    DB.bookings = DB.bookings.filter(b => !(b.type === "photo" && b.itemId === id));
-    return Promise.resolve(p);
+
+  logout: async () => {
+    await API._fetch("/auth/logout");
+    localStorage.removeItem("doisneau_session");
+    location.href = "login.html";
   },
-  confirmSale: (id) => {
-    const p = DB.photos.find(x => x.id === id);
-    if (!p) return Promise.reject("not found");
-    p.state = "venduta";
-    return Promise.resolve(p);
+
+  getCurrentUser: () => API._fetch("/users/user"),
+
+  // Photos
+  getPhotos: async () => {
+    const photos = await API._fetch("/photos/");
+    return photos.map(API._fetchPhotoExtras || API._mapPhotoToFrontend);
+  },
+
+  getPhoto: async (id) => {
+    const photo = await API._fetch(`/photos/${id}`);
+    return API._mapPhotoToFrontend(photo);
+  },
+
+  createPhoto: async (formData) => {
+    // Riceve FormData perché l'admin carica un file
+    const photo = await API._fetch("/photos/upload", {
+      method: "POST",
+      body: formData
+    });
+    return API._mapPhotoToFrontend(photo);
+  },
+
+  updatePhoto: async (id, data) => {
+    // Se data è una Photo oggetto frontend, mappiamo a backend
+    const backendData = API._mapPhotoToBackend(data);
+    const photo = await API._fetch("/photos/", {
+      method: "PUT",
+      body: JSON.stringify(backendData)
+    });
+    return photo ? API._mapPhotoToFrontend(photo) : null;
+  },
+
+  deletePhoto: (id) => API._fetch(`/photos/${id}`, { method: "DELETE" }),
+
+  bookPhoto: async (id) => {
+    const photo = await API.getPhoto(id);
+    const session = getSession();
+    if (!session) throw "Devi aver fatto il login per prenotare";
+    
+    // Aggiorniamo lo stato tramite la PUT generalizzata come confermato dall'utente
+    photo.state = "prenotata";
+    photo.bookedBy = session.user_id;
+    return API.updatePhoto(id, photo);
+  },
+
+  cancelPhotoBooking: async (id) => {
+    const photo = await API.getPhoto(id);
+    photo.state = "disponibile";
+    photo.bookedBy = null;
+    return API.updatePhoto(id, photo);
+  },
+
+  confirmSale: async (id) => {
+    const photo = await API.getPhoto(id);
+    photo.state = "venduta";
+    return API.updatePhoto(id, photo);
   },
 
   // Products
-  getProducts: () => Promise.resolve([...DB.products]),
-  getProduct:  (id) => Promise.resolve(DB.products.find(p => p.id === id) || null),
-  createProduct: (data) => {
-    const stringint = `${data.price}`;
-    const p = { ...data, id: Date.now(), price: stringint };
-    DB.products.push(p);
-    return Promise.resolve(p);
+  getProducts: async () => {
+    const products = await API._fetch("/products/");
+    return products.map(API._mapProductToFrontend);
   },
-  updateProduct: (id, data) => {
-    const i = DB.products.findIndex(p => p.id === id);
-    if (i < 0) return Promise.reject("not found");
 
-    if (data.price) {
-      data.price = `${data.price}`;
-    }
+  getProduct: async (id) => {
+    const product = await API._fetch(`/products/${id}`);
+    return API._mapProductToFrontend(product);
+  },
 
-    DB.products[i] = { ...DB.products[i], ...data };
-    return Promise.resolve(DB.products[i]);
+  createProduct: async (data) => {
+    const product = await API._fetch("/products/", {
+      method: "POST",
+      body: JSON.stringify(data)
+    });
+    return API._mapProductToFrontend(product);
   },
-  deleteProduct: (id) => {
-    DB.products = DB.products.filter(p => p.id !== id);
-    return Promise.resolve();
+
+  updateProduct: async (id, data) => {
+    // I campi id nel backend sono product_id
+    const payload = { ...data, product_id: id };
+    const product = await API._fetch("/products/", {
+      method: "PUT",
+      body: JSON.stringify(payload)
+    });
+    return product ? API._mapProductToFrontend(product) : null;
   },
-  bookProduct: (id, qty) => {
-    const p = DB.products.find(x => x.id === id);
-    if (!p || p.available < qty) return Promise.reject("quantità non disponibile");
+
+  deleteProduct: (id) => API._fetch(`/products/${id}`, { method: "DELETE" }),
+
+  bookProduct: async (id, qty) => {
+    // README non ha un endpoint specifico per prenotare prodotti,
+    // in un'app reale si farebbe una POST /orders o simili.
+    // Qui cerchiamo di aggiornare la disponibilità via PUT su product.
+    const p = await API.getProduct(id);
+    if (p.available < qty) throw "Quantità non disponibile";
     p.available -= qty;
-    DB.bookings.push({ id: Date.now(), type: "product", itemId: id, userId: "user", qty, date: new Date().toISOString().slice(0,10) });
-    return Promise.resolve(p);
+    p.booked = (p.booked || 0) + Number(qty);
+    return API.updateProduct(id, p);
   },
-  displayPrice: (price) => {
-    return `${price} €`;
-  },
+
+  displayPrice: (price) => `${price} €`,
 
   // Users
-  getUsers: () => Promise.resolve([...DB.users]),
-  toggleCollaboratore: (id) => {
-    const u = DB.users.find(x => x.id === id);
-    if (!u) return Promise.reject("not found");
-    u.role = u.role === "collaboratore" ? "utente" : "collaboratore";
-    return Promise.resolve(u);
+  getUsers: () => API._fetch("/users/"),
+  
+  toggleCollaboratore: async (id) => {
+    const user = await API._fetch(`/users/${id}`);
+    user.collaborator = user.collaborator === 1 ? 0 : 1;
+    return API._fetch("/users/", {
+      method: "PUT",
+      body: JSON.stringify(user)
+    });
   },
 
 };

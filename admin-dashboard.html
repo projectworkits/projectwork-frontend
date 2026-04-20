@@ -67,7 +67,7 @@ function renderDashboard(photos, products, users) {
   const fotos_pren   = photos.filter(p => p.state === "prenotata").length;
   const fotos_vend   = photos.filter(p => p.state === "venduta").length;
   const prod_disp    = products.filter(p => p.available > 0).length;
-  const collaboratori = users.filter(u => u.role === "collaboratore").length;
+  const collaboratori = users.filter(u => u.collaborator === 1).length;
 
   document.getElementById("page-content").innerHTML = `
     <div class="page-header">

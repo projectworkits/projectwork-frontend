@@ -82,7 +82,8 @@ let photo = null;
 
 function buildActions(p) {
   const role = getRole();
-  const isMyBooking = p.bookedBy === "user" && role === "user";
+  const user = currentUser();
+  const isMyBooking = user && p.bookedBy === user.user_id && role === "user";
 
   // Guest
   if (role === "guest") {
