@@ -172,8 +172,7 @@ async function handleRegister() {
     } else {
       toast(`Benvenuto`);
     }
-
-    return { ok: true, user: data.user || data };
+    
   } catch (err) {
     return { ok: false, error: "Errore di connessione al server." };
   }
