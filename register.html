@@ -169,9 +169,10 @@ async function handleRegister() {
         ok: false,
         error: errorData?.message || `Registrazione fallita (${response.status})`
       };
+    } else {
+      toast(`Benvenuto`);
     }
 
-    const data = await response.json();
 
     // Salva la sessione localmente
     localStorage.setItem("doisneau_session", JSON.stringify(data));
