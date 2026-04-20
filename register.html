@@ -147,7 +147,7 @@ async function handleRegister() {
   if (!valid) return;
 
   const result = await authRegister(name, email, password);
-  if (!result.ok) {
+  if (!result.status === 201) {
     showGlobalError(result.error);
     return;
   }
