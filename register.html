@@ -163,16 +163,12 @@ async function handleRegister() {
       body: JSON.stringify({ username: username, email: email, password: password })
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      return {
-        ok: false,
-        error: errorData?.message || `Registrazione fallita (${response.status})`
-      };
-    } else {
+    if (response.status === 201) {
       toast(`Benvenuto`);
+    } else {
+      toast(`Credenziali nel formato non corretto`);
     }
-    
+
   } catch (err) {
     return { ok: false, error: "Errore di connessione al server." };
   }
