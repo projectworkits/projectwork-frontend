@@ -51,14 +51,14 @@
         grid.innerHTML = list.map(ph => {
           const id    = ph.photoId;
           const title = escapeHtml(ph.title || 'Senza titolo');
-          const year  = ph.year ? String(ph.year) : '';
+          const date  = escapeHtml(ph.date || '');
           const path  = escapeHtml(photoUrl(ph.path));
           return `
             <a href="mostra-detail.html?id=${id}" class="card-art">
               <div class="card-art-bg" style="background-image: url('${path}');"></div>
               <div class="card-art-overlay"></div>
               <div class="card-art-body">
-                ${year ? `<span class="card-art-year">${year}</span>` : ''}
+                ${date ? `<span class="card-art-year">${date}</span>` : ''}
                 <h3 class="card-art-title">${title}</h3>
               </div>
             </a>`;

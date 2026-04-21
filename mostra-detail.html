@@ -74,7 +74,7 @@
               <span class="state-badge is-${state}">${stateLabel}</span>
             </div>
             <div class="detail-meta">
-              <div class="detail-meta-item"><span class="detail-meta-label">Data</span><span class="detail-meta-value">${ph.year != null ? ph.year : '—'}</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-label">Data</span><span class="detail-meta-value">${escapeHtml(ph.date || '—')}</span></div>
               <div class="detail-meta-item"><span class="detail-meta-label">Luogo</span><span class="detail-meta-value">${escapeHtml(ph.place || '—')}</span></div>
             </div>
             ${ph.description ? `<p class="section-body">${escapeHtml(ph.description)}</p>` : ''}

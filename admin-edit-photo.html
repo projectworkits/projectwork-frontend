@@ -35,8 +35,8 @@
       </div>
       <div class="form-row">
         <div class="form-field">
-          <label class="form-label" for="year">Anno</label>
-          <input class="form-input" type="number" id="year" name="year" min="1800" max="2100" required>
+          <label class="form-label" for="date">Data</label>
+          <input class="form-input" type="text" id="date" name="date" maxlength="30" required>
         </div>
         <div class="form-field">
           <label class="form-label" for="place">Luogo</label>
@@ -102,7 +102,7 @@
       form.path.value           = ph.path || '';
       form.title.value          = ph.title || '';
       form.originalTitle.value  = ph.originalTitle || '';
-      form.year.value           = ph.year ?? '';
+      form.date.value           = ph.date || '';
       form.place.value          = ph.place || '';
       form.description.value    = ph.description || '';
       form.state.value          = String(Number(ph.state) || 0);
@@ -117,7 +117,7 @@
           path:           form.path.value,
           title:          form.title.value.trim(),
           originalTitle:  form.originalTitle.value.trim(),
-          year:           parseInt(form.year.value, 10),
+          date:           form.date.value.trim(),
           place:          form.place.value.trim(),
           description:    form.description.value.trim(),
           state:          parseInt(form.state.value, 10),
