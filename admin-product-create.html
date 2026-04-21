@@ -18,108 +18,94 @@
 </head>
 <body>
 <div class="site">
-
   <script src="data.js"></script>
   <script src="app.js"></script>
   <script src="navbar.js"></script>
-  <script>renderNavbar("admin");</script>
 
-  <a href="admin-products.html" class="back-link">← Torna all'elenco prodotti</a>
+  <a href="admin-products.html" class="back-link">← Torna all'elenco</a>
 
-  <div id="denied" style="display:none;padding:3rem 2.5rem;text-align:center;color:rgba(240,236,228,0.4)">Accesso riservato agli amministratori.</div>
+  <div class="page-header">
+    <p class="eyebrow" id="page-eyebrow">Admin · Nuovo Prodotto</p>
+    <h1 class="section-title" id="page-title">Aggiungi prodotto</h1>
+  </div>
 
-  <div id="main" style="display:none">
-    <div class="page-header">
-      <p class="eyebrow" id="form-eyebrow">Admin · Prodotti</p>
-      <h1 class="section-title" id="form-title">Nuovo prodotto</h1>
+  <div class="form-card">
+    <div class="form-group">
+      <label class="form-label">Nome Prodotto</label>
+      <input type="text" class="form-input" id="name" placeholder="Es. Catalogo della Mostra">
     </div>
-    <div class="form-card">
+    <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Nome *</label>
-        <input type="text" class="form-input" id="f-name" placeholder="es. Catalogo ufficiale della mostra">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Descrizione *</label>
-        <textarea class="form-textarea" id="f-desc" rows="5" placeholder="Descrizione dettagliata del prodotto…"></textarea>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Prezzo (€) *</label>
-          <input type="number" class="form-input" id="f-price" placeholder="38" min="0" step="0.01">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Disponibilità *</label>
-          <input type="number" class="form-input" id="f-available" placeholder="50" min="0">
-        </div>
+        <label class="form-label">Prezzo (€)</label>
+        <input type="number" class="form-input" id="price" placeholder="25">
       </div>
       <div class="form-group">
-        <label class="form-label">URL immagine (opzionale)</label>
-        <input type="url" class="form-input" id="f-img" placeholder="https://…">
+        <label class="form-label">Disponibilità</label>
+        <input type="number" class="form-input" id="available" placeholder="100">
       </div>
-      <div style="display:flex;gap:1rem;margin-top:1rem">
-        <button class="btn btn-solid" onclick="handleSubmit()">Salva prodotto</button>
-        <a href="admin-products.html" class="btn btn-ghost">Annulla</a>
-      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrizione</label>
+      <textarea class="form-input" id="description" rows="4" placeholder="Dettagli del prodotto..."></textarea>
+    </div>
+    <div style="margin-top:2rem">
+      <button class="btn btn-gold" id="save-btn" onclick="handleSave()">Salva prodotto</button>
     </div>
   </div>
 
   <footer class="footer">
     <span>© 2026 Mostra Doisneau — Pordenone</span>
-    <span>Privacy · Accessibilità</span>
   </footer>
-
 </div>
+
 <script>
-const params = new URLSearchParams(location.search);
-const editId = params.get("id") ? parseInt(params.get("id")) : null;
+const productId = new URLSearchParams(location.search).get("id");
+let existingProduct = null;
 
-function populate(p) {
-  document.getElementById("form-eyebrow").textContent = "Admin · Prodotti · Modifica";
-  document.getElementById("form-title").textContent = p.name;
-  document.getElementById("f-name").value = p.name;
-  document.getElementById("f-desc").value = p.description;
-  document.getElementById("f-price").value = p.price;
-  document.getElementById("f-available").value = p.available;
-  document.getElementById("f-img").value = p.img || "";
-}
+async function handleSave() {
+  const btn = document.getElementById("save-btn");
+  btn.disabled = true;
+  btn.textContent = "Salvataggio...";
 
-function validate() {
-  const required = [
-    ["f-name",      "Il nome è obbligatorio"],
-    ["f-desc",      "La descrizione è obbligatoria"],
-    ["f-price",     "Il prezzo è obbligatorio"],
-    ["f-available", "La disponibilità è obbligatoria"],
-  ];
-  for (const [id, msg] of required) {
-    if (!document.getElementById(id).value.toString().trim()) { toast(msg, "error"); return false; }
-  }
-  return true;
-}
-
-function handleSubmit() {
-  if (!validate()) return;
   const data = {
-    name:        document.getElementById("f-name").value.trim(),
-    description: document.getElementById("f-desc").value.trim(),
-    price:       parseFloat(document.getElementById("f-price").value),
-    available:   parseInt(document.getElementById("f-available").value),
-    img:         document.getElementById("f-img").value.trim() || null,
+    name: document.getElementById("name").value,
+    price: Number(document.getElementById("price").value),
+    available: Number(document.getElementById("available").value),
+    description: document.getElementById("description").value,
   };
-  const action = editId ? API.updateProduct(editId, data) : API.createProduct(data);
-  action.then(() => {
-    toast(editId ? "Prodotto aggiornato" : "Prodotto creato");
+
+  try {
+    if (productId) {
+      await API.updateProduct(productId, { ...existingProduct, ...data });
+      toast("Prodotto aggiornato");
+    } else {
+      await API.createProduct(data);
+      toast("Prodotto creato");
+    }
     setTimeout(() => location.href = "admin-products.html", 1000);
-  }).catch(err => toast(err, "error"));
+  } catch (err) {
+    toast(err, "error");
+    btn.disabled = false;
+    btn.textContent = "Salva prodotto";
+  }
 }
 
-function init() {
-  if (!isAdmin()) {
-    document.getElementById("denied").style.display = "block"; return;
+initApp().then(user => {
+  renderNavbar("admin", user);
+  if (!isAdmin(user)) { location.href = "index.html"; return; }
+
+  if (productId) {
+    document.getElementById("page-eyebrow").textContent = "Admin · Modifica";
+    document.getElementById("page-title").textContent = "Modifica prodotto";
+    API.getProduct(productId).then(p => {
+      existingProduct = p;
+      document.getElementById("name").value = p.name;
+      document.getElementById("price").value = p.price;
+      document.getElementById("available").value = p.available;
+      document.getElementById("description").value = p.description;
+    });
   }
-  document.getElementById("main").style.display = "block";
-  if (editId) API.getProduct(editId).then(p => { if (p) populate(p); else toast("Prodotto non trovato", "error"); });
-}
-init();
+});
 </script>
 </body>
 </html>

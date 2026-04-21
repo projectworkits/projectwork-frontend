@@ -57,6 +57,7 @@
     </div>
   </div>
 
+
   <footer class="footer">
     <span>© 2026 Mostra Doisneau — Pordenone</span>
     <span>Privacy · Accessibilità</span>
@@ -129,17 +130,15 @@ function handleDelete(id) {
   });
 }
 
-function refreshPageForRole(role) {
+initApp().then(user => {
+  renderNavbar("admin", user);
+  const role = getRole(user);
   document.getElementById("denied").style.display = role !== "admin" ? "block" : "none";
   document.getElementById("main").style.display = role === "admin" ? "block" : "none";
-}
-
-if (isAdmin()) {
-  document.getElementById("main").style.display = "block";
-  API.getProducts().then(products => { allProducts = products; filtered = products; renderTable(); });
-} else {
-  document.getElementById("denied").style.display = "block";
-}
+  if (role === "admin") {
+    API.getProducts().then(products => { allProducts = products; filtered = products; renderTable(); });
+  }
+});
 </script>
 </body>
 </html>

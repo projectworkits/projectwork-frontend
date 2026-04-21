@@ -1,25 +1,30 @@
-// Utenti salvati in localStorage da fare collegamento API
+// Le sessioni sono gestite lato server tramite cookie HttpOnly.
+// Non memorizziamo dati utente o carrello localmente in variabili globali persistenti.
 
-
-function getSession() {
-  try { return JSON.parse(localStorage.getItem("doisneau_session")) || null; }
-  catch { return null; }
+async function initApp() {
+  try {
+    const user = await API.getCurrentUser();
+    applyTheme();
+    injectCursor();
+    return user;
+  } catch (e) {
+    applyTheme();
+    injectCursor();
+    return null;
+  }
 }
 
-function currentUser() { return getSession(); }
-function isLoggedIn() { return !!getSession(); }
-
-function getRole() {
-  const s = getSession();
-  if (!s) return "guest";
-  if (s.admin === 1) return "admin";
-  if (s.collaborator === 1) return "collaborator";
+function getRole(user) {
+  if (!user) return "guest";
+  if (user.admin === 1) return "admin";
+  if (user.collaborator === 1) return "collaborator";
   return "user";
 }
 
-function isAdmin() { return getRole() === "admin"; }
-function isCollaborator() { return getRole() === "collaborator" || getRole() === "admin"; }
-function isUser() { return isLoggedIn(); }
+function isAdmin(user) { return getRole(user) === "admin"; }
+function isCollaborator(user) { return getRole(user) === "collaborator" || getRole(user) === "admin"; }
+function isLoggedIn(user) { return !!user; }
+function isUser(user) { return isLoggedIn(user); }
 
 function setRole() { }
 function renderRoleBadge() {
@@ -123,15 +128,11 @@ function toggleTheme() {
     btn.innerHTML = body.classList.contains("light-mode") ? "☾" : "☀";
     btn.title = body.classList.contains("light-mode") ? "Passa al tema scuro" : "Passa al tema chiaro";
   }
-  localStorage.setItem("doisneau_theme", body.classList.contains("light-mode") ? "light" : "dark");
 }
 
 function applyTheme() {
-  if (localStorage.getItem("doisneau_theme") === "light") {
-    document.body.classList.add("light-mode");
-    const btn = document.getElementById("theme-toggle");
-    if (btn) { btn.innerHTML = "☾"; btn.title = "Passa al tema scuro"; }
-  }
+  // Il tema ora è guidato dallo stato iniziale o sessione server, 
+  // senza persistenza locale nel client.
 }
 function injectCursor() {
   const cursorEl = document.createElement('div');

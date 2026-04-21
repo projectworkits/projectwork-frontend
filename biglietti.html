@@ -13,7 +13,13 @@
   <script src="data.js"></script>
   <script src="app.js"></script>
   <script src="navbar.js"></script>
-  <script>renderNavbar("biglietti");</script>
+  <script>
+    let currentUser = null;
+    initApp().then(user => {
+      currentUser = user;
+      renderNavbar("biglietti", user);
+    });
+  </script>
 
   <div class="page active" id="page-biglietti">
     <div class="biglietti-page">
@@ -91,7 +97,7 @@
 </div>
 <script>
 function handleTicket(tipo, prezzo) {
-  if (!isUser()) {
+  if (!isUser(currentUser)) {
     toast("Accedi come utente per acquistare", "error");
     return;
   }

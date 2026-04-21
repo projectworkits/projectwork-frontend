@@ -19,168 +19,161 @@
 </head>
 <body>
 <div class="site">
-
   <script src="data.js"></script>
   <script src="app.js"></script>
   <script src="navbar.js"></script>
-  <script>renderNavbar("admin");</script>
 
-  <a href="admin-photos.html" class="back-link">← Torna all'elenco fotografie</a>
+  <a href="admin-photos.html" class="back-link">← Torna all'elenco</a>
 
-  <div id="denied" style="display:none;padding:3rem 2.5rem;text-align:center;color:rgba(240,236,228,0.4)">Accesso riservato agli amministratori.</div>
+  <div class="page-header">
+    <p class="eyebrow" id="page-eyebrow">Admin · Nuova Fotografia</p>
+    <h1 class="section-title" id="page-title">Aggiungi fotografia</h1>
+  </div>
 
-  <div id="main" style="display:none">
-    <div class="page-header">
-      <p class="eyebrow" id="form-eyebrow">Admin · Fotografie</p>
-      <h1 class="section-title" id="form-title">Nuova fotografia</h1>
+  <div class="form-card">
+    <div class="form-group">
+      <label class="form-label">Titolo</label>
+      <input type="text" class="form-input" id="title" placeholder="Es. Il bacio all'Hotel de Ville">
     </div>
-    <div class="form-card">
+    <div class="form-group">
+      <label class="form-label">Titolo Originale</label>
+      <input type="text" class="form-input" id="originalTitle" placeholder="Es. Le baiser de l'hôtel de ville">
+    </div>
+    <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Titolo *</label>
-        <input type="text" class="form-input" id="f-title" placeholder="es. Il Bacio">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Titolo originale</label>
-        <input type="text" class="form-input" id="f-orig" placeholder="es. Le Baiser de l'Hôtel de Ville">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Anno *</label>
-          <input type="number" class="form-input" id="f-year" placeholder="1950" min="1900" max="2000">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Luogo *</label>
-          <input type="text" class="form-input" id="f-place" placeholder="Parigi, Francia">
-        </div>
+        <label class="form-label">Anno</label>
+        <input type="number" class="form-input" id="year" placeholder="1950">
       </div>
       <div class="form-group">
-        <label class="form-label">Descrizione</label>
-        <textarea class="form-textarea" id="f-desc" rows="5" placeholder="Descrizione della fotografia…"></textarea>
+        <label class="form-label">Luogo</label>
+        <input type="text" class="form-input" id="place" placeholder="Parigi">
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Prezzo (€) *</label>
-          <input type="number" class="form-input" id="f-price" placeholder="4800" min="0">
-        </div>
-        <div class="form-group" id="state-group" style="display:none">
-          <label class="form-label">Stato</label>
-          <select class="form-select" id="f-state">
-            <option value="disponibile">Disponibile</option>
-            <option value="prenotata">Prenotata</option>
-            <option value="venduta">Venduta</option>
-          </select>
-        </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Prezzo (€)</label>
+        <input type="number" class="form-input" id="price" placeholder="1200">
       </div>
       <div class="form-group">
-        <label class="form-label">File Immagine *</label>
-        <input type="file" class="form-input" id="f-file" accept="image/*" onchange="updatePreview()">
-        <img id="img-preview" class="img-preview" style="display:none" alt="Anteprima">
+        <label class="form-label">Stato</label>
+        <select class="form-select" id="state">
+          <option value="disponibile">Disponibile</option>
+          <option value="prenotata">Prenotata</option>
+          <option value="venduta">Venduta</option>
+        </select>
       </div>
-      <div style="display:flex;gap:1rem;margin-top:1rem">
-        <button class="btn btn-solid" onclick="handleSubmit()">Salva fotografia</button>
-        <a href="admin-photos.html" class="btn btn-ghost">Annulla</a>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrizione</label>
+      <textarea class="form-input" id="description" rows="4" placeholder="Breve storia o dettagli tecnici..."></textarea>
+    </div>
+    <div class="form-group" id="file-group">
+      <label class="form-label">Immagine (File)</label>
+      <input type="file" class="form-input" id="photoFile" accept="image/*" onchange="previewImg(event)">
+      <div id="preview-container" style="display:none">
+        <img id="img-preview" class="img-preview">
       </div>
+    </div>
+    <div style="margin-top:2rem">
+      <button class="btn btn-gold" id="save-btn" onclick="handleSave()">Salva fotografia</button>
     </div>
   </div>
 
   <footer class="footer">
     <span>© 2026 Mostra Doisneau — Pordenone</span>
-    <span>Privacy · Accessibilità</span>
   </footer>
-
 </div>
+
 <script>
-const params = new URLSearchParams(location.search);
-const editId = params.get("id") ? parseInt(params.get("id")) : null;
-let editPhoto = null;
+const photoId = new URLSearchParams(location.search).get("id");
+let existingPhoto = null;
 
-function updatePreview() {
-  const file = document.getElementById("f-file").files[0];
-  const img = document.getElementById("img-preview");
-  if (file) {
-    img.src = URL.createObjectURL(file);
-    img.style.display = "block";
-  } else if (editPhoto && editPhoto.img) {
-    img.src = editPhoto.img;
-    img.style.display = "block";
-  } else {
-    img.style.display = "none";
+function previewImg(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ex) => {
+    const p = document.getElementById("img-preview");
+    p.src = ex.target.result;
+    document.getElementById("preview-container").style.display = "block";
+  };
+  reader.readAsDataURL(file);
+}
+
+async function handleSave() {
+  const btn = document.getElementById("save-btn");
+  btn.disabled = true;
+  btn.textContent = "Salvataggio...";
+
+  const data = {
+    title: document.getElementById("title").value,
+    originalTitle: document.getElementById("originalTitle").value,
+    year: document.getElementById("year").value,
+    place: document.getElementById("place").value,
+    price: document.getElementById("price").value,
+    state: document.getElementById("state").value,
+    description: document.getElementById("description").value,
+  };
+
+  try {
+    if (photoId) {
+      // Update
+      await API.updatePhoto(photoId, { ...existingPhoto, ...data });
+      toast("Fotografia aggiornata");
+      setTimeout(() => location.href = "admin-photos.html", 1000);
+    } else {
+      // Create (needs FormData for file)
+      const fileInp = document.getElementById("photoFile");
+      if (!fileInp.files.length) throw "Seleziona un'immagine";
+
+      const fd = new FormData();
+      fd.append("photo", fileInp.files[0]);
+      // Aggiungiamo i dati come campi del FormData o JSON a seconda di come il backend si aspetta
+      // Nel nostro data.js, createPhoto invia il FormData direttamente
+      fd.append("title", data.title);
+      fd.append("original_title", data.originalTitle);
+      fd.append("year", data.year);
+      fd.append("place", data.place);
+      fd.append("description", data.description);
+      fd.append("price", data.price);
+      fd.append("state", data.state === "disponibile" ? "available" : (data.state === "prenotata" ? "booked" : "sold"));
+
+      await API.createPhoto(fd);
+      toast("Fotografia aggiunta");
+      setTimeout(() => location.href = "admin-photos.html", 1000);
+    }
+  } catch (err) {
+    toast(err, "error");
+    btn.disabled = false;
+    btn.textContent = "Salva fotografia";
   }
 }
 
-function populate(p) {
-  editPhoto = p;
-  document.getElementById("form-eyebrow").textContent = "Admin · Fotografie · Modifica";
-  document.getElementById("form-title").textContent = p.title;
-  document.getElementById("f-title").value = p.title;
-  document.getElementById("f-orig").value = p.originalTitle || "";
-  document.getElementById("f-year").value = p.year;
-  document.getElementById("f-place").value = p.place;
-  document.getElementById("f-desc").value = p.description;
-  document.getElementById("f-price").value = p.price;
-  document.getElementById("f-state").value = p.state;
-  document.getElementById("state-group").style.display = "block";
-  if (p.img) { updatePreview(); }
-}
+initApp().then(user => {
+  renderNavbar("admin", user);
+  if (!isAdmin(user)) { location.href = "index.html"; return; }
 
-function validate() {
-  const required = [
-    ["f-title", "Il titolo è obbligatorio"],
-    ["f-year",  "L'anno è obbligatorio"],
-    ["f-place", "Il luogo è obbligatorio"],
-    ["f-price", "Il prezzo è obbligatorio"],
-  ];
-  for (const [id, msg] of required) {
-    if (!document.getElementById(id).value.trim()) { toast(msg, "error"); return false; }
+  if (photoId) {
+    document.getElementById("page-eyebrow").textContent = "Admin · Modifica";
+    document.getElementById("page-title").textContent = "Modifica fotografia";
+    document.getElementById("file-group").style.display = "none"; // Non cambiamo file in update qui per semplicità
+    API.getPhoto(photoId).then(p => {
+      existingPhoto = p;
+      document.getElementById("title").value = p.title;
+      document.getElementById("originalTitle").value = p.originalTitle;
+      document.getElementById("year").value = p.year;
+      document.getElementById("place").value = p.place;
+      document.getElementById("price").value = p.price;
+      document.getElementById("state").value = p.state;
+      document.getElementById("description").value = p.description;
+      if (p.img) {
+        const pre = document.getElementById("img-preview");
+        pre.src = p.img;
+        document.getElementById("preview-container").style.display = "block";
+      }
+    });
   }
-  return true;
-}
-
-function handleSubmit() {
-  if (!validate()) return;
-  let action;
-  if (editId) {
-    const data = {
-      id:            editId,
-      title:         document.getElementById("f-title").value.trim(),
-      originalTitle: document.getElementById("f-orig").value.trim(),
-      year:          parseInt(document.getElementById("f-year").value),
-      place:         document.getElementById("f-place").value.trim(),
-      description:   document.getElementById("f-desc").value.trim(),
-      price:         parseFloat(document.getElementById("f-price").value),
-      state:         document.getElementById("f-state").value || "disponibile",
-      img:           editPhoto.img // Keep existing path if not handled by PUT with file
-    };
-    action = API.updatePhoto(editId, data);
-  } else {
-    const formData = new FormData();
-    formData.append("title", document.getElementById("f-title").value.trim());
-    formData.append("originalTitle", document.getElementById("f-orig").value.trim());
-    formData.append("year", parseInt(document.getElementById("f-year").value));
-    formData.append("place", document.getElementById("f-place").value.trim());
-    formData.append("description", document.getElementById("f-desc").value.trim());
-    formData.append("price", parseFloat(document.getElementById("f-price").value));
-    formData.append("state", "available");
-    const file = document.getElementById("f-file").files[0];
-    if (file) formData.append("photo", file);
-    else { toast("Seleziona un'immagine", "error"); return; }
-    
-    action = API.createPhoto(formData);
-  }
-  action.then(() => {
-    toast(editId ? "Fotografia aggiornata" : "Fotografia creata");
-    setTimeout(() => location.href = "admin-photos.html", 1000);
-  }).catch(err => toast(err, "error"));
-}
-
-function init() {
-  if (!isAdmin()) {
-    document.getElementById("denied").style.display = "block"; return;
-  }
-  document.getElementById("main").style.display = "block";
-  if (editId) API.getPhoto(editId).then(p => { if (p) populate(p); else toast("Fotografia non trovata", "error"); });
-}
-init();
+});
 </script>
 </body>
 </html>

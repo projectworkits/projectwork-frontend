@@ -1,5 +1,4 @@
-function renderNavbar(activePage) {
-
+async function renderNavbar(activePage, user) {
   if (!document.querySelector('link[href*="font-awesome"]')) {
     const faLink = document.createElement('link');
     faLink.rel = 'stylesheet';
@@ -8,8 +7,6 @@ function renderNavbar(activePage) {
   }
   const style = document.createElement('style');
   style.textContent = `
-
-  
     .navbar, .navbar a, .nb-links a, .nb-cta {
       font-family: 'Cormorant Garamond', serif !important;
       font-weight: 500 !important;
@@ -23,7 +20,6 @@ function renderNavbar(activePage) {
       font-size: 14px !important;
       letter-spacing: 0.22em !important;
       text-transform: uppercase !important;
-      color: ;
     }
     .nb-links a.active {
       font-weight: 700 !important;
@@ -33,7 +29,10 @@ function renderNavbar(activePage) {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1rem 2rem;
+      padding: 1.2rem 2.5rem;
+      background: rgba(10,10,10,0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 0.5px solid rgba(200, 180, 130, 0.2);
     }
     .nav-brand-link {
       display: flex;
@@ -41,113 +40,74 @@ function renderNavbar(activePage) {
       gap: 12px;           
       text-decoration: none;
     }
-    .nav-icon {
-      height: 40px;  
-      width: auto;
-      display: block;
-      transition: transform 0.3s ease;
-    }
-    .nav-brand-link:hover .nav-icon {
-      transform: scale(1.05);
-    }
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 0.8rem;
+      gap: 1.2rem;
     }
-
-    .nb-cart-link {
+    .nb-links {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none !important;
-      color: #c8b482 !important; 
-      font-size: 1.2rem !important;
-      transition: transform 0.2s ease, opacity 0.2s ease;
-      padding: 0 10px;
+      list-style: none;
+      gap: 2rem;
     }
-
-    .nb-cart-link:hover {
-      opacity: 0.8;
-      transform: scale(1.1);
-    }
-
-    .nb-cart-link i {
+    .nb-links a {
+      text-decoration: none;
       color: inherit;
+      opacity: 0.7;
+      transition: opacity 0.3s;
     }
-    body.light-mode .nb-cart-link {
-      color: #9a3636 !important;
+    .nb-links a:hover { opacity: 1; }
+    .nb-cta {
+      padding: 0.5rem 1.4rem;
+      border: 0.5px solid #c8b482;
+      color: #c8b482;
+      text-decoration: none;
+      transition: all 0.3s;
     }
-
+    .nb-cta:hover { background: #c8b482; color: #0e0e0e; }
+    body.light-mode .nb-cta { border-color: #9a3636; color: #9a3636; }
+    body.light-mode .nb-cta:hover { background: #9a3636; color: #fff; }
   `;
   document.head.appendChild(style);
 
-  const userRole = typeof getRole === "function" ? getRole() : "guest";
-  const user = typeof currentUser === "function" ? currentUser() : null;
+  const role = getRole(user);
   const loggedIn = !!user;
 
-  // 3. Definizione Link Standard
   const pages = [
     { id: "home", label: "Home", href: "index.html" },
     { id: "shop", label: "Shop", href: "shop-index.html" },
     { id: "mostra", label: "Galleria", href: "mostra-index.html" },
     { id: "biglietti", label: "Biglietti", href: "biglietti.html" },
-    { id: "landing page", label: "Landing Page", href: "landingPage.html" },
   ];
 
   const linksHtml = pages.map(p => `
     <li><a href="${p.href}" data-page="${p.id}" class="${activePage === p.id ? "active" : ""}">${p.label}</a></li>
   `).join("");
 
-  const adminLink = `<li><a href="admin-dashboard.html" data-page="admin" class="${activePage === "admin" ? "active" : ""}">Admin</a></li>`;
+  const adminLink = role === "admin" ? `<li><a href="admin-dashboard.html" data-page="admin" class="${activePage === "admin" ? "active" : ""}">Admin</a></li>` : "";
 
   const ctaButton = loggedIn
     ? `<a class="nb-cta" href="#" onclick="API.logout(); return false;">Esci</a>`
     : `<a class="nb-cta" href="login.html">Accedi</a>`;
 
-  // 4. Sezione Utente (Login/Logout)
-  const userArea = (user)
-    ? `<div class="nb-user" style="display:flex; align-items:center; gap: 1rem;">
-         <span class="nb-username" style="font-size: 13px; opacity: 0.7;">
-           ${user.username || "Account"}
-         </span>
-         <button class="nb-cta" style="cursor:pointer;" onclick="API.logout()">Esci</button>
-       </div>`
-    : ``;
-
   const html = `
     <nav class="navbar">
       <div class="nav-brand">
-        <div class="nav-brand-link">
-          <span class="nb-logo">Doisneau</span>
-        </div>
+        <a href="index.html" class="nav-brand-link">
+          <span class="nb-logo" style="color:#c8b482">Doisneau</span>
+        </a>
       </div>
       <ul class="nb-links">
         ${linksHtml}
-        <li id="admin-nav-item" style="display:none">${adminLink}</li>
+        ${adminLink}
       </ul>
-      <div style="display:flex;align-items:center;gap:0.8rem;">
-        
+      <div class="nav-actions">
+        ${loggedIn ? `<span style="font-size:12px;opacity:0.6">${user.username}</span>` : ""}
         ${ctaButton}
-        <a href="carrello.html" class="nb-cart-link">
-          <i class="fa-solid fa-cart-shopping"></i>
-        </a>
-        
-        <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()">☀</button>
+        <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" style="background:none;border:none;color:inherit;cursor:pointer;font-size:1.2rem">☀</button>
       </div>
     </nav>`;
 
   document.body.insertAdjacentHTML("afterbegin", html);
-
-  // 6. CONTROLLO ACCESSO ADMIN (Cruciale)
-  const adminItem = document.getElementById("admin-nav-item");
-  if (adminItem) {
-    if (userRole === "admin") {
-      adminItem.style.display = "list-item";
-    } else {
-      adminItem.style.display = "none";
-    }
-  }
-
   if (typeof applyTheme === "function") applyTheme();
 }

@@ -870,9 +870,6 @@
     <div style="display: flex; align-items: center; gap: 1.5rem;">
       <a class="nav-cta" href="index.html">Visita il nostro sito</a>
       <a class="nav-cta" href="#biglietti">Acquista il biglietto</a>
-      <a class="nav-cart" href="carrello.html">
-        <i class="fa-solid fa-cart-shopping"></i>
-      </a>
       <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()">☀</button>
     </div>
   </nav>
@@ -1104,39 +1101,20 @@
 
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
-  <script src="app.js"></script>
   <script src="data.js"></script>
+  <script src="app.js"></script>
   <script>
-    // Cursor
-    const cur = document.getElementById('cursor');
-    const ring = document.getElementById('cursorRing');
-    let mx = 0, my = 0, rx = 0, ry = 0;
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-    (function animCursor() {
-      cur.style.transform = `translate(${mx - 4}px,${my - 4}px)`;
-      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
-      ring.style.transform = `translate(${rx - 16}px,${ry - 16}px)`;
-      requestAnimationFrame(animCursor);
-    })();
+    initApp().then(() => {
+      // Scroll reveal
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+      }, { threshold: 0.08 });
+      document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+    });
 
-    // Scroll reveal
-    const obs = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
-    }, { threshold: 0.08 });
-    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-
-    // Toast
-    function toast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('visible');
-      setTimeout(() => t.classList.remove('visible'), 3200);
-    }
-
-    // Acquista
+    // Acquista (Placeholder)
     function acquista(tipo, prezzo) {
       toast(`Biglietto ${tipo} (€${prezzo}) aggiunto — pagamento in arrivo`);
-      // → collegare a gateway di pagamento
     }
   </script>
 </body>

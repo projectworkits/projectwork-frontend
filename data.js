@@ -5,6 +5,7 @@ const API = {
   _fetch: async (url, options = {}) => {
     const res = await fetch(BASE_URL + url, {
       ...options,
+      credentials: "same-origin",
       headers: {
         'Accept': 'application/json',
         ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
@@ -59,16 +60,11 @@ const API = {
       method: "POST",
       body: JSON.stringify({ username, password })
     });
-    // In un'app reale il backend ritorna i cookie HttpOnly automaticamente.
-    // Qui ci serve salvare lo user per i helper di app.js
-    const user = await API.getCurrentUser();
-    localStorage.setItem("doisneau_session", JSON.stringify(user));
-    return user;
+    return API.getCurrentUser();
   },
 
   logout: async () => {
     await API._fetch("/auth/logout");
-    localStorage.removeItem("doisneau_session");
     location.href = "login.html";
   },
 

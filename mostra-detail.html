@@ -63,7 +63,6 @@
   <script src="data.js"></script>
   <script src="app.js"></script>
   <script src="navbar.js"></script>
-  <script>renderNavbar("mostra");</script>
 
   <a href="mostra-index.html" class="back-link">← Torna alla galleria</a>
 
@@ -80,10 +79,9 @@ const params = new URLSearchParams(location.search);
 const photoId = parseInt(params.get("id"));
 let photo = null;
 
-function buildActions(p) {
-  const role = getRole();
-  const user = currentUser();
-  const isMyBooking = user && p.bookedBy === user.user_id && role === "user";
+function buildActions(p, user) {
+  const role = getRole(user);
+  const isMyBooking = user && p.bookedBy === user.user_id && (role === "user" || role === "collaborator");
 
   // Guest
   if (role === "guest") {
@@ -126,7 +124,7 @@ function buildActions(p) {
   return "";
 }
 
-function render(p) {
+function render(p, user) {
   photo = p;
   document.title = `${p.title} — Doisneau Pordenone`;
   document.getElementById("page-content").innerHTML = `
@@ -163,33 +161,26 @@ function render(p) {
           <span class="info-value price">${formatPrice(p.price)}</span>
         </div>
         <div class="action-area" id="action-area">
-          ${buildActions(p)}
+          ${buildActions(p, user)}
         </div>
       </div>
     </div>`;
 }
 
-function refreshActions() {
-  document.getElementById("action-area").innerHTML = buildActions(photo);
-}
-
-function refreshPageForRole() { if (photo) refreshActions(); }
-
+// Per semplicità ricarichiamo la pagina dopo azioni critiche, così ri-otteniamo lo user da initApp
 function handleBook() {
-  API.bookPhoto(photo.id).then(updated => {
-    photo = updated;
+  API.bookPhoto(photo.id).then(() => {
     toast("Fotografia prenotata con successo");
-    refreshActions();
+    setTimeout(() => location.reload(), 1000);
   }).catch(err => toast(err, "error"));
 }
 
 function handleCancelBooking() {
   confirmDialog("Vuoi eliminare la prenotazione?").then(ok => {
     if (!ok) return;
-    API.cancelPhotoBooking(photo.id).then(updated => {
-      photo = updated;
+    API.cancelPhotoBooking(photo.id).then(() => {
       toast("Prenotazione annullata");
-      refreshActions();
+      setTimeout(() => location.reload(), 1000);
     }).catch(err => toast(err, "error"));
   });
 }
@@ -197,18 +188,20 @@ function handleCancelBooking() {
 function handleConfirmSale() {
   confirmDialog("Confermi la vendita di questa fotografia?").then(ok => {
     if (!ok) return;
-    API.confirmSale(photo.id).then(updated => {
-      photo = updated;
+    API.confirmSale(photo.id).then(() => {
       toast("Vendita confermata");
-      refreshActions();
+      setTimeout(() => location.reload(), 1000);
     }).catch(err => toast(err, "error"));
   });
 }
 
-API.getPhoto(photoId).then(p => {
-  if (!p) { document.getElementById("page-content").innerHTML = '<p style="padding:3rem 2.5rem">Fotografia non trovata.</p>'; return; }
-  render(p);
-}).catch(() => toast("Errore nel caricamento", "error"));
+initApp().then(user => {
+  renderNavbar("mostra", user);
+  API.getPhoto(photoId).then(p => {
+    if (!p) { document.getElementById("page-content").innerHTML = '<p style="padding:3rem 2.5rem">Fotografia non trovata.</p>'; return; }
+    render(p, user);
+  }).catch(() => toast("Errore nel caricamento", "error"));
+});
 </script>
 </body>
 </html>

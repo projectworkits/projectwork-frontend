@@ -16,8 +16,10 @@
 		<script src="app.js"></script>
 		<script src="navbar.js"></script>
 		<script>
-			if (isLoggedIn()) location.window.href = "biglietti.html";
-			renderNavbar("register");
+			initApp().then(user => {
+				if (isLoggedIn(user)) location.href = "biglietti.html";
+				renderNavbar("register", user);
+			});
 		</script>
 
 		<div class="auth-bg"></div>
@@ -137,7 +139,7 @@
 
 		function setFieldError(id, msg) {
 			const el = document.getElementById(id);
-			el.textContent = msg; el.style.display = "block";
+			if (el) { el.textContent = msg; el.style.display = "block"; }
 		}
 
 		async function handleRegister() {
@@ -154,32 +156,24 @@
 			if (password !== confirm) { setFieldError("confirm-err", "Le password non coincidono."); valid = false; }
 			if (!valid) return;
 
-			const result = await authRegister(name, email, password);
-			if (!result.status === 201) {
-				showGlobalError(result.error);
-				return;
-			}
+			try {
+				const response = await fetch("/api/users/register", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ username: name, email: email, password: password })
+				});
 
-			toast(`Benvenuto, ${result.user.name.split(" ")[0]}!`);
-			setTimeout(() => location.href = "biglietti.html", 700);
-
-			async function authRegister(username, email, password) {
-				try {
-					const response = await fetch("https://localhost/api/users/register", {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({ username: username, email: email, password: password })
-					});
-
-					if (response.status === 201) {
-						toast(`Benvenuto`);
-					} else {
-						return { ok: false, error: "Credenziali nel formato non corretto" };
-					}
-
-				} catch (err) {
-					return { ok: false, error: "Errore di connessione al server." };
+				if (response.status === 201) {
+					toast(`Registrazione completata! Benvenuto.`);
+					// Dopo la registrazione, l'utente potrebbe dover fare login o essere loggato automaticamente
+					// In base all'API, se restituisce cookie, redirigiamo
+					setTimeout(() => location.href = "login.html", 1000);
+				} else {
+					const data = await response.json();
+					showGlobalError(data.error || "Errore durante la registrazione.");
 				}
+			} catch (err) {
+				showGlobalError("Errore di connessione al server.");
 			}
 		}
 

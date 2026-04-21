@@ -16,9 +16,10 @@
 		<script src="app.js"></script>
 		<script src="navbar.js"></script>
 		<script>
-			// Se già loggato, redirect
-			if (isLoggedIn()) location.window.href = "biglietti.html";
-			renderNavbar("login");
+			initApp().then(user => {
+				if (isLoggedIn(user)) location.href = "biglietti.html";
+				renderNavbar("login", user);
+			});
 		</script>
 
 		<div class="auth-bg"></div>

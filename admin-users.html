@@ -59,6 +59,7 @@
     </div>
   </div>
 
+
   <footer class="footer">
     <span>© 2026 Mostra Doisneau — Pordenone</span>
     <span>Privacy · Accessibilità</span>
@@ -90,8 +91,11 @@ function applyFilters() {
 function renderTable() {
   const tbody = document.getElementById("table-body");
   const collab = allUsers.filter(u => u.collaborator === 1).length;
-  document.getElementById("summary").textContent =
-    `${allUsers.length} utenti totali · ${collab} collaboratori · ${allUsers.length - collab} utenti standard`;
+  const summaryEl = document.getElementById("summary");
+  if (summaryEl) {
+    summaryEl.textContent =
+      `${allUsers.length} utenti totali · ${collab} collaboratori · ${allUsers.length - collab} utenti standard`;
+  }
 
   if (!filtered.length) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:2rem;color:rgba(240,236,228,0.3)">Nessun utente trovato.</td></tr>`;
@@ -124,17 +128,15 @@ function handleToggle(id) {
   }).catch(err => toast(err, "error"));
 }
 
-function refreshPageForRole(role) {
+initApp().then(user => {
+  renderNavbar("admin", user);
+  const role = getRole(user);
   document.getElementById("denied").style.display = role !== "admin" ? "block" : "none";
   document.getElementById("main").style.display = role === "admin" ? "block" : "none";
-}
-
-if (isAdmin()) {
-  document.getElementById("main").style.display = "block";
-  API.getUsers().then(users => { allUsers = users; filtered = users; renderTable(); });
-} else {
-  document.getElementById("denied").style.display = "block";
-}
+  if (role === "admin") {
+    API.getUsers().then(users => { allUsers = users; filtered = users; renderTable(); });
+  }
+});
 </script>
 </body>
 </html>

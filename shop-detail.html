@@ -60,79 +60,16 @@
 <body>
 <div class="site">
 
-  <script src="data.js"></script>
-  <script src="app.js"></script>
-  <script src="navbar.js"></script>
-  <script>renderNavbar("shop");</script>
-
-  <a href="shop-index.html" class="back-link">← Torna allo shop</a>
-
-  <div id="page-content"></div>
-
-  <footer class="footer">
-    <span>© 2026 Mostra Doisneau — Pordenone</span>
-    <span>Privacy · Accessibilità</span>
-  </footer>
-
-</div>
-<script>
-const params = new URLSearchParams(location.search);
-const productId = parseInt(params.get("id"));
-let product = null;
-
-function render(p) {
-  product = p;
-  const isOut = p.available === 0;
-  const isLow = p.available > 0 && p.available <= 5;
-  const availClass = isOut ? "out" : isLow ? "low" : "";
-  const availText  = isOut ? "Esaurito" : `${p.available} disponibili`;
-
-  const bookingSection = isUser() && !isOut ? `
-    <div class="booking-form">
-      <div class="qty-row">
-        <span class="qty-label">Quantità</span>
-        <input type="number" class="qty-input" id="qty-input" min="1" max="${p.available}" value="1">
-        <span style="font-size:13px;color:rgba(240,236,228,0.4)">/ ${p.available}</span>
-      </div>
-      <button class="btn btn-gold" onclick="handleBook()">Prenota</button>
-    </div>` :
-    isUser() && isOut ? `<p style="margin-top:1rem;font-size:14px;color:rgba(240,236,228,0.4)">Prodotto esaurito</p>` :
-    `<p class="guest-note" style="margin-top:1rem;">Accedi come utente per prenotare.</p>`;
-
-  document.getElementById("page-content").innerHTML = `
-    <div class="detail-layout">
-      <div class="detail-img">
-        ${p.img ? `<img src="${p.img}" alt="${p.name}">` : `<div class="detail-img-placeholder">◻</div>`}
-      </div>
-      <div class="detail-info">
-        <span class="detail-avail ${availClass}">${availText}</span>
-        <h1 class="detail-name">${p.name}</h1>
-        <p class="detail-desc">${p.description}</p>
-        <div class="detail-price">${formatPrice(p.price)}</div>
-        ${bookingSection}
-      </div>
-    </div>`;
-}
-
-function handleBook() {
-  const qty = parseInt(document.getElementById("qty-input").value);
-  if (!qty || qty < 1 || qty > product.available) {
-    toast("Quantità non valida", "error"); return;
-  }
-  API.bookProduct(product.id, qty).then(updated => {
-    product = updated;
-    toast(`Prenotazione effettuata — ${qty} × ${product.name}`);
-    render(updated);
-  }).catch(err => toast(err, "error"));
-}
-
-function refreshPageForRole() { if (product) render(product); }
-
-API.getProduct(productId).then(p => {
-  if (!p) { document.getElementById("page-content").innerHTML = '<p style="padding:3rem 2.5rem">Prodotto non trovato.</p>'; return; }
-  document.title = `${p.name} — Doisneau Pordenone`;
-  render(p);
-}).catch(() => toast("Errore nel caricamento", "error"));
+  <script>
+    initApp().then(() => {
+      renderNavbar("shop");
+      API.getProduct(productId).then(p => {
+        if (!p) { document.getElementById("page-content").innerHTML = '<p style="padding:3rem 2.5rem">Prodotto non trovato.</p>'; return; }
+        document.title = `${p.name} — Doisneau Pordenone`;
+        render(p);
+      }).catch(() => toast("Errore nel caricamento", "error"));
+    });
+  </script>
 </script>
 </body>
 </html>
