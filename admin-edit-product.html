@@ -19,7 +19,6 @@
   <main class="container" style="padding-bottom: 5rem; max-width: 720px;">
     <form id="productForm" novalidate class="u-hidden">
       <input type="hidden" id="productId" name="productId">
-      <input type="hidden" id="booked" name="booked">
       <input type="hidden" id="sold" name="sold">
 
       <div class="form-field">
@@ -75,7 +74,6 @@
 
       document.getElementById('pid').textContent = '#' + p.productId;
       form.productId.value   = p.productId;
-      form.booked.value      = p.booked ?? 0;
       form.sold.value        = p.sold ?? 0;
       form.name.value        = p.name || '';
       form.description.value = p.description || '';
@@ -88,7 +86,6 @@
         errF.textContent = '';
         const payload = {
           productId:   Number(form.productId.value),
-          booked:      Number(form.booked.value),
           sold:        Number(form.sold.value),
           name:        form.name.value.trim(),
           description: form.description.value.trim(),

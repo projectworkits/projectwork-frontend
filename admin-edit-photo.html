@@ -51,9 +51,9 @@
         <div class="form-field">
           <label class="form-label" for="state">Stato</label>
           <select class="form-select" id="state" name="state" required>
-            <option value="available">Disponibile</option>
-            <option value="booked">Prenotata</option>
-            <option value="sold">Venduta</option>
+            <option value="0">Disponibile</option>
+            <option value="1">Prenotata</option>
+            <option value="2">Venduta</option>
           </select>
         </div>
         <div class="form-field">
@@ -105,7 +105,7 @@
       form.year.value           = ph.year ?? '';
       form.place.value          = ph.place || '';
       form.description.value    = ph.description || '';
-      form.state.value          = photoStateKey(ph.state);
+      form.state.value          = String(Number(ph.state) || 0);
       form.price.value          = ph.price ?? '';
       form.classList.remove('u-hidden');
 
@@ -120,7 +120,7 @@
           year:           parseInt(form.year.value, 10),
           place:          form.place.value.trim(),
           description:    form.description.value.trim(),
-          state:          photoStateInt(form.state.value),
+          state:          parseInt(form.state.value, 10),
           price:          parseFloat(form.price.value),
           bookedBy:       ph.bookedBy ?? null,
         };

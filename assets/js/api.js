@@ -53,34 +53,34 @@ const API = {
 
   users: {
     register(payload) {
-      // payload: { username, email, password }
+      // payload: { username, password, email }
       return _request('/users/register', { method: 'POST', body: JSON.stringify(payload) });
     },
-    me()        { return _request('/users/user'); },
-    list()      { return _request('/users/'); },
-    get(id)     { return _request('/users/' + id); },
-    update(user) { return _request('/users/', { method: 'PUT', body: JSON.stringify(user) }); },
-    delete(id)  { return _request('/users/' + id, { method: 'DELETE' }); },
-    opCollaborator(id)   { return _request('/users/opCollaborator/' + id,   { method: 'PUT' }); },
+    me()         { return _request('/users/user'); },
+    list()       { return _request('/users'); },
+    get(id)      { return _request('/users/' + id); },
+    update(user) { return _request('/users', { method: 'PUT', body: JSON.stringify(user) }); },
+    delete(id)   { return _request('/users/' + id, { method: 'DELETE' }); },
+    opCollaborator(id)   { return _request('/users/opCollaborator/'   + id, { method: 'PUT' }); },
     deopCollaborator(id) { return _request('/users/deopCollaborator/' + id, { method: 'PUT' }); },
   },
 
   products: {
-    list()    { return _request('/products/'); },
-    get(id)   { return _request('/products/' + id); },
-    create(product) { return _request('/products/', { method: 'POST', body: JSON.stringify(product) }); },
-    update(product) { return _request('/products/', { method: 'PUT',  body: JSON.stringify(product) }); },
+    list()          { return _request('/products'); },
+    get(id)         { return _request('/products/' + id); },
+    create(product) { return _request('/products', { method: 'POST', body: JSON.stringify(product) }); },
+    update(product) { return _request('/products', { method: 'PUT',  body: JSON.stringify(product) }); },
     delete(id)      { return _request('/products/' + id, { method: 'DELETE' }); },
-    sell(id, qty)   { return _request('/products/sell/'   + id + '/' + qty, { method: 'PUT' }); },
-    unsell(id, qty) { return _request('/products/unsell/' + id + '/' + qty, { method: 'PUT' }); },
+    sell(id, qty)         { return _request('/products/sell/'         + id + '/' + qty, { method: 'PUT' }); },
+    addAvailable(id, qty) { return _request('/products/addAvailable/' + id + '/' + qty, { method: 'PUT' }); },
   },
 
   photos: {
-    list()                { return _request('/photos/'); },
-    listByState(state)    { return _request('/photos/' + state); },
+    list()                { return _request('/photos'); },
+    filter(state)         { return _request('/photos/filter/' + state); },
     get(id)               { return _request('/photos/' + id); },
     upload(formData)      { return _request('/photos/upload', { method: 'POST', body: formData }); },
-    update(photo)         { return _request('/photos/', { method: 'PUT', body: JSON.stringify(photo) }); },
+    update(photo)         { return _request('/photos', { method: 'PUT', body: JSON.stringify(photo) }); },
     delete(id)            { return _request('/photos/' + id, { method: 'DELETE' }); },
     book(imgId, userId)   { return _request('/photos/book/'    + imgId + '/' + userId, { method: 'PUT' }); },
     unbook(imgId)         { return _request('/photos/unbook/'  + imgId, { method: 'PUT' }); },
