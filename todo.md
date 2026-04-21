@@ -1,0 +1,27 @@
+- login
+    - [x] layout
+    - [x] logica
+- register
+    - [x] layout
+    - [x] logica
+- [x] sito azienda integrato al progetto (si tratta di un project work, noi fingiamo di essere quasta azienda)
+- [x] landing page (`landing.html` — standalone, non collegata alla nav)
+- [x] home page (`index.html`)
+- shop
+    - [x] elenco dei prodotti (`shop-index.html`)
+        - nome, descrizione troncata 20ch, prezzo in €, disponibilità, pulsante "prenota" → dettaglio
+    - [x] pagina per il singolo prodotto (`shop-detail.html`)
+        - form quantità (min 1, max available, disabilitato se 0), POST `sell`
+- [x] mostra
+    - [x] elenco delle foto (`mostra-index.html`): titolo, data, thumb
+    - [x] detail (`mostra-detail.html`): tutti i campi + azioni condizionali per ruolo/stato
+- [x] admin
+    - [x] dashboard (`admin-dashboard.html`)
+    - [x] create photo (`admin-create-photo.html`)
+    - [x] delete photo (elenco con delete inline: `admin-photos.html`)
+    - [x] edit photo (`admin-edit-photo.html?id=X`)
+    - [x] create product (`admin-create-product.html`)
+    - [x] delete product (elenco con delete inline: `admin-products.html`)
+    - [x] edit product (`admin-edit-product.html?id=X`)
+    - [x] users (`admin-users.html`)
+- [x] scaricare tutte le risorse da internet in locale (font Playfair/Cormorant/DM Mono/Cinzel + immagini Doisneau sotto `assets/fonts/` e `assets/img/`)

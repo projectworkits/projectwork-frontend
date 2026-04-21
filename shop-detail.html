@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dettaglio prodotto · Doisneau Pordenone</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <main class="container" style="padding: 3rem 2rem 5rem;">
+    <a href="shop-index.html" class="eyebrow" style="margin-bottom: 2rem; cursor: pointer;">← Torna allo shop</a>
+
+    <div id="content"></div>
+    <div id="error" class="data-table-empty u-hidden" style="color: var(--danger);">Prodotto non trovato.</div>
+  </main>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
+  <script>
+    (async () => {
+      const user = await initApp();
+      renderNavbar('shop', user);
+      renderFooter();
+
+      const id = qs('id');
+      const root    = document.getElementById('content');
+      const errEl   = document.getElementById('error');
+      if (!id) { errEl.classList.remove('u-hidden'); return; }
+
+      let product;
+      try { product = await API.products.get(id); }
+      catch (_) { errEl.classList.remove('u-hidden'); return; }
+
+      const avail = Number(product.available || 0);
+      const name  = escapeHtml(product.name || '');
+      const desc  = escapeHtml(product.description || '');
+      const price = fmtPrice(product.price);
+
+      root.innerHTML = `
+        <div class="detail">
+          <div class="detail-media" style="aspect-ratio: 4 / 3; display:flex; align-items:center; justify-content:center; background: var(--onyx-soft);">
+            <span class="eyebrow is-plain" style="color: var(--muted-soft);">${name}</span>
+          </div>
+          <div class="detail-body">
+            <span class="eyebrow">Prodotto</span>
+            <h1 class="u-mt-2">${name}</h1>
+            <p class="section-body u-mt-2">${desc}</p>
+            <div class="detail-meta">
+              <div class="detail-meta-item">
+                <span class="detail-meta-label">Disponibilità</span>
+                <span class="detail-meta-value" id="availVal">${avail}</span>
+              </div>
+              <div class="detail-meta-item">
+                <span class="detail-meta-label">Prezzo unitario</span>
+                <span class="detail-meta-value">${price}</span>
+              </div>
+            </div>
+
+            <form id="bookForm" ${avail <= 0 ? 'hidden' : ''}>
+              <div class="form-field" style="max-width: 220px;">
+                <label class="form-label" for="qty">Quantità</label>
+                <input class="form-input" type="number" id="qty" name="qty"
+                       min="1" max="${avail}" value="1" required>
+                <span class="form-hint">Minimo 1, massimo ${avail}.</span>
+              </div>
+              <div class="detail-actions">
+                <button type="submit" class="btn btn-primary" id="bookBtn">Prenota</button>
+                <a href="shop-index.html" class="btn btn-ghost">Annulla</a>
+              </div>
+              <span class="form-error" id="err-form" style="margin-top: 1rem; display:block;"></span>
+            </form>
+
+            ${avail <= 0 ? `
+              <p class="u-muted u-mt-3"><em>Prodotto esaurito.</em></p>
+              <a href="shop-index.html" class="btn btn-ghost u-mt-3">Torna allo shop</a>
+            ` : ''}
+          </div>
+        </div>`;
+
+      if (avail <= 0) return;
+
+      const form   = document.getElementById('bookForm');
+      const qtyEl  = document.getElementById('qty');
+      const availL = document.getElementById('availVal');
+      const btn    = document.getElementById('bookBtn');
+      const errF   = document.getElementById('err-form');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errF.textContent = '';
+        if (!user) { requireAuth(null); return; }
+
+        const qty = parseInt(qtyEl.value, 10);
+        if (!(qty >= 1 && qty <= avail)) { errF.textContent = `Quantità 1–${avail}.`; return; }
+
+        const ok = await confirmModal(
+          `Confermi la prenotazione di ${qty} × ${name} (${fmtPrice(product.price * qty)})?`,
+          { title: 'Conferma prenotazione', okLabel: 'Prenota' }
+        );
+        if (!ok) return;
+
+        btn.disabled = true;
+        try {
+          await API.products.sell(id, qty);
+          toast('Prenotazione registrata.', 'success');
+          availL.textContent = String(avail - qty);
+          setTimeout(() => { location.href = 'shop-index.html'; }, 900);
+        } catch (err) {
+          btn.disabled = false;
+          errF.textContent = err.status === 401 ? 'Devi accedere per prenotare.'
+                           : err.status === 403 ? 'Operazione non consentita.'
+                           : 'Errore. Riprova.';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

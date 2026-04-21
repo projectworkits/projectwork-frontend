@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrati · Doisneau Pordenone</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <section class="auth-shell">
+    <div class="auth-bg" aria-hidden="true"></div>
+
+    <div class="auth-card">
+      <span class="auth-logo">Doisneau · Pordenone</span>
+      <h1 class="auth-title">Crea un account</h1>
+      <p class="auth-subtitle">Ti basterà un minuto: username, email, password.</p>
+
+      <form id="registerForm" novalidate>
+        <div class="form-field">
+          <label class="form-label" for="username">Nome utente</label>
+          <input class="form-input" id="username" name="username" type="text"
+                 autocomplete="username" required pattern="[A-Za-z0-9]+" maxlength="50">
+          <span class="form-hint">Solo lettere e numeri, senza spazi.</span>
+          <span class="form-error" id="err-username"></span>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="email">Email</label>
+          <input class="form-input" id="email" name="email" type="email"
+                 autocomplete="email" required maxlength="100">
+          <span class="form-error" id="err-email"></span>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="password">Password</label>
+          <div class="input-wrap">
+            <input class="form-input" id="password" name="password" type="password"
+                   autocomplete="new-password" required minlength="8">
+            <button type="button" class="input-eye" id="togglePwd" aria-label="Mostra password">◉</button>
+          </div>
+          <span class="form-hint">Minimo 8 caratteri.</span>
+          <span class="form-error" id="err-password"></span>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="password2">Conferma password</label>
+          <input class="form-input" id="password2" name="password2" type="password"
+                 autocomplete="new-password" required minlength="8">
+          <span class="form-error" id="err-password2"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="submitBtn">Crea account</button>
+        <span class="form-error u-center" id="err-form" style="margin-top: 1rem;"></span>
+      </form>
+
+      <div class="auth-divider"><span>Oppure</span></div>
+      <p class="auth-switch">
+        Hai già un account? <a href="login.html">Accedi</a>
+      </p>
+    </div>
+  </section>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
+  <script>
+    (async () => {
+      const user = await initApp();
+      renderNavbar('auth', user);
+      renderFooter();
+      if (user) { location.href = 'index.html'; return; }
+
+      const form = document.getElementById('registerForm');
+      const btn  = document.getElementById('submitBtn');
+      const errF = document.getElementById('err-form');
+
+      document.getElementById('togglePwd').addEventListener('click', () => {
+        const p = document.getElementById('password');
+        p.type = p.type === 'password' ? 'text' : 'password';
+      });
+
+      const emailRe = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      const userRe  = /^[A-Za-z0-9]+$/;
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errF.textContent = '';
+        ['username','email','password','password2'].forEach(id => document.getElementById('err-'+id).textContent = '');
+
+        const u  = form.username.value.trim();
+        const em = form.email.value.trim();
+        const p  = form.password.value;
+        const p2 = form.password2.value;
+
+        let ok = true;
+        if (!userRe.test(u))             { document.getElementById('err-username').textContent  = 'Solo lettere e numeri.'; ok = false; }
+        if (!emailRe.test(em))           { document.getElementById('err-email').textContent     = 'Email non valida.';       ok = false; }
+        if (p.length < 8)                { document.getElementById('err-password').textContent  = 'Minimo 8 caratteri.';     ok = false; }
+        if (p !== p2)                    { document.getElementById('err-password2').textContent = 'Le password non coincidono.'; ok = false; }
+        if (!ok) return;
+
+        btn.disabled = true;
+        try {
+          await API.users.register({ username: u, email: em, password: p });
+          toast('Account creato. Ora puoi accedere.', 'success');
+          setTimeout(() => { location.href = 'login.html'; }, 700);
+        } catch (err) {
+          btn.disabled = false;
+          errF.textContent = err.status === 400
+            ? 'Dati non validi o utente già esistente.'
+            : 'Errore durante la registrazione. Riprova.';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

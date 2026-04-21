@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Foto</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <header class="page-head">
+    <div class="container">
+      <div class="page-head-row">
+        <div>
+          <a href="admin-dashboard.html" class="eyebrow">← Dashboard</a>
+          <h1 class="u-mt-2">Gestione <em>foto</em></h1>
+          <p class="section-body">Elenco completo delle opere della mostra.</p>
+        </div>
+        <a href="admin-create-photo.html" class="btn btn-primary">+ Nuova foto</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-bottom: 5rem;">
+    <div class="data-table-wrap">
+      <table class="data-table" id="tbl">
+        <thead>
+          <tr>
+            <th>#</th><th>Anteprima</th><th>Titolo</th><th>Data</th><th>Stato</th><th>Prezzo</th><th class="is-actions">Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div id="empty" class="data-table-empty u-hidden">Nessuna foto presente.</div>
+    </div>
+  </main>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
+  <script>
+    (async () => {
+      const user = await initApp();
+      renderNavbar('admin', user);
+      renderFooter();
+      if (!requireStaff(user)) return;
+
+      const tbody = document.getElementById('tbody');
+      const emptyEl = document.getElementById('empty');
+
+      async function reload() {
+        tbody.innerHTML = '';
+        let list = [];
+        try { list = await API.photos.list(); } catch (_) { toast('Errore di caricamento.', 'error'); return; }
+        if (!list || !list.length) { document.getElementById('tbl').classList.add('u-hidden'); emptyEl.classList.remove('u-hidden'); return; }
+        tbody.innerHTML = list.map(ph => {
+          const state = String(ph.state || '').toLowerCase();
+          return `
+            <tr data-id="${ph.photo_id}">
+              <td>${ph.photo_id}</td>
+              <td><img src="${escapeHtml(ph.path || '')}" alt="" style="width:72px; height:48px; object-fit:cover; border:0.5px solid var(--gold-faint);"></td>
+              <td>${escapeHtml(ph.title || '')}</td>
+              <td>${escapeHtml(ph.date || '')}</td>
+              <td><span class="state-badge is-${state}">${state}</span></td>
+              <td>${fmtPrice(ph.price)}</td>
+              <td class="is-actions">
+                <a class="btn btn-ghost btn-sm" href="admin-edit-photo.html?id=${ph.photo_id}">Modifica</a>
+                <button class="btn btn-danger btn-sm" data-act="del">Elimina</button>
+              </td>
+            </tr>`;
+        }).join('');
+      }
+
+      tbody.addEventListener('click', async (e) => {
+        const btn = e.target.closest('button[data-act="del"]');
+        if (!btn) return;
+        const tr = btn.closest('tr');
+        const id = tr.dataset.id;
+        const title = tr.children[2].textContent.trim();
+        const ok = await confirmModal(`Eliminare definitivamente la foto "${title}"?`, {
+          title: 'Conferma eliminazione', okLabel: 'Elimina', danger: true
+        });
+        if (!ok) return;
+        btn.disabled = true;
+        try {
+          await API.photos.delete(id);
+          tr.remove();
+          toast('Foto eliminata.', 'success');
+        } catch (err) {
+          btn.disabled = false;
+          toast(err.status === 403 ? 'Operazione non consentita.' : 'Errore durante l\u2019eliminazione.', 'error');
+        }
+      });
+
+      await reload();
+    })();
+  </script>
+</body>
+</html>

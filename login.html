@@ -1,148 +1,90 @@
 <!DOCTYPE html>
 <html lang="it">
-
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Accedi — Doisneau, Lo sguardo che racconta</title>
-	<link rel="stylesheet" href="style.css" />
-	<link rel="stylesheet" href="shared.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accedi · Doisneau Pordenone</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
-
 <body>
-	<div class="site">
 
-		<script src="data.js"></script>
-		<script src="app.js"></script>
-		<script src="navbar.js"></script>
-		<script>
-			initApp().then(user => {
-				if (isLoggedIn(user)) location.href = "biglietti.html";
-				renderNavbar("login", user);
-			});
-		</script>
+  <section class="auth-shell">
+    <div class="auth-bg" aria-hidden="true"></div>
 
-		<div class="auth-bg"></div>
+    <div class="auth-card">
+      <span class="auth-logo">Doisneau · Pordenone</span>
+      <h1 class="auth-title">Accedi</h1>
+      <p class="auth-subtitle">Entra nel tuo account per prenotare opere e acquistare souvenir.</p>
 
-		<main class="auth-page">
-			<div class="auth-card">
+      <form id="loginForm" novalidate>
+        <div class="form-field">
+          <label class="form-label" for="username">Nome utente</label>
+          <input class="form-input" id="username" name="username" type="text"
+                 autocomplete="username" required pattern="[A-Za-z0-9]+" maxlength="50">
+          <span class="form-error" id="err-username"></span>
+        </div>
 
-				<a href="biglietti.html" class="auth-logo">← Doisneau · Pordenone</a>
+        <div class="form-field">
+          <label class="form-label" for="password">Password</label>
+          <div class="input-wrap">
+            <input class="form-input" id="password" name="password" type="password"
+                   autocomplete="current-password" required>
+            <button type="button" class="input-eye" id="togglePwd" aria-label="Mostra password">◉</button>
+          </div>
+          <span class="form-error" id="err-password"></span>
+        </div>
 
-				<h1 class="auth-title">Bentornato</h1>
-				<p class="auth-subtitle">Accedi per prenotare fotografie e prodotti della mostra.</p>
+        <button type="submit" class="btn btn-primary btn-block" id="submitBtn">Accedi</button>
+        <span class="form-error u-center" id="err-form" style="margin-top: 1rem;"></span>
+      </form>
 
-				<div class="form-group">
-					<label class="form-label" for="username">username</label>
-					<input type="username" class="form-input" id="username" placeholder="username"
-						autocomplete="username">
-					<div class="form-error" id="username-err"></div>
-				</div>
+      <div class="auth-divider"><span>Oppure</span></div>
+      <p class="auth-switch">
+        Non hai un account? <a href="register.html">Registrati</a>
+      </p>
+    </div>
+  </section>
 
-				<div class="form-group">
-					<label class="form-label" for="password">Password</label>
-					<div class="input-wrap">
-						<input type="password" class="form-input" id="password" placeholder="••••••••"
-							autocomplete="current-password">
-						<button type="button" class="eye-btn" id="eye-btn" onclick="toggleEye()"
-							title="Mostra/nascondi">👁</button>
-					</div>
-					<div class="form-error" id="pw-err"></div>
-				</div>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
+  <script>
+    (async () => {
+      const user = await initApp();
+      renderNavbar('auth', user);
+      renderFooter();
+      if (user) { location.href = qs('from') || 'index.html'; return; }
 
-				<div id="global-err" class="form-error" style="margin-bottom:1rem;font-size:14px;display:none">
-				</div>
+      const form = document.getElementById('loginForm');
+      const btn  = document.getElementById('submitBtn');
+      const errF = document.getElementById('err-form');
 
-				<button class="btn btn-solid" style="width:100%;padding:0.85rem" onclick="handleLogin()">Accedi</button>
+      document.getElementById('togglePwd').addEventListener('click', () => {
+        const p = document.getElementById('password');
+        p.type = p.type === 'password' ? 'text' : 'password';
+      });
 
-				<div class="auth-divider"><span>oppure</span></div>
-
-				<div class="auth-switch">
-					Non hai ancora un account?
-					<a href="register.html">Registrati</a>
-				</div>
-
-			</div>
-		</main>
-
-		<footer class="footer" style="position:relative;z-index:1">
-			<span>© 2026 Mostra Doisneau — Pordenone</span>
-			<span>Privacy · Accessibilità</span>
-		</footer>
-
-	</div>
-	<script>
-		function toggleEye() {
-			const inp = document.getElementById("password");
-			const btn = document.getElementById("eye-btn");
-			inp.type = inp.type === "password" ? "text" : "password";
-			btn.textContent = inp.type === "password" ? "👁" : "🙈";
-		}
-
-		function clearErrors() {
-			["username-err", "pw-err", "global-err"].forEach(id => {
-				const el = document.getElementById(id);
-				if (el) { el.textContent = ""; el.style.display = "none"; }
-			});
-		}
-
-		function showGlobalError(msg) {
-			const el = document.getElementById("global-err");
-			el.textContent = msg;
-			el.style.display = "block";
-			// shake animation
-			const card = document.querySelector(".auth-card");
-			card.style.animation = "none";
-			card.offsetHeight; // reflow
-			card.style.animation = "shake 0.4s ease";
-		}
-
-		async function handleLogin() {
-			clearErrors();
-			const username = document.getElementById("username").value.trim();
-			const password = document.getElementById("password").value;
-
-			let valid = true;
-			if (!username) {
-				document.getElementById("username-err").textContent = "Inserisci la tua username.";
-				valid = false;
-			}
-			if (!password) {
-				document.getElementById("pw-err").textContent = "Inserisci la password.";
-				valid = false;
-			}
-			if (!valid) return;
-
-			try {
-				const user = await API.login(username, password);
-				toast(`Benvenuto, ${user.username || username}!`);
-				const redirect = new URLSearchParams(location.search).get("from") || "index.html";
-				setTimeout(() => location.href = redirect, 700);
-			} catch (err) {
-				showGlobalError(err);
-			}
-		}
-	</script>
-
-	<style>
-		@keyframes shake {
-
-			0%,
-			100% {
-				transform: translateX(0);
-			}
-
-			20%,
-			60% {
-				transform: translateX(-6px);
-			}
-
-			40%,
-			80% {
-				transform: translateX(6px);
-			}
-		}
-	</style>
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errF.textContent = '';
+        const u = form.username.value.trim();
+        const p = form.password.value;
+        if (!u || !p) { errF.textContent = 'Compila entrambi i campi.'; return; }
+        btn.disabled = true;
+        try {
+          await API.auth.login(u, p);
+          toast('Accesso effettuato', 'success');
+          setTimeout(() => { location.href = qs('from') || 'index.html'; }, 400);
+        } catch (err) {
+          btn.disabled = false;
+          errF.textContent = err.status === 401
+            ? 'Credenziali non valide.'
+            : 'Errore durante l\u2019accesso. Riprova.';
+        }
+      });
+    })();
+  </script>
 </body>
-
 </html>

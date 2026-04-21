@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop · Doisneau Pordenone</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <header class="page-head">
+    <div class="container">
+      <div class="page-head-row">
+        <div>
+          <span class="eyebrow">Bottega ufficiale</span>
+          <h1 class="u-mt-2">Shop</h1>
+          <p class="section-body">Souvenir, stampe e merchandising della mostra. Ritiro in galleria.</p>
+        </div>
+        <span class="eyebrow is-plain" id="count">—</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-bottom: 5rem;">
+    <div id="grid" class="card-grid is-auto"></div>
+    <div id="empty" class="data-table-empty u-hidden">Nessun prodotto disponibile al momento.</div>
+    <div id="error" class="data-table-empty u-hidden" style="color: var(--danger);">Errore di caricamento. Riprova più tardi.</div>
+  </main>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
+  <script>
+    (async () => {
+      const user = await initApp();
+      renderNavbar('shop', user);
+      renderFooter();
+
+      const grid    = document.getElementById('grid');
+      const emptyEl = document.getElementById('empty');
+      const errEl   = document.getElementById('error');
+      const countEl = document.getElementById('count');
+
+      try {
+        const list = await API.products.list();
+        countEl.textContent = (list?.length || 0) + ' prodotti';
+        if (!list || !list.length) { emptyEl.classList.remove('u-hidden'); return; }
+
+        grid.innerHTML = list.map(p => {
+          const id    = p.product_id;
+          const name  = escapeHtml(p.name || '');
+          const desc  = escapeHtml(truncate(p.description || '', 20));
+          const price = fmtPrice(p.price);
+          const avail = Number(p.available || 0);
+          const disabled = avail <= 0;
+          return `
+            <article class="card-frame">
+              <h3 class="card-frame-title">${name}</h3>
+              <p class="card-frame-text">${desc}</p>
+              <div class="card-frame-foot">
+                <span class="card-frame-price">${price}</span>
+                <span class="card-frame-meta">${avail} disp.</span>
+              </div>
+              <a href="shop-detail.html?id=${id}" class="btn ${disabled ? 'btn-ghost' : 'btn-primary'} btn-sm"
+                 ${disabled ? 'aria-disabled="true" style="pointer-events:none; opacity:.4;"' : ''}>
+                ${disabled ? 'Esaurito' : 'Prenota'}
+              </a>
+            </article>`;
+        }).join('');
+      } catch (_) {
+        errEl.classList.remove('u-hidden');
+      }
+    })();
+  </script>
+</body>
+</html>

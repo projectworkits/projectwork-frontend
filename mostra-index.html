@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galleria · Doisneau Pordenone</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <header class="page-head">
+    <div class="container">
+      <div class="page-head-row">
+        <div>
+          <span class="eyebrow">Lo sguardo che racconta</span>
+          <h1 class="u-mt-2">La <em>galleria</em></h1>
+          <p class="section-body">Cento fotografie originali, sei sezioni tematiche, sessant'anni di Parigi.</p>
+        </div>
+        <span class="eyebrow is-plain" id="count">—</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-bottom: 5rem;">
+    <div id="grid" class="card-grid is-auto"></div>
+    <div id="empty" class="data-table-empty u-hidden">Nessuna foto disponibile al momento.</div>
+    <div id="error" class="data-table-empty u-hidden" style="color: var(--danger);">Errore di caricamento. Riprova più tardi.</div>
+  </main>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
+  <script>
+    (async () => {
+      const user = await initApp();
+      renderNavbar('mostra', user);
+      renderFooter();
+
+      const grid    = document.getElementById('grid');
+      const emptyEl = document.getElementById('empty');
+      const errEl   = document.getElementById('error');
+      const countEl = document.getElementById('count');
+
+      try {
+        const list = await API.photos.list();
+        countEl.textContent = (list?.length || 0) + ' opere';
+        if (!list || !list.length) { emptyEl.classList.remove('u-hidden'); return; }
+
+        grid.innerHTML = list.map(ph => {
+          const id    = ph.photo_id;
+          const title = escapeHtml(ph.title || 'Senza titolo');
+          const date  = escapeHtml(ph.date || '');
+          const path  = escapeHtml(ph.path || '');
+          return `
+            <a href="mostra-detail.html?id=${id}" class="card-art">
+              <div class="card-art-bg" style="background-image: url('${path}');"></div>
+              <div class="card-art-overlay"></div>
+              <div class="card-art-body">
+                ${date ? `<span class="card-art-year">${date}</span>` : ''}
+                <h3 class="card-art-title">${title}</h3>
+              </div>
+            </a>`;
+        }).join('');
+      } catch (_) {
+        errEl.classList.remove('u-hidden');
+      }
+    })();
+  </script>
+</body>
+</html>

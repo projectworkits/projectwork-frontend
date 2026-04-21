@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Modifica foto</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <header class="page-head">
+    <div class="container">
+      <a href="admin-photos.html" class="eyebrow">← Gestione foto</a>
+      <h1 class="u-mt-2">Modifica <em>foto</em> <span id="photoId" style="font-size: .5em; color: var(--muted);"></span></h1>
+      <p class="section-body">I metadati sono modificabili; l'immagine caricata resta invariata.</p>
+    </div>
+  </header>
+
+  <main class="container" style="padding-bottom: 5rem; max-width: 760px;">
+    <div id="preview" class="u-mt-2" style="margin-bottom: 2rem;"></div>
+
+    <form id="photoForm" novalidate class="u-hidden">
+      <input type="hidden" id="photo_id" name="photo_id">
+      <input type="hidden" id="path" name="path">
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="title">Titolo</label>
+          <input class="form-input" type="text" id="title" name="title" required maxlength="100">
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="original_title">Titolo originale</label>
+          <input class="form-input" type="text" id="original_title" name="original_title" required maxlength="100">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="date">Data</label>
+          <input class="form-input" type="text" id="date" name="date" maxlength="30" required>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="place">Luogo</label>
+          <input class="form-input" type="text" id="place" name="place" maxlength="100" required>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="description">Descrizione</label>
+        <textarea class="form-textarea" id="description" name="description" rows="4"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="state">Stato</label>
+          <select class="form-select" id="state" name="state" required>
+            <option value="available">Disponibile</option>
+            <option value="booked">Prenotata</option>
+            <option value="sold">Venduta</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="price">Prezzo (€)</label>
+          <input class="form-input" type="number" id="price" name="price" min="0" step="0.01" required>
+        </div>
+      </div>
+
+      <div class="detail-actions">
+        <button type="submit" class="btn btn-primary" id="submitBtn">Salva modifiche</button>
+        <a href="admin-photos.html" class="btn btn-ghost">Annulla</a>
+      </div>
+      <span class="form-error" id="err-form" style="margin-top: 1rem; display:block;"></span>
+    </form>
+
+    <div id="error" class="data-table-empty u-hidden" style="color: var(--danger);">Foto non trovata.</div>
+  </main>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
+  <script>
+    (async () => {
+      const user = await initApp();
+      renderNavbar('admin', user);
+      renderFooter();
+      if (!requireStaff(user)) return;
+
+      const id = qs('id');
+      const form = document.getElementById('photoForm');
+      const errEl = document.getElementById('error');
+      const errF  = document.getElementById('err-form');
+      const btn   = document.getElementById('submitBtn');
+      if (!id) { errEl.classList.remove('u-hidden'); return; }
+
+      let ph;
+      try { ph = await API.photos.get(id); }
+      catch (_) { errEl.classList.remove('u-hidden'); return; }
+
+      document.getElementById('photoId').textContent = '#' + ph.photo_id;
+      document.getElementById('preview').innerHTML =
+        `<img src="${escapeHtml(ph.path || '')}" alt="" style="max-height: 280px; border: 0.5px solid var(--gold-dim);">`;
+
+      form.photo_id.value       = ph.photo_id;
+      form.path.value           = ph.path || '';
+      form.title.value          = ph.title || '';
+      form.original_title.value = ph.original_title || '';
+      form.date.value           = ph.date || '';
+      form.place.value          = ph.place || '';
+      form.description.value    = ph.description || '';
+      form.state.value          = String(ph.state || 'available').toLowerCase();
+      form.price.value          = ph.price ?? '';
+      form.classList.remove('u-hidden');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errF.textContent = '';
+        const payload = {
+          photo_id:       Number(form.photo_id.value),
+          path:           form.path.value,
+          title:          form.title.value.trim(),
+          original_title: form.original_title.value.trim(),
+          date:           form.date.value.trim(),
+          place:          form.place.value.trim(),
+          description:    form.description.value.trim(),
+          state:          form.state.value,
+          price:          parseFloat(form.price.value),
+          booked_by:      ph.booked_by ?? null,
+        };
+        btn.disabled = true;
+        try {
+          await API.photos.update(payload);
+          toast('Modifiche salvate.', 'success');
+          setTimeout(() => location.href = 'admin-photos.html', 700);
+        } catch (err) {
+          btn.disabled = false;
+          errF.textContent = err.status === 403 ? 'Operazione non consentita.'
+                           : err.status === 404 ? 'Foto non trovata.'
+                           : 'Errore durante il salvataggio.';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Utenti</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <header class="page-head">
+    <div class="container">
+      <a href="admin-dashboard.html" class="eyebrow">← Dashboard</a>
+      <h1 class="u-mt-2">Gestione <em>utenti</em></h1>
+      <p class="section-body">Promozione a collaboratore ed eliminazione account.</p>
+    </div>
+  </header>
+
+  <main class="container" style="padding-bottom: 5rem;">
+    <div class="data-table-wrap">
+      <table class="data-table" id="tbl">
+        <thead>
+          <tr><th>#</th><th>Username</th><th>Email</th><th>Ruolo</th><th class="is-actions">Azioni</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div id="empty" class="data-table-empty u-hidden">Nessun utente registrato.</div>
+    </div>
+  </main>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
+  <script>
+    (async () => {
+      const me = await initApp();
+      renderNavbar('admin', me);
+      renderFooter();
+      if (!requireStaff(me)) return;
+
+      const tbody = document.getElementById('tbody');
+      const emptyEl = document.getElementById('empty');
+      const myRole = getRole(me);
+
+      function targetRole(u) {
+        if (u.admin === true) return 'admin';
+        if (u.collaborator === true) return 'collaborator';
+        return 'user';
+      }
+
+      // Regole di permesso (README + regola conferma utente):
+      //  - eliminare: staff, ma collaboratore non può eliminare admin né altri collaboratori; nessuno può eliminare se stesso
+      //  - promuovere/destituire collaboratore: solo admin; target non deve essere admin
+      function canDelete(t) {
+        if (me.user_id === t.user_id) return false;
+        if (t.admin === true) return false;
+        if (myRole === 'collaborator' && t.collaborator === true) return false;
+        return true;
+      }
+      function canOp(t)   { return myRole === 'admin' && !t.admin && !t.collaborator; }
+      function canDeop(t) { return myRole === 'admin' && !t.admin &&  t.collaborator; }
+
+      async function reload() {
+        tbody.innerHTML = '';
+        let list = [];
+        try { list = await API.users.list(); } catch (_) { toast('Errore di caricamento.', 'error'); return; }
+        if (!list || !list.length) { document.getElementById('tbl').classList.add('u-hidden'); emptyEl.classList.remove('u-hidden'); return; }
+        tbody.innerHTML = list.map(u => {
+          const r = targetRole(u);
+          const badgeColor = r === 'admin' ? 'var(--state-sold)' : r === 'collaborator' ? 'var(--golden-glow)' : 'var(--muted)';
+          const actions = [];
+          if (canOp(u))     actions.push(`<button class="btn btn-ghost btn-sm" data-act="op">Promuovi</button>`);
+          if (canDeop(u))   actions.push(`<button class="btn btn-ghost btn-sm" data-act="deop">Destituisci</button>`);
+          if (canDelete(u)) actions.push(`<button class="btn btn-danger btn-sm" data-act="del">Elimina</button>`);
+          return `
+            <tr data-id="${u.user_id}" data-username="${escapeHtml(u.username)}">
+              <td>${u.user_id}</td>
+              <td>${escapeHtml(u.username || '')}${me.user_id === u.user_id ? ' <span class="eyebrow is-plain" style="margin-left:.5rem;">tu</span>' : ''}</td>
+              <td>${escapeHtml(u.email || '')}</td>
+              <td><span style="font-family: var(--ff-mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: ${badgeColor};">${r}</span></td>
+              <td class="is-actions">${actions.join('') || '<span class="u-muted" style="font-size: 12px;">—</span>'}</td>
+            </tr>`;
+        }).join('');
+      }
+
+      tbody.addEventListener('click', async (e) => {
+        const btn = e.target.closest('button[data-act]');
+        if (!btn) return;
+        const tr = btn.closest('tr');
+        const id = tr.dataset.id;
+        const username = tr.dataset.username;
+        const act = btn.dataset.act;
+
+        const prompts = {
+          op:   { m: `Promuovere "${username}" a collaboratore?`, t: 'Promuovi', d: false },
+          deop: { m: `Rimuovere "${username}" dai collaboratori?`, t: 'Destituisci', d: false },
+          del:  { m: `Eliminare definitivamente l'utente "${username}"?`, t: 'Elimina', d: true },
+        }[act];
+        const ok = await confirmModal(prompts.m, { title: 'Conferma', okLabel: prompts.t, danger: prompts.d });
+        if (!ok) return;
+
+        btn.disabled = true;
+        try {
+          if (act === 'op')   await API.users.opCollaborator(id);
+          if (act === 'deop') await API.users.deopCollaborator(id);
+          if (act === 'del')  await API.users.delete(id);
+          toast('Operazione completata.', 'success');
+          await reload();
+        } catch (err) {
+          btn.disabled = false;
+          toast(err.status === 401 ? 'Non autorizzato (account protetto).'
+              : err.status === 403 ? 'Operazione non consentita.'
+              : err.status === 404 ? 'Utente non trovato.'
+              : 'Errore.', 'error');
+        }
+      });
+
+      await reload();
+    })();
+  </script>
+</body>
+</html>

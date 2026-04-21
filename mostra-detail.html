@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dettaglio opera · Doisneau Pordenone</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <main class="container" style="padding: 3rem 2rem 5rem;">
+    <a href="mostra-index.html" class="eyebrow" style="margin-bottom: 2rem;">← Torna alla galleria</a>
+    <div id="content"></div>
+    <div id="error" class="data-table-empty u-hidden" style="color: var(--danger);">Opera non trovata.</div>
+  </main>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
+  <script>
+    (async () => {
+      const user = await initApp();
+      renderNavbar('mostra', user);
+      renderFooter();
+
+      const id = qs('id');
+      const root  = document.getElementById('content');
+      const errEl = document.getElementById('error');
+      if (!id) { errEl.classList.remove('u-hidden'); return; }
+
+      let ph;
+      try { ph = await API.photos.get(id); }
+      catch (_) { errEl.classList.remove('u-hidden'); return; }
+
+      const state = String(ph.state || 'available').toLowerCase();
+      const stateLabel = { available: 'Disponibile', booked: 'Prenotato', sold: 'Venduto' }[state] || state;
+
+      const role       = getRole(user);
+      const isOwner    = user && ph.booked_by && Number(ph.booked_by) === Number(user.user_id);
+      const isStaffU   = isStaff(user);
+
+      let actions = '';
+      if (state === 'available') {
+        actions = user
+          ? `<button class="btn btn-primary" data-act="book">Prenota quest\u2019opera</button>`
+          : `<a href="login.html?from=${encodeURIComponent(location.pathname + location.search)}" class="btn btn-primary">Accedi per prenotare</a>`;
+      } else if (state === 'booked') {
+        const parts = [];
+        if (isStaffU) {
+          parts.push(`<button class="btn btn-primary" data-act="setsold">Conferma vendita</button>`);
+          parts.push(`<button class="btn btn-danger" data-act="unbook">Annulla prenotazione</button>`);
+        } else if (isOwner) {
+          parts.push(`<button class="btn btn-danger" data-act="unbook">Annulla la mia prenotazione</button>`);
+        } else {
+          parts.push(`<span class="u-muted"><em>Opera attualmente prenotata.</em></span>`);
+        }
+        actions = parts.join('');
+      } else if (state === 'sold') {
+        actions = `<span class="u-muted"><em>Opera venduta. Non più disponibile.</em></span>`;
+      }
+
+      root.innerHTML = `
+        <div class="detail">
+          <div class="detail-media">
+            <img src="${escapeHtml(ph.path || '')}" alt="${escapeHtml(ph.title || '')}">
+          </div>
+          <div class="detail-body">
+            <span class="eyebrow">Opera · #${ph.photo_id}</span>
+            <h1 class="u-mt-2">${escapeHtml(ph.title || 'Senza titolo')}</h1>
+            ${ph.original_title ? `<p style="font-style:italic; color: var(--muted); margin-top:-.5rem;">${escapeHtml(ph.original_title)}</p>` : ''}
+            <div style="margin: 1rem 0;">
+              <span class="state-badge is-${state}">${stateLabel}</span>
+            </div>
+            <div class="detail-meta">
+              <div class="detail-meta-item"><span class="detail-meta-label">Data</span><span class="detail-meta-value">${escapeHtml(ph.date || '—')}</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-label">Luogo</span><span class="detail-meta-value">${escapeHtml(ph.place || '—')}</span></div>
+            </div>
+            ${ph.description ? `<p class="section-body">${escapeHtml(ph.description)}</p>` : ''}
+            <div class="detail-price">${fmtPrice(ph.price)}</div>
+            <div class="detail-actions" id="actions">${actions}</div>
+            <span class="form-error" id="err-form" style="margin-top: 1rem; display:block;"></span>
+          </div>
+        </div>`;
+
+      const actBox = document.getElementById('actions');
+      const errF   = document.getElementById('err-form');
+      if (!actBox) return;
+
+      actBox.addEventListener('click', async (e) => {
+        const btn = e.target.closest('button[data-act]');
+        if (!btn) return;
+        const act = btn.dataset.act;
+        errF.textContent = '';
+
+        const labels = { book: 'Prenotare', unbook: 'Annullare la prenotazione', setsold: 'Confermare la vendita' };
+        const ok = await confirmModal(`${labels[act]} di "${escapeHtml(ph.title || '')}"?`, {
+          title: 'Conferma', okLabel: labels[act], danger: act !== 'book'
+        });
+        if (!ok) return;
+
+        btn.disabled = true;
+        try {
+          if (act === 'book')    await API.photos.book(id, user.user_id);
+          if (act === 'unbook')  await API.photos.unbook(id);
+          if (act === 'setsold') await API.photos.setSold(id);
+          toast('Operazione completata.', 'success');
+          setTimeout(() => location.reload(), 700);
+        } catch (err) {
+          btn.disabled = false;
+          errF.textContent = err.status === 401 ? 'Sessione scaduta. Accedi di nuovo.'
+                           : err.status === 403 ? 'Operazione non consentita.'
+                           : err.status === 404 ? 'Opera o utente non trovato.'
+                           : 'Errore. Riprova.';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

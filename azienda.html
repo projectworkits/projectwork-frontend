@@ -5,11 +5,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Silk & Stack — Proposta Progettuale</title>
 		<link rel="icon" type="image/x-icon" href="favicon.ico">
-		<link rel="preload" as="image" href="logo.jpeg">
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link
-			href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap"
-			rel="stylesheet">
+		<link rel="preload" as="image" href="assets/img/logo.png">
+		<link rel="stylesheet" href="assets/css/style.css">
 		<style>
 			:root {
 				--violet-deep: #1a0a2e;
@@ -640,7 +637,7 @@
 			<div class="geo-deco mid"></div>
 
 		<div class="hero-inner">
-			<img src="logo.jpeg" alt="Logo Silk & Stack" class="hero-logo logo-large">
+			<img src="assets/img/logo.png" alt="Logo Silk & Stack" class="hero-logo logo-large">
 			<div class="hero-badge">Proposta Progettuale · 2026</div>
 				<h1 class="hero-title">
 					<span>SILK</span>
@@ -714,13 +711,17 @@
 			</div>
 		</div> -->
 
-		<!-- FOOTER -->
-		<footer>
-			<div class="ornament">· · ◆ · ·</div>
-			<div class="footer-logo">SILK & STACK</div>
-			<div class="footer-sub">Sviluppo Software · Alta Gamma</div>
-			<div class="footer-note">Progetto Doisneau — Pordenone 2025</div>
-		</footer>
+		<script src="assets/js/api.js"></script>
+		<script src="assets/js/app.js"></script>
+		<script src="assets/js/navbar.js"></script>
+		<script src="assets/js/footer.js"></script>
+		<script>
+			(async () => {
+				const user = await initApp();
+				renderNavbar('azienda', user);
+				renderFooter();
+			})();
+		</script>
 
 	</body>
 
