@@ -54,7 +54,7 @@
       //  - eliminare: staff, ma collaboratore non può eliminare admin né altri collaboratori; nessuno può eliminare se stesso
       //  - promuovere/destituire collaboratore: solo admin; target non deve essere admin
       function canDelete(t) {
-        if (me.user_id === t.user_id) return false;
+        if (me.userId === t.userId) return false;
         if (t.admin === true) return false;
         if (myRole === 'collaborator' && t.collaborator === true) return false;
         return true;
@@ -75,9 +75,9 @@
           if (canDeop(u))   actions.push(`<button class="btn btn-ghost btn-sm" data-act="deop">Destituisci</button>`);
           if (canDelete(u)) actions.push(`<button class="btn btn-danger btn-sm" data-act="del">Elimina</button>`);
           return `
-            <tr data-id="${u.user_id}" data-username="${escapeHtml(u.username)}">
-              <td>${u.user_id}</td>
-              <td>${escapeHtml(u.username || '')}${me.user_id === u.user_id ? ' <span class="eyebrow is-plain" style="margin-left:.5rem;">tu</span>' : ''}</td>
+            <tr data-id="${u.userId}" data-username="${escapeHtml(u.username)}">
+              <td>${u.userId}</td>
+              <td>${escapeHtml(u.username || '')}${me.userId === u.userId ? ' <span class="eyebrow is-plain" style="margin-left:.5rem;">tu</span>' : ''}</td>
               <td>${escapeHtml(u.email || '')}</td>
               <td><span style="font-family: var(--ff-mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: ${badgeColor};">${r}</span></td>
               <td class="is-actions">${actions.join('') || '<span class="u-muted" style="font-size: 12px;">—</span>'}</td>

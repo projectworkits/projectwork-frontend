@@ -116,6 +116,24 @@ function escapeHtml(s) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
+/** Normalizza il path di una foto ritornato dal backend in un URL servibile.
+ *  Le foto vivono su /photos/<uuid> (volume condiviso). */
+function photoUrl(path) {
+  if (!path) return '';
+  if (/^(https?:)?\/\//.test(path)) return path;
+  if (path.startsWith('/')) return path;
+  return '/photos/' + path.replace(/^photos\//, '');
+}
+/* ── Mapping stato foto (backend usa int: 0/1/2) ───────────────────────── */
+const PHOTO_STATE_KEYS   = ['available', 'booked', 'sold'];
+const PHOTO_STATE_LABELS = { available: 'Disponibile', booked: 'Prenotato', sold: 'Venduto' };
+function photoStateKey(state) {
+  if (typeof state === 'number') return PHOTO_STATE_KEYS[state] || 'available';
+  const s = String(state || '').toLowerCase();
+  return PHOTO_STATE_KEYS.includes(s) ? s : 'available';
+}
+function photoStateLabel(state) { return PHOTO_STATE_LABELS[photoStateKey(state)]; }
+function photoStateInt(key) { return Math.max(0, PHOTO_STATE_KEYS.indexOf(String(key).toLowerCase())); }
 
 /* ── reveal on scroll (per sezioni con class .reveal) ──────────────────── */
 function initReveal() {
@@ -148,3 +166,7 @@ window.truncate = truncate;
 window.fmtPrice = fmtPrice;
 window.qs = qs;
 window.escapeHtml = escapeHtml;
+window.photoUrl = photoUrl;
+window.photoStateKey = photoStateKey;
+window.photoStateLabel = photoStateLabel;
+window.photoStateInt = photoStateInt;

@@ -12,7 +12,7 @@
   <header class="page-head">
     <div class="container">
       <a href="admin-photos.html" class="eyebrow">← Gestione foto</a>
-      <h1 class="u-mt-2">Modifica <em>foto</em> <span id="photoId" style="font-size: .5em; color: var(--muted);"></span></h1>
+      <h1 class="u-mt-2">Modifica <em>foto</em> <span id="pid" style="font-size: .5em; color: var(--muted);"></span></h1>
       <p class="section-body">I metadati sono modificabili; l'immagine caricata resta invariata.</p>
     </div>
   </header>
@@ -21,7 +21,7 @@
     <div id="preview" class="u-mt-2" style="margin-bottom: 2rem;"></div>
 
     <form id="photoForm" novalidate class="u-hidden">
-      <input type="hidden" id="photo_id" name="photo_id">
+      <input type="hidden" id="photoId" name="photoId">
       <input type="hidden" id="path" name="path">
       <div class="form-row">
         <div class="form-field">
@@ -29,14 +29,14 @@
           <input class="form-input" type="text" id="title" name="title" required maxlength="100">
         </div>
         <div class="form-field">
-          <label class="form-label" for="original_title">Titolo originale</label>
-          <input class="form-input" type="text" id="original_title" name="original_title" required maxlength="100">
+          <label class="form-label" for="originalTitle">Titolo originale</label>
+          <input class="form-input" type="text" id="originalTitle" name="originalTitle" required maxlength="100">
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
-          <label class="form-label" for="date">Data</label>
-          <input class="form-input" type="text" id="date" name="date" maxlength="30" required>
+          <label class="form-label" for="year">Anno</label>
+          <input class="form-input" type="number" id="year" name="year" min="1800" max="2100" required>
         </div>
         <div class="form-field">
           <label class="form-label" for="place">Luogo</label>
@@ -94,18 +94,18 @@
       try { ph = await API.photos.get(id); }
       catch (_) { errEl.classList.remove('u-hidden'); return; }
 
-      document.getElementById('photoId').textContent = '#' + ph.photo_id;
+      document.getElementById('pid').textContent = '#' + ph.photoId;
       document.getElementById('preview').innerHTML =
-        `<img src="${escapeHtml(ph.path || '')}" alt="" style="max-height: 280px; border: 0.5px solid var(--gold-dim);">`;
+        `<img src="${escapeHtml(photoUrl(ph.path))}" alt="" style="max-height: 280px; border: 0.5px solid var(--gold-dim);">`;
 
-      form.photo_id.value       = ph.photo_id;
+      form.photoId.value        = ph.photoId;
       form.path.value           = ph.path || '';
       form.title.value          = ph.title || '';
-      form.original_title.value = ph.original_title || '';
-      form.date.value           = ph.date || '';
+      form.originalTitle.value  = ph.originalTitle || '';
+      form.year.value           = ph.year ?? '';
       form.place.value          = ph.place || '';
       form.description.value    = ph.description || '';
-      form.state.value          = String(ph.state || 'available').toLowerCase();
+      form.state.value          = photoStateKey(ph.state);
       form.price.value          = ph.price ?? '';
       form.classList.remove('u-hidden');
 
@@ -113,16 +113,16 @@
         e.preventDefault();
         errF.textContent = '';
         const payload = {
-          photo_id:       Number(form.photo_id.value),
+          photoId:        Number(form.photoId.value),
           path:           form.path.value,
           title:          form.title.value.trim(),
-          original_title: form.original_title.value.trim(),
-          date:           form.date.value.trim(),
+          originalTitle:  form.originalTitle.value.trim(),
+          year:           parseInt(form.year.value, 10),
           place:          form.place.value.trim(),
           description:    form.description.value.trim(),
-          state:          form.state.value,
+          state:          photoStateInt(form.state.value),
           price:          parseFloat(form.price.value),
-          booked_by:      ph.booked_by ?? null,
+          bookedBy:       ph.bookedBy ?? null,
         };
         btn.disabled = true;
         try {

@@ -49,7 +49,7 @@
         if (!list || !list.length) { emptyEl.classList.remove('u-hidden'); return; }
 
         grid.innerHTML = list.map(p => {
-          const id    = p.product_id;
+          const id    = p.productId;
           const name  = escapeHtml(p.name || '');
           const desc  = escapeHtml(truncate(p.description || '', 20));
           const price = fmtPrice(p.price);

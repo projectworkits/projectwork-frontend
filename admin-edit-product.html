@@ -18,7 +18,7 @@
 
   <main class="container" style="padding-bottom: 5rem; max-width: 720px;">
     <form id="productForm" novalidate class="u-hidden">
-      <input type="hidden" id="product_id" name="product_id">
+      <input type="hidden" id="productId" name="productId">
       <input type="hidden" id="booked" name="booked">
       <input type="hidden" id="sold" name="sold">
 
@@ -73,8 +73,8 @@
       try { p = await API.products.get(id); }
       catch (_) { errEl.classList.remove('u-hidden'); return; }
 
-      document.getElementById('pid').textContent = '#' + p.product_id;
-      form.product_id.value  = p.product_id;
+      document.getElementById('pid').textContent = '#' + p.productId;
+      form.productId.value   = p.productId;
       form.booked.value      = p.booked ?? 0;
       form.sold.value        = p.sold ?? 0;
       form.name.value        = p.name || '';
@@ -87,7 +87,7 @@
         e.preventDefault();
         errF.textContent = '';
         const payload = {
-          product_id:  Number(form.product_id.value),
+          productId:   Number(form.productId.value),
           booked:      Number(form.booked.value),
           sold:        Number(form.sold.value),
           name:        form.name.value.trim(),

@@ -54,15 +54,15 @@
         try { list = await API.products.list(); } catch (_) { toast('Errore di caricamento.', 'error'); return; }
         if (!list || !list.length) { document.getElementById('tbl').classList.add('u-hidden'); emptyEl.classList.remove('u-hidden'); return; }
         tbody.innerHTML = list.map(p => `
-          <tr data-id="${p.product_id}">
-            <td>${p.product_id}</td>
+          <tr data-id="${p.productId}">
+            <td>${p.productId}</td>
             <td>${escapeHtml(p.name || '')}</td>
             <td>${escapeHtml(truncate(p.description || '', 40))}</td>
             <td>${Number(p.available || 0)}</td>
             <td>${Number(p.sold || 0)}</td>
             <td>${fmtPrice(p.price)}</td>
             <td class="is-actions">
-              <a class="btn btn-ghost btn-sm" href="admin-edit-product.html?id=${p.product_id}">Modifica</a>
+              <a class="btn btn-ghost btn-sm" href="admin-edit-product.html?id=${p.productId}">Modifica</a>
               <button class="btn btn-danger btn-sm" data-act="del">Elimina</button>
             </td>
           </tr>`).join('');

@@ -49,16 +49,16 @@
         if (!list || !list.length) { emptyEl.classList.remove('u-hidden'); return; }
 
         grid.innerHTML = list.map(ph => {
-          const id    = ph.photo_id;
+          const id    = ph.photoId;
           const title = escapeHtml(ph.title || 'Senza titolo');
-          const date  = escapeHtml(ph.date || '');
-          const path  = escapeHtml(ph.path || '');
+          const year  = ph.year ? String(ph.year) : '';
+          const path  = escapeHtml(photoUrl(ph.path));
           return `
             <a href="mostra-detail.html?id=${id}" class="card-art">
               <div class="card-art-bg" style="background-image: url('${path}');"></div>
               <div class="card-art-overlay"></div>
               <div class="card-art-body">
-                ${date ? `<span class="card-art-year">${date}</span>` : ''}
+                ${year ? `<span class="card-art-year">${year}</span>` : ''}
                 <h3 class="card-art-title">${title}</h3>
               </div>
             </a>`;

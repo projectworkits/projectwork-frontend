@@ -56,17 +56,17 @@
         try { list = await API.photos.list(); } catch (_) { toast('Errore di caricamento.', 'error'); return; }
         if (!list || !list.length) { document.getElementById('tbl').classList.add('u-hidden'); emptyEl.classList.remove('u-hidden'); return; }
         tbody.innerHTML = list.map(ph => {
-          const state = String(ph.state || '').toLowerCase();
+          const state = photoStateKey(ph.state);
           return `
-            <tr data-id="${ph.photo_id}">
-              <td>${ph.photo_id}</td>
-              <td><img src="${escapeHtml(ph.path || '')}" alt="" style="width:72px; height:48px; object-fit:cover; border:0.5px solid var(--gold-faint);"></td>
+            <tr data-id="${ph.photoId}">
+              <td>${ph.photoId}</td>
+              <td><img src="${escapeHtml(photoUrl(ph.path))}" alt="" style="width:72px; height:48px; object-fit:cover; border:0.5px solid var(--gold-faint);"></td>
               <td>${escapeHtml(ph.title || '')}</td>
-              <td>${escapeHtml(ph.date || '')}</td>
-              <td><span class="state-badge is-${state}">${state}</span></td>
+              <td>${ph.year != null ? ph.year : ''}</td>
+              <td><span class="state-badge is-${state}">${photoStateLabel(ph.state)}</span></td>
               <td>${fmtPrice(ph.price)}</td>
               <td class="is-actions">
-                <a class="btn btn-ghost btn-sm" href="admin-edit-photo.html?id=${ph.photo_id}">Modifica</a>
+                <a class="btn btn-ghost btn-sm" href="admin-edit-photo.html?id=${ph.photoId}">Modifica</a>
                 <button class="btn btn-danger btn-sm" data-act="del">Elimina</button>
               </td>
             </tr>`;

@@ -34,11 +34,11 @@
       try { ph = await API.photos.get(id); }
       catch (_) { errEl.classList.remove('u-hidden'); return; }
 
-      const state = String(ph.state || 'available').toLowerCase();
-      const stateLabel = { available: 'Disponibile', booked: 'Prenotato', sold: 'Venduto' }[state] || state;
+      const state = photoStateKey(ph.state);
+      const stateLabel = photoStateLabel(ph.state);
 
       const role       = getRole(user);
-      const isOwner    = user && ph.booked_by && Number(ph.booked_by) === Number(user.user_id);
+      const isOwner    = user && ph.bookedBy && Number(ph.bookedBy) === Number(user.userId);
       const isStaffU   = isStaff(user);
 
       let actions = '';
@@ -64,17 +64,17 @@
       root.innerHTML = `
         <div class="detail">
           <div class="detail-media">
-            <img src="${escapeHtml(ph.path || '')}" alt="${escapeHtml(ph.title || '')}">
+            <img src="${escapeHtml(photoUrl(ph.path))}" alt="${escapeHtml(ph.title || '')}">
           </div>
           <div class="detail-body">
-            <span class="eyebrow">Opera · #${ph.photo_id}</span>
+            <span class="eyebrow">Opera · #${ph.photoId}</span>
             <h1 class="u-mt-2">${escapeHtml(ph.title || 'Senza titolo')}</h1>
-            ${ph.original_title ? `<p style="font-style:italic; color: var(--muted); margin-top:-.5rem;">${escapeHtml(ph.original_title)}</p>` : ''}
+            ${ph.originalTitle ? `<p style="font-style:italic; color: var(--muted); margin-top:-.5rem;">${escapeHtml(ph.originalTitle)}</p>` : ''}
             <div style="margin: 1rem 0;">
               <span class="state-badge is-${state}">${stateLabel}</span>
             </div>
             <div class="detail-meta">
-              <div class="detail-meta-item"><span class="detail-meta-label">Data</span><span class="detail-meta-value">${escapeHtml(ph.date || '—')}</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-label">Data</span><span class="detail-meta-value">${ph.year != null ? ph.year : '—'}</span></div>
               <div class="detail-meta-item"><span class="detail-meta-label">Luogo</span><span class="detail-meta-value">${escapeHtml(ph.place || '—')}</span></div>
             </div>
             ${ph.description ? `<p class="section-body">${escapeHtml(ph.description)}</p>` : ''}
@@ -102,7 +102,7 @@
 
         btn.disabled = true;
         try {
-          if (act === 'book')    await API.photos.book(id, user.user_id);
+          if (act === 'book')    await API.photos.book(id, user.userId);
           if (act === 'unbook')  await API.photos.unbook(id);
           if (act === 'setsold') await API.photos.setSold(id);
           toast('Operazione completata.', 'success');
