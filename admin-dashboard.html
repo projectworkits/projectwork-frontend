@@ -1,144 +1,84 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin — Doisneau Pordenone</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="shared.css" />
-  <style>
-    .dash-sections { padding: 0 2.5rem 4rem; display: flex; flex-direction: column; gap: 2.5rem; }
-    .dash-section-title { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: #c8b482; margin-bottom: 1rem; }
-    .dash-link-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
-    .dash-link {
-      display: block; text-decoration: none; padding: 1.4rem 1.6rem;
-      border: 0.5px solid rgba(200,180,130,0.2); background: rgba(200,180,130,0.02);
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .dash-link:hover { border-color: #c8b482; background: rgba(200,180,130,0.07); }
-    .dash-link-icon { font-size: 1.4rem; margin-bottom: 0.6rem; opacity: 0.6; }
-    .dash-link-name { font-family: 'Playfair Display', serif; font-size: 1rem; color: #f0ece4; margin-bottom: 0.25rem; }
-    .dash-link-desc { font-size: 12px; color: rgba(240,236,228,0.4); line-height: 1.4; }
-    .stat-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-bottom: 2.5rem; }
-    .stat-box { padding: 1.2rem 1.5rem; border: 0.5px solid rgba(200,180,130,0.15); }
-    .stat-box-val { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: #c8b482; line-height: 1; }
-    .stat-box-label { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(240,236,228,0.4); margin-top: 0.4rem; }
-    .access-denied { padding: 4rem 2.5rem; text-align: center; }
-    .access-denied p { font-size: 16px; color: rgba(240,236,228,0.5); margin-bottom: 1rem; }
-
-    body.light-mode .dash-link { border-color: rgba(133,121,111,0.2); background: #fff; }
-    body.light-mode .dash-link:hover { border-color: #9a3636; background: rgba(154,54,54,0.04); }
-    body.light-mode .dash-link-name { color: #1f1f1f; }
-    body.light-mode .dash-link-desc { color: rgba(31,31,31,0.4); }
-    body.light-mode .stat-box { border-color: rgba(133,121,111,0.15); }
-    body.light-mode .stat-box-val { color: #9a3636; }
-    body.light-mode .stat-box-label { color: rgba(31,31,31,0.4); }
-    body.light-mode .dash-section-title { color: #9a3636; }
-    @media (max-width: 700px) { .stat-row { grid-template-columns: repeat(2,1fr); } .dash-sections { padding: 0 1rem 3rem; } }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Dashboard</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-<div class="site">
 
-  <script src="data.js"></script>
-  <script src="app.js"></script>
-  <script src="navbar.js"></script>
-
-  <div id="page-content"></div>
-
-  <footer class="footer">
-    <span>© 2026 Mostra Doisneau — Pordenone</span>
-    <span>Privacy · Accessibilità</span>
-  </footer>
-
-</div>
-<script>
-function renderDenied() {
-  document.getElementById("page-content").innerHTML = `
-    <div class="access-denied">
-      <p>Accesso riservato agli amministratori.</p>
-    </div>`;
-}
-
-function renderDashboard(photos, products, users) {
-  const fotos_disp   = photos.filter(p => p.state === "disponibile").length;
-  const fotos_pren   = photos.filter(p => p.state === "prenotata").length;
-  const fotos_vend   = photos.filter(p => p.state === "venduta").length;
-  const prod_disp    = products.filter(p => p.available > 0).length;
-  const collaboratori = users.filter(u => u.collaborator === 1).length;
-
-  document.getElementById("page-content").innerHTML = `
-    <div class="page-header">
-      <p class="eyebrow">Pannello di controllo</p>
-      <h1 class="section-title">Dashboard</h1>
+  <header class="page-head">
+    <div class="container">
+      <div class="page-head-row">
+        <div>
+          <span class="eyebrow">Pannello di controllo</span>
+          <h1 class="u-mt-2">Dashboard <em>admin</em></h1>
+          <p class="section-body">Gestisci le opere della mostra, i prodotti dello shop e gli utenti.</p>
+        </div>
+        <span class="eyebrow is-plain" id="roleBadge">—</span>
+      </div>
     </div>
-    <div class="dash-sections">
+  </header>
 
-      <div>
-        <div class="stat-row">
-          <div class="stat-box"><div class="stat-box-val">${photos.length}</div><div class="stat-box-label">Fotografie totali</div></div>
-          <div class="stat-box"><div class="stat-box-val">${fotos_disp}</div><div class="stat-box-label">Disponibili</div></div>
-          <div class="stat-box"><div class="stat-box-val">${fotos_pren}</div><div class="stat-box-label">Prenotate</div></div>
-          <div class="stat-box"><div class="stat-box-val">${fotos_vend}</div><div class="stat-box-label">Vendute</div></div>
-        </div>
+  <main class="container" style="padding-bottom: 5rem;">
+    <section class="u-mt-4">
+      <span class="eyebrow">Foto della mostra</span>
+      <div class="dash-grid u-mt-3">
+        <a class="dash-card" href="admin-photos.html">
+          <h3 class="dash-card-title">Gestisci foto</h3>
+          <p class="dash-card-desc">Elenco con modifica ed eliminazione inline.</p>
+          <span class="dash-card-link">Apri →</span>
+        </a>
+        <a class="dash-card" href="admin-create-photo.html">
+          <h3 class="dash-card-title">Nuova foto</h3>
+          <p class="dash-card-desc">Carica una nuova opera con metadati e immagine.</p>
+          <span class="dash-card-link">Crea →</span>
+        </a>
       </div>
+    </section>
 
-      <div>
-        <p class="dash-section-title">Fotografie</p>
-        <div class="dash-link-grid">
-          <a href="admin-photos.html" class="dash-link">
-            <div class="dash-link-icon">◫</div>
-            <div class="dash-link-name">Elenco fotografie</div>
-            <div class="dash-link-desc">Visualizza, filtra e gestisci tutte le fotografie in mostra.</div>
-          </a>
-          <a href="admin-photo-create.html" class="dash-link">
-            <div class="dash-link-icon">＋</div>
-            <div class="dash-link-name">Aggiungi fotografia</div>
-            <div class="dash-link-desc">Inserisci una nuova opera nel catalogo della mostra.</div>
-          </a>
-        </div>
+    <section class="u-mt-4" style="margin-top: 3rem;">
+      <span class="eyebrow">Prodotti dello shop</span>
+      <div class="dash-grid u-mt-3">
+        <a class="dash-card" href="admin-products.html">
+          <h3 class="dash-card-title">Gestisci prodotti</h3>
+          <p class="dash-card-desc">Elenco con modifica ed eliminazione inline.</p>
+          <span class="dash-card-link">Apri →</span>
+        </a>
+        <a class="dash-card" href="admin-create-product.html">
+          <h3 class="dash-card-title">Nuovo prodotto</h3>
+          <p class="dash-card-desc">Aggiungi un nuovo articolo allo shop.</p>
+          <span class="dash-card-link">Crea →</span>
+        </a>
       </div>
+    </section>
 
-      <div>
-        <p class="dash-section-title">Prodotti</p>
-        <div class="dash-link-grid">
-          <a href="admin-products.html" class="dash-link">
-            <div class="dash-link-icon">◻</div>
-            <div class="dash-link-name">Elenco prodotti</div>
-            <div class="dash-link-desc">Gestisci il catalogo dello shop — ${prod_disp} prodotti disponibili.</div>
-          </a>
-          <a href="admin-product-create.html" class="dash-link">
-            <div class="dash-link-icon">＋</div>
-            <div class="dash-link-name">Aggiungi prodotto</div>
-            <div class="dash-link-desc">Inserisci un nuovo articolo nello shop della mostra.</div>
-          </a>
-        </div>
+    <section class="u-mt-4" style="margin-top: 3rem;" id="usersSection">
+      <span class="eyebrow">Utenti</span>
+      <div class="dash-grid u-mt-3">
+        <a class="dash-card" href="admin-users.html">
+          <h3 class="dash-card-title">Gestisci utenti</h3>
+          <p class="dash-card-desc">Promuovi collaboratori, elimina account.</p>
+          <span class="dash-card-link">Apri →</span>
+        </a>
       </div>
+    </section>
+  </main>
 
-      <div>
-        <p class="dash-section-title">Utenti</p>
-        <div class="dash-link-grid">
-          <a href="admin-users.html" class="dash-link">
-            <div class="dash-link-icon">◎</div>
-            <div class="dash-link-name">Gestione utenti</div>
-            <div class="dash-link-desc">${users.length} utenti registrati · ${collaboratori} collaboratori.</div>
-          </a>
-        </div>
-      </div>
-
-    </div>`;
-}
-
-function loadAll() {
-  Promise.all([API.getPhotos(), API.getProducts(), API.getUsers()])
-    .then(([photos, products, users]) => renderDashboard(photos, products, users));
-}
-
-initApp().then(user => {
-  renderNavbar("admin", user);
-  if (isAdmin(user)) loadAll();
-  else renderDenied();
-});
-</script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
+  <script>
+    (async () => {
+      const user = await initApp();
+      renderNavbar('admin', user);
+      renderFooter();
+      if (!requireStaff(user)) return;
+      document.getElementById('roleBadge').textContent = getRole(user);
+    })();
+  </script>
 </body>
 </html>

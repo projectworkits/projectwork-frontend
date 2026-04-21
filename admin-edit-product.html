@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Modifica prodotto</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <header class="page-head">
+    <div class="container">
+      <a href="admin-products.html" class="eyebrow">← Gestione prodotti</a>
+      <h1 class="u-mt-2">Modifica <em>prodotto</em> <span id="pid" style="font-size: .5em; color: var(--muted);"></span></h1>
+    </div>
+  </header>
+
+  <main class="container" style="padding-bottom: 5rem; max-width: 720px;">
+    <form id="productForm" novalidate class="u-hidden">
+      <input type="hidden" id="productId" name="productId">
+      <input type="hidden" id="sold" name="sold">
+
+      <div class="form-field">
+        <label class="form-label" for="name">Nome</label>
+        <input class="form-input" type="text" id="name" name="name" required maxlength="255">
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="description">Descrizione</label>
+        <textarea class="form-textarea" id="description" name="description" rows="5" required></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="price">Prezzo (€)</label>
+          <input class="form-input" type="number" id="price" name="price" min="0" step="0.01" required>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="available">Disponibilità</label>
+          <input class="form-input" type="number" id="available" name="available" min="0" step="1" required>
+        </div>
+      </div>
+
+      <div class="detail-actions">
+        <button type="submit" class="btn btn-primary" id="submitBtn">Salva modifiche</button>
+        <a href="admin-products.html" class="btn btn-ghost">Annulla</a>
+      </div>
+      <span class="form-error" id="err-form" style="margin-top: 1rem; display:block;"></span>
+    </form>
+
+    <div id="error" class="data-table-empty u-hidden" style="color: var(--danger);">Prodotto non trovato.</div>
+  </main>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
+  <script>
+    (async () => {
+      const user = await initApp();
+      renderNavbar('admin', user);
+      renderFooter();
+      if (!requireStaff(user)) return;
+
+      const id = qs('id');
+      const form = document.getElementById('productForm');
+      const errEl = document.getElementById('error');
+      const errF  = document.getElementById('err-form');
+      const btn   = document.getElementById('submitBtn');
+      if (!id) { errEl.classList.remove('u-hidden'); return; }
+
+      let p;
+      try { p = await API.products.get(id); }
+      catch (_) { errEl.classList.remove('u-hidden'); return; }
+
+      document.getElementById('pid').textContent = '#' + p.productId;
+      form.productId.value   = p.productId;
+      form.sold.value        = p.sold ?? 0;
+      form.name.value        = p.name || '';
+      form.description.value = p.description || '';
+      form.price.value       = p.price ?? '';
+      form.available.value   = p.available ?? 0;
+      form.classList.remove('u-hidden');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errF.textContent = '';
+        const payload = {
+          productId:   Number(form.productId.value),
+          sold:        Number(form.sold.value),
+          name:        form.name.value.trim(),
+          description: form.description.value.trim(),
+          price:       parseFloat(form.price.value),
+          available:   parseInt(form.available.value, 10),
+        };
+        btn.disabled = true;
+        try {
+          await API.products.update(payload);
+          toast('Modifiche salvate.', 'success');
+          setTimeout(() => location.href = 'admin-products.html', 700);
+        } catch (err) {
+          btn.disabled = false;
+          errF.textContent = err.status === 403 ? 'Operazione non consentita.'
+                           : err.status === 404 ? 'Prodotto non trovato.'
+                           : 'Errore durante il salvataggio.';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

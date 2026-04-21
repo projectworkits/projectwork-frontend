@@ -1,1479 +1,202 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Silk & Stack — Doisneau: La Strada Come Teatro</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="shared.css">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,600&display=swap"
-    rel="stylesheet">
-  <style>
-    :root {
-      --onyx: #0a0a0a;
-      --vivid-royal: #2d1ba1;
-      --blue-violet: #803cc4;
-      --golden-glow: #c8b482;
-      /* --golden-glow: #c0ac2b; */
-      --alabaster-grey: #f0ece4;
-    }
-
-    body.light-mode {
-      --onyx: #f4efe6 !important;
-      /* Sfondo chiaro crema */
-      --alabaster-grey: #1f1f1f !important;
-      /* Testo scuro principale */
-      background-color: #f4efe6;
-      color: #1f1f1f;
-    }
-
-
-    body.light-mode .Robert,
-    body.light-mode .hero-desc,
-    body.light-mode .about-body,
-
-    body.light-mode .dates-banner {
-      color: #1f1f1f;
-    }
-
-    body.light-mode .ticker-item {
-      color: #303030;
-    }
-
-    body.light-mode .ticker-dot {
-      background-color: #9a3636;
-    }
-
-    body.light-mode .quote-author {
-      color: #9a3636;
-    }
-
-    body.light-mode .footer-logo {
-      color: #803cc4;
-    }
-
-
-    body.light-mode .hero-subtitle,
-    body.light-mode .stat-desc,
-    body.light-mode .ticket-desc,
-    body.light-mode .about-text p,
-    body.light-mode .ticket-note,
-    body.light-mode .footer-copy,
-    body.light-mode .ticket-features li {
-      color: rgba(31, 31, 31, 0.7) !important;
-    }
-
-    /* 3. Colori dei bottoni in Light Mode */
-    body.light-mode .btn-primary,
-    body.light-mode .btn-ticket {
-      background-color: var(--golden-glow) !important;
-      color: #0a0a0a !important;
-      /* Testo chiaro sul bottone scuro */
-    }
-
-    body.light-mode .btn-ghost {
-      color: #1f1f1f !important;
-      border-color: rgba(31, 31, 31, 0.3) !important;
-    }
-
-    body.light-mode .btn-ghost:hover {
-      background-color: rgba(31, 31, 31, 0.05) !important;
-    }
-
-    /* 4. Sfondo delle card dei biglietti per farle staccare dal fondo */
-    body.light-mode .ticket-box {
-      background: rgba(0, 0, 0, 0.03) !important;
-      border-color: rgba(0, 0, 0, 0.1) !important;
-    }
-
-    /* 5. Tasto per il cambio tema */
-    body.light-mode .theme-toggle-btn {
-      border-color: #9a3636 !important;
-      color: #9a3636 !important;
-    }
-
-    /* Eccezione per le icone: ridiamo il colore di accento */
-    body.light-mode svg,
-    body.light-mode .icon,
-    body.light-mode i {
-      color: var(--golden-glow) !important;
-      fill: var(--golden-glow) !important;
-    }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      background-color: var(--onyx);
-      color: var(--alabaster-grey);
-      font-family: 'Cormorant Garamond', serif;
-      overflow-x: hidden;
-      cursor: default;
-
-      margin: 0 !important;
-      padding-top: 0 !important;
-    }
-
-    /* ── NOISE OVERLAY ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.4;
-    }
-
-    /* ── NAV ── */
-    .navbar,
-    .navbar a,
-    .nb-cta,
-    .role-switcher {
-      font-family: 'Cormorant Garamond', serif !important;
-      /* Usa il font del sito */
-      font-weight: 400 !important;
-      /* Riporta lo spessore alla normalità (togliendo il 300) */
-      font-size: 16px !important;
-      /* Forza la grandezza standard */
-      letter-spacing: normal !important;
-    }
-
-    .nb-logo {
-      font-family: 'Playfair Display', serif !important;
-      font-weight: 400 !important;
-    }
-
-    /* nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.5rem 4rem;
-      mix-blend-mode: normal;
-    }
-
-    .nav-logo {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--golden-glow);
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 3rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--alabaster-grey);
-      text-decoration: none;
-      opacity: 0.6;
-      transition: opacity 0.3s, color 0.3s;
-    }
-
-    .nav-links a:hover {
-      opacity: 1;
-      color: var(--golden-glow);
-    } */
-
-    /* ── HERO ── */
-    .hero {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-left {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 0 4rem 5rem 4rem;
-      position: relative;
-      z-index: 2;
-    }
-
-    .hero-eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--golden-glow);
-      margin-bottom: 2rem;
-      opacity: 0;
-      animation: fadeUp 1s ease 0.3s forwards;
-    }
-
-    .hero-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(4rem, 7vw, 7.5rem);
-      font-weight: 900;
-      line-height: 0.92;
-      letter-spacing: -0.02em;
-      margin-bottom: 2.5rem;
-      opacity: 0;
-      animation: fadeUp 1s ease 0.5s forwards;
-    }
-
-    .hero-title .line-italic {
-      font-style: italic;
-      color: var(--golden-glow);
-      display: block;
-    }
-
-    .hero-title .line-outlined {
-      -webkit-text-stroke: 1.5px var(--alabaster-grey);
-      color: transparent;
-      display: block;
-    }
-
-    .hero-desc {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.15rem;
-      font-weight: 300;
-      line-height: 1.7;
-      color: rgba(224, 224, 224, 0.65);
-      max-width: 380px;
-      margin-bottom: 3rem;
-      opacity: 0;
-      animation: fadeUp 1s ease 0.7s forwards;
-    }
-
-    .hero-cta-group {
-      display: flex;
-      align-items: center;
-      gap: 2.5rem;
-      opacity: 0;
-      animation: fadeUp 1s ease 0.9s forwards;
-    }
-
-    .btn-primary {
-      background: var(--golden-glow);
-      color: var(--onyx);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      padding: 1rem 2.5rem;
-      text-decoration: none;
-      display: inline-block;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-primary::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: var(--blue-violet);
-      transform: translateX(-100%);
-      transition: transform 0.4s ease;
-      z-index: -1;
-    }
-
-    .btn-primary:hover {
-      color: white;
-    }
-
-    .btn-primary:hover::after {
-      transform: translateX(0);
-    }
-
-    .btn-ghost {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--alabaster-grey);
-      text-decoration: none;
-      opacity: 0.5;
-      transition: opacity 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .btn-ghost::before {
-      content: '→';
-    }
-
-    .btn-ghost:hover {
-      opacity: 1;
-    }
-
-    /* Hero right: cinematic frame */
-    .hero-right {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-frame {
-      position: absolute;
-      inset: 0;
-      background: var(--vivid-royal);
-      clip-path: polygon(8% 0%, 100% 0%, 100% 100%, 0% 100%);
-    }
-
-    /* Simulated photograph - a layered geometric composition */
-    .photo-sim {
-      position: absolute;
-      inset: 0;
-      clip-path: polygon(8% 0%, 100% 0%, 100% 100%, 0% 100%);
-      overflow: hidden;
-    }
-
-    .photo-bg {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse at 30% 60%, rgba(128, 60, 196, 0.5) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 20%, rgba(45, 27, 161, 0.7) 0%, transparent 50%),
-        linear-gradient(160deg, #1a1230 0%, #0d0d18 50%, #1e1050 100%);
-    }
-
-    /* Decorative street photography abstraction */
-    .photo-scene {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .street-figure {
-      position: absolute;
-      width: 3px;
-      background: rgba(224, 224, 224, 0.15);
-      border-radius: 2px;
-    }
-
-    /* Big quote overlay */
-    .photo-quote {
-      position: absolute;
-      bottom: 10%;
-      left: 18%;
-      right: 5%;
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: clamp(1rem, 1.8vw, 1.6rem);
-      line-height: 1.5;
-      color: rgba(224, 224, 224, 0.9);
-      opacity: 0;
-      animation: fadeUp 1.2s ease 1.2s forwards;
-    }
-
-    .photo-quote cite {
-      display: block;
-      font-family: 'DM Mono', monospace;
-      font-style: normal;
-      font-size: 0.6rem;
-      letter-spacing: 0.25em;
-      color: var(--golden-glow);
-      margin-top: 1rem;
-    }
-
-    /* Decorative lines in the hero frame */
-    .deco-lines {
-      position: absolute;
-      inset: 0;
-      clip-path: polygon(8% 0%, 100% 0%, 100% 100%, 0% 100%);
-      pointer-events: none;
-    }
-
-    .deco-lines svg {
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Year stamp */
-    .hero-year {
-      position: absolute;
-      bottom: 5rem;
-      left: 4rem;
-      font-family: 'Playfair Display', serif;
-      font-size: 7rem;
-      font-weight: 900;
-      color: transparent;
-      -webkit-text-stroke: 1px rgba(224, 201, 49, 0.12);
-      pointer-events: none;
-      user-select: none;
-      line-height: 1;
-      opacity: 0;
-      animation: fadeIn 2s ease 1.5s forwards;
-    }
-
-    /* Scroll indicator */
-    .scroll-hint {
-      position: absolute;
-      bottom: 2.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: rgba(224, 224, 224, 0.35);
-      z-index: 10;
-      opacity: 0;
-      animation: fadeIn 1s ease 1.8s forwards;
-    }
-
-    .scroll-line {
-      width: 1px;
-      height: 50px;
-      background: linear-gradient(to bottom, var(--golden-glow), transparent);
-      animation: scrollDrop 2s ease-in-out infinite;
-    }
-
-    /* ── DATES BANNER ── */
-    .dates-banner {
-      background: var(--golden-glow);
-      color: var(--onyx);
-      padding: 1.2rem 4rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      overflow: hidden;
-    }
-
-    .dates-banner-inner {
-      display: flex;
-      gap: 6rem;
-      align-items: baseline;
-    }
-
-    .date-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      opacity: 0.6;
-      display: block;
-    }
-
-    .date-value {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.8rem;
-      font-weight: 700;
-    }
-
-    .dates-ticker {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      opacity: 0.6;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .ticker-dot {
-      width: 6px;
-      height: 6px;
-      background: var(--onyx);
-      border-radius: 50%;
-      opacity: 0.4;
-    }
-
-    /* ── ABOUT SECTION ── */
-    .about {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      min-height: 80vh;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .about-left {
-      padding: 8rem 5rem 8rem 4rem;
-      position: relative;
-    }
-
-    .about-left::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width: 1px;
-      background: linear-gradient(to bottom, transparent, var(--vivid-royal), transparent);
-      right: 0;
-      left: auto;
-    }
-
-    .section-tag {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--blue-violet);
-      margin-bottom: 3rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .section-tag::before {
-      content: '';
-      display: block;
-      width: 30px;
-      height: 1px;
-      background: var(--blue-violet);
-    }
-
-    .about-heading {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.5rem, 4vw, 4rem);
-      font-weight: 700;
-      line-height: 1.1;
-      margin-bottom: 2.5rem;
-    }
-
-    .about-heading em {
-      font-style: italic;
-      color: var(--golden-glow);
-    }
-
-    .about-body {
-      font-size: 1.1rem;
-      font-weight: 300;
-      line-height: 1.9;
-      color: rgba(224, 224, 224, 0.65);
-      margin-bottom: 2rem;
-    }
-
-    .about-stat-row {
-      display: flex;
-      gap: 3rem;
-      margin-top: 4rem;
-      padding-top: 3rem;
-      border-top: 1px solid rgba(224, 224, 224, 0.08);
-    }
-
-    .stat {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-
-    .stat-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 3rem;
-      font-weight: 900;
-      color: var(--golden-glow);
-      line-height: 1;
-    }
-
-    .stat-desc {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(224, 224, 224, 0.4);
-    }
-
-    .about-right {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .about-right-bg {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse at 50% 50%, rgba(45, 27, 161, 0.3) 0%, transparent 70%),
-        var(--onyx);
-    }
-
-    /* Mosaic of abstract photo squares */
-    .mosaic {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-      gap: 6px;
-      padding: 4rem 3rem;
-      opacity: 0.7;
-    }
-
-    .mosaic-cell {
-      position: relative;
-      overflow: hidden;
-      border-radius: 2px;
-    }
-
-    .mosaic-cell img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .mosaic-cell:nth-child(1) {
-      grid-column: 1 / 3;
-      /* occupa 2 colonne */
-      grid-row: 1 / 3;
-      /* occupa 2 righe */
-    }
-
-    .mosaic-cell:nth-child(2) {
-      grid-column: 3 / 4;
-      grid-row: 1 / 3;
-    }
-
-    .mosaic-cell:nth-child(3) {
-      grid-column: 1 / 4;
-      grid-row: 3 / 4;
-    }
-
-    .mosaic-cell::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at center, transparent 60%, rgba(17, 17, 23, 0.6) 100%);
-    }
-
-    /* Big oblique text on right */
-    .about-right-word {
-      position: absolute;
-      bottom: -2rem;
-      right: -1rem;
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: 12rem;
-      font-weight: 900;
-      color: transparent;
-      -webkit-text-stroke: 1px rgba(224, 201, 49, 0.08);
-      line-height: 1;
-      user-select: none;
-      pointer-events: none;
-    }
-
-    /* ── HIGHLIGHTS ── */
-    .highlights {
-      padding: 8rem 4rem;
-      position: relative;
-    }
-
-    .highlights::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 80% 50%, rgba(45, 27, 161, 0.15) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
-    .highlights-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      margin-bottom: 5rem;
-    }
-
-    .highlights-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2rem, 3.5vw, 3.5rem);
-      font-weight: 700;
-      line-height: 1.1;
-    }
-
-    .highlights-title em {
-      font-style: italic;
-      color: var(--golden-glow);
-    }
-
-    .highlights-count {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      color: rgba(224, 224, 224, 0.35);
-      text-transform: uppercase;
-    }
-
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-      /* Nota: avevi scritto 1.5px, forse intendevi 1.5rem? */
-    }
-
-    .card {
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      padding: 3rem 2.5rem;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-    }
-
-    /* 1. NOVITÀ: Portiamo tutto il contenuto della card in primo piano rispetto all'overlay */
-    .card>* {
-      position: relative;
-      z-index: 2;
-    }
-
-    .card:nth-child(1) {
-      background-image: url('https://image.jimcdn.com/app/cms/image/transf/none/path/s55fe77d416bad7bc/image/iab63d00d703e1806/version/1397545185/image.jpg');
-    }
-
-    .card:nth-child(2) {
-      background-image: url('https://uploads.lebonbon.fr/source/2025/february/2074553/robert-doisneau-derniere-valse-14-juillet-expo-mus_1_2000.jpg');
-    }
-
-    .card:nth-child(3) {
-      background-image: url('https://i.ebayimg.com/images/g/qroAAOSwBahVO9Xl/s-l1200.jpg');
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: linear-gradient(90deg, var(--vivid-royal, #2d1ba1), var(--blue-violet, #8a2be2));
-      transform: scaleX(0);
-      transform-origin: left;
-      z-index: 3;
-      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    .card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: linear-gradient(to top,
-          rgba(17, 17, 23, 0.95) 0%,
-          rgba(17, 17, 23, 0.4) 50%,
-          rgba(17, 17, 23, 0.2) 100%);
-      background-color: transparent;
-      z-index: 1;
-      transition: background-color 0.6s ease;
-    }
-
-    .card:hover::after {
-      background-color: rgba(45, 27, 161, 0.35);
-    }
-
-    .card:hover::before {
-      transform: scaleX(1);
-    }
-
-    .card-num {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      color: var(--golden-glow, #ffd700);
-      opacity: 0.8;
-      margin-bottom: 2.5rem;
-    }
-
-    .card-icon {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-      display: block;
-    }
-
-    .card-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      line-height: 1.2;
-      color: #ffffff;
-      /* 5. Aggiunta una leggera ombra al testo per staccarlo maggiormente dallo sfondo */
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-    }
-
-    .card-body {
-      font-size: 0.95rem;
-      font-weight: 300;
-      line-height: 1.8;
-      color: rgba(255, 255, 255, 0.9);
-      /* Reso leggermente più bianco */
-    }
-
-    /* ── QUOTE SECTION ── */
-    .quote-section {
-      padding: 10rem 4rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .quote-section::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse at 50% 50%, rgba(128, 60, 196, 0.2) 0%, transparent 60%),
-        linear-gradient(to bottom, transparent, rgba(45, 27, 161, 0.1) 50%, transparent);
-    }
-
-    .big-quote {
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: clamp(1.8rem, 4vw, 4rem);
-      font-weight: 400;
-      line-height: 1.35;
-      max-width: 900px;
-      margin: 0 auto 3rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .big-quote::before {
-      content: '\201C';
-      font-size: 10rem;
-      color: var(--vivid-royal);
-      opacity: 0.3;
-      position: absolute;
-      top: -3rem;
-      left: -2rem;
-      font-style: normal;
-      line-height: 1;
-      pointer-events: none;
-    }
-
-    .quote-author {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--golden-glow);
-      position: relative;
-      z-index: 1;
-    }
-
-    /* ── LOCATION ── */
-    .location-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .location-left {
-      padding: 6rem 5rem;
-      border-right: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .location-right {
-      padding: 6rem 4rem;
-    }
-
-    .location-map-placeholder {
-      width: 100%;
-      aspect-ratio: 4/3;
-      background:
-        radial-gradient(ellipse at 50% 50%, rgba(45, 27, 161, 0.4) 0%, transparent 60%),
-        linear-gradient(135deg, #0d0d18 0%, #111117 100%);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .map-grid {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(45, 27, 161, 0.15) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(45, 27, 161, 0.15) 1px, transparent 1px);
-      background-size: 30px 30px;
-    }
-
-    .map-pin {
-      width: 14px;
-      height: 14px;
-      background: var(--golden-glow);
-      border-radius: 50% 50% 50% 0;
-      transform: rotate(-45deg);
-      position: relative;
-      z-index: 1;
-      box-shadow: 0 0 0 4px rgba(224, 201, 49, 0.2), 0 0 20px rgba(224, 201, 49, 0.4);
-    }
-
-    .info-block {
-      margin-bottom: 2.5rem;
-    }
-
-    .info-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--blue-violet);
-      margin-bottom: 0.5rem;
-    }
-
-    .info-value {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.2rem;
-      color: var(--alabaster-grey);
-      line-height: 1.5;
-    }
-
-    .tickets-section {
-      padding: 4rem 0 8rem 0;
-      position: relative;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .ticket-container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-      margin-bottom: 3rem;
-
-      max-width: 1300px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    .ticket-box {
-      padding: 3rem 2.5rem;
-      border: 1px solid rgba(229, 205, 54, 0.33);
-      position: relative;
-      aspect-ratio: 4 / 3;
-      min-height: 250px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .ticket-box::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(45, 27, 161, 0.15), rgba(128, 60, 196, 0.1));
-      z-index: -1;
-    }
-
-    .ticket-price {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.5rem;
-      font-weight: 900;
-      color: var(--golden-glow);
-      position: relative;
-    }
-
-    .ticket-price span {
-      font-size: 1rem;
-      font-weight: 300;
-      color: rgba(224, 224, 224, 0.5);
-      font-family: 'DM Mono', monospace;
-      letter-spacing: 0.2em;
-      margin-left: 0.5rem;
-    }
-
-    .ticket-note {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      color: rgba(224, 224, 224, 0.4);
-      margin-top: 0.5rem;
-      margin-bottom: 1.5rem;
-      position: relative;
-    }
-
-    .btn-ticket {
-      display: inline-block;
-      background: var(--golden-glow);
-      color: var(--onyx);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      padding: 0.85rem 2rem;
-      text-decoration: none;
-      font-weight: 400;
-      position: relative;
-      transition: all 0.3s;
-      z-index: 1;
-    }
-
-    .btn-ticket:hover {
-      background: var(--blue-violet);
-      color: white;
-    }
-
-    .location-map-placeholder {
-      position: relative;
-      width: 100%;
-      height: 350px;
-      /* Scegli tu l'altezza che preferisci */
-      border-radius: 12px;
-      /* Se vuoi dare un bell'effetto arrotondato agli angoli */
-      overflow: hidden;
-      /* Taglia via gli angoli quadrati della mappa di Google */
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      /* Una leggera ombra per farla risaltare */
-    }
-
-    /* Rimuove i bordi dall'iframe e lo fissa al 100% del contenitore */
-    .location-map-placeholder iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      padding: 4rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .footer-logo {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--golden-glow);
-    }
-
-    .footer-copy {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.15em;
-      color: rgba(224, 224, 224, 0.25);
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-
-    .footer-links a {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(224, 224, 224, 0.35);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-
-    .footer-links a:hover {
-      color: var(--golden-glow);
-    }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 1;
-      }
-    }
-
-    @keyframes scrollDrop {
-      0% {
-        transform: scaleY(0);
-        transform-origin: top;
-        opacity: 1;
-      }
-
-      50% {
-        transform: scaleY(1);
-        transform-origin: top;
-        opacity: 1;
-      }
-
-      100% {
-        transform: scaleY(1);
-        transform-origin: bottom;
-        opacity: 0;
-      }
-    }
-
-    /* ── REVEAL ON SCROLL ── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.8s ease, transform 0.8s ease;
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ── TICKER ── */
-    .ticker-wrap {
-      overflow: hidden;
-      background: rgba(45, 27, 161, 0.15);
-      border-top: 1px solid rgba(45, 27, 161, 0.3);
-      border-bottom: 1px solid rgba(45, 27, 161, 0.3);
-      padding: 0.8rem 0;
-    }
-
-    .ticker-inner {
-      display: flex;
-      gap: 3rem;
-      width: max-content;
-      animation: tickerMove 22s linear infinite;
-    }
-
-    .ticker-item {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: rgba(224, 224, 224, 0.4);
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
-
-    .ticker-item span {
-      color: var(--golden-glow);
-      opacity: 0.5;
-    }
-
-    body {
-      padding-top: 0;
-    }
-
-    .hero {
-      margin-top: -56px;
-    }
-
-    @keyframes tickerMove {
-      from {
-        transform: translateX(0);
-      }
-
-      to {
-        transform: translateX(-50%);
-      }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doisneau Â· Pordenone â€” Home</title>
+  <meta name="description" content="Robert Doisneau a Pordenone Â· 100 fotografie originali Â· 22 Novembre 2025 â€” 26 Aprile 2026">
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
-
 <body>
 
-  <!-- Cursor -->
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-ring" id="cursorRing"></div>
-
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-left">
-      <p class="hero-eyebrow">Primavera 2025</p>
-      <h1 class="hero-title">
-        <span class="Robert">Robert</span>
-        <span class="line-italic">Doisneau</span>
-        <span class="line-outlined">Pordenone</span>
-      </h1>
-      <p class="hero-desc">
-        Cento fotografie che ritraggono la vita quotidiana della Parigi del dopoguerra.
-        Amore, ironia e umanità catturati nell'attimo fuggente.
-      </p>
-      <div class="hero-cta-group">
-        <a href="login.html" class="btn-primary">Accedi per prenotare</a>
-        <a href="#about" class="btn-ghost">Scopri la mostra</a>
-      </div>
-    </div>
-
-    <div class="hero-right">
-      <div class="hero-frame"></div>
-      <div class="photo-sim">
-        <div class="photo-bg">
-          <img
-            src="https://www.robert-doisneau.com/ressources/imageBank/cache/26/320x-4891-Autoportrait-jules-ferry.jpeg"
-            alt="Robert Doisneau - Autoportrait, Jules Ferry"
-            style="width: 100%; height: 100%; object-fit: cover; filter: grayscale(80%) brightness(90%) opacity(90%) ;">
+  <!-- HERO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <section class="hero-full">
+    <div class="container">
+      <div class="hero-full-grid">
+        <div class="hero-full-media reveal">
+          <img src="assets/img/doisneau/hero-autoportrait.jpeg" alt="Robert Doisneau Â· Autoportrait Ã  Jules Ferry">
         </div>
-        <blockquote class="photo-quote">
-          "La fotografia è una piccola voce. Non è la grande voce. Ma a volte una fotografia, oppure una serie di
-          fotografie, può attrarre l'attenzione."
-          <cite>— Robert Doisneau</cite>
-        </blockquote>
-      </div>
-    </div>
-
-    <div class="hero-year">1950</div>
-    <div class="scroll-hint">
-      <div class="scroll-line"></div>
-      Scorri
-    </div>
-  </section>
-
-  <!-- Dates banner -->
-  <div class="dates-banner">
-    <div class="dates-banner-inner">
-      <div>
-        <span class="date-label">Apertura</span>
-        <span class="date-value">22 Novembre 2025</span>
-      </div>
-      <div>
-        <span class="date-label">Chiusura</span>
-        <span class="date-value">26 Aprile 2026</span>
-      </div>
-      <div>
-        <span class="date-label">Sede</span>
-        <span class="date-value">Galleria Harry Bertoia, Pordenone</span>
-      </div>
-    </div>
-    <div class="dates-ticker">
-      <div class="ticker-dot"></div>
-      Mostra in corso
-      <div class="ticker-dot"></div>
-    </div>
-  </div>
-
-  <!-- Ticker -->
-  <div class="ticker-wrap">
-    <div class="ticker-inner">
-      <div class="ticker-item">Doisneau <span>✦</span></div>
-      <div class="ticker-item">La Strada Come Teatro <span>✦</span></div>
-      <div class="ticker-item">100 Fotografie Originali <span>✦</span></div>
-      <div class="ticker-item">Parigi 1945–1965 <span>✦</span></div>
-      <div class="ticker-item">Foto nella storia <span>✦</span></div>
-      <div class="ticker-item">Galleria Harry Bertoia, Pordenone <span>✦</span></div>
-      <div class="ticker-item">Doisneau <span>✦</span></div>
-      <div class="ticker-item">La Strada Come Teatro <span>✦</span></div>
-      <div class="ticker-item">100 Fotografie Originali <span>✦</span></div>
-      <div class="ticker-item">Parigi 1945–1965 <span>✦</span></div>
-      <div class="ticker-item">Foto nella storia <span>✦</span></div>
-      <div class="ticker-item">Galleria Harry Bertoia, Pordenone <span>✦</span></div>
-    </div>
-  </div>
-
-  <!-- About -->
-  <section class="about" id="about">
-    <div class="about-left reveal">
-      <div class="section-tag">La Mostra</div>
-      <h2 class="about-heading">
-        La strada come<br>
-        <em>palcoscenico</em><br>
-        dell'anima
-      </h2>
-      <p class="about-body">
-        Robert Doisneau ha trasformato i marciapiedi di Parigi in una scena teatrale permanente.
-        Con discrezione e ironia, ha fissato su carta i momenti fugaci che compongono la trama invisibile
-        della vita urbana: gli amanti, i bambini, gli eccentrici, i solitari.
-      </p>
-      <p class="about-body">
-        Questa mostra riunisce per la prima volta cento stampe vintage provenienti da archivi privati e
-        istituzioni internazionali, restituendo al pubblico italiano un corpus raramente esposto in
-        questa completezza.
-      </p>
-      <div class="about-stat-row">
-        <div class="stat">
-          <span class="stat-num">+100</span>
-          <span class="stat-desc">Fotografie originali</span>
+        <div class="reveal">
+          <span class="eyebrow">Inverno 2025 / 26</span>
+          <h1 class="hero-full-title">Robert <em>Doisneau</em> Pordenone</h1>
+          <p class="hero-full-lead">
+            Cento fotografie che ritraggono la vita quotidiana della Parigi del dopoguerra.
+            Amore, ironia e umanitÃ  catturati nell'attimo fuggente.
+          </p>
+          <div class="hero-full-ctas">
+            <a href="login.html" class="btn btn-primary">Accedi per prenotare</a>
+            <a href="#about" class="btn btn-ghost">Scopri la mostra</a>
+          </div>
         </div>
-        <div class="stat">
-          <span class="stat-num">6</span>
-          <span class="stat-desc">Sezioni tematiche</span>
-        </div>
-        <div class="stat">
-          <span class="stat-num">+50</span>
-          <span class="stat-desc">Anni di produzione</span>
-        </div>
-      </div>
-    </div>
-    <div class="about-right">
-      <div class="about-right-bg"></div>
-      <div class="mosaic">
-        <div class="mosaic-cell">
-          <img src="https://compass-media.vogue.it/photos/645cf22e69fb9735214322b2/4:3/w_699,h_524,c_limit/Bacio.jpg">
-        </div>
-        <div class="mosaic-cell">
-          <img src="https://ilfotografo.it/wp-content/uploads/2022/10/Doisneau-875x1024.jpg">
-        </div>
-        <div class="mosaic-cell">
-          <img
-            src="https://d7hftxdivxxvm.cloudfront.net/?height=800&quality=80&resize_to=fit&src=https://d32dm0rphc51dk.cloudfront.net/U8kWWWHRWS4BOdgA64k1JA/normalized.jpg&width=787">
-        </div>
-      </div>
-      <div class="about-right-word">Rue</div>
-    </div>
-  </section>
-
-  <!-- Highlights -->
-  <section class="highlights" id="highlights">
-    <div class="highlights-header reveal">
-      <h2 class="highlights-title">
-        Tre nuclei<br>
-        <em>narrativi</em>
-      </h2>
-      <span class="highlights-count">01 — 03</span>
-    </div>
-    <div class="cards-grid">
-      <div class="card reveal" style="transition-delay:0.1s">
-        <div class="card-num">01</div>
-        <span class="card-icon">🏙</span>
-        <h3 class="card-title">La Parigi di tutti</h3>
-        <p class="card-body">
-          Mercati, bistrot, cortili interni, periferie operaie. Doisneau ritrae
-          una città popolare e vitale, lontana dai cliché della cartolina.
-        </p>
-      </div>
-      <div class="card reveal" style="transition-delay:0.25s">
-        <div class="card-num">02</div>
-        <span class="card-icon">💛</span>
-        <h3 class="card-title">L'amore in strada</h3>
-        <p class="card-body">
-          Il celebre <em>Le Baiser de l'Hôtel de Ville</em> e le sue variazioni.
-          Una riflessione sull'attimo, sulla messa in scena e sulla verità dell'immagine.
-        </p>
-      </div>
-      <div class="card reveal" style="transition-delay:0.4s">
-        <div class="card-num">03</div>
-        <span class="card-icon">🧒</span>
-        <h3 class="card-title">I bambini e il gioco</h3>
-        <p class="card-body">
-          Lo sguardo di Doisneau sui piccoli abitanti della città: liberi,
-          inventivi, capaci di abitare ogni angolo con immaginazione.
-        </p>
       </div>
     </div>
   </section>
 
-  <!-- Quote -->
-  <section class="quote-section">
-    <blockquote class="big-quote reveal">
-      I miei soggetti mi sorprendevano mentre sorprendevo loro.
-      Era uno scambio di meraviglie.
-    </blockquote>
-    <p class="quote-author reveal" style="transition-delay:0.2s">Robert Doisneau — 1992</p>
-  </section>
-
-  <!-- Location -->
-  <section class="location-section" id="location">
-    <div class="location-left reveal">
-      <div class="section-tag">Informazioni Pratiche</div>
-      <div class="info-block">
-        <div class="info-label">Dove</div>
-        <div class="info-value">Galleria Harry Bertoia<br>Corso Vittorio Emanuele II n. 60, Pordenone</div>
-      </div>
-      <div class="info-block">
-        <div class="info-label">Quando</div>
-        <div class="info-value">22 Novembre 2025 — 26 Aprile 2026<br>Mercoledi – Venerdi, 15:00-19:00<br>Sabato -
-          Domenica, 10:00-13:00 15:00-19:00</div>
-      </div>
-
-    </div>
-    <div class="location-right reveal" style="transition-delay:0.2s">
-      <div class="section-tag">Come Raggiungerci</div>
-      <div class="location-map-placeholder">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2773.8380251925196!2d12.657254076525575!3d45.95451917108613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x477964ba9e4b1023%3A0xaea273ee6e362d7!2sGalleria%20Harry%20Bertoia!5e0!3m2!1sit!2snl!4v1776169129193!5m2!1sit!2snl"
-          width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"></iframe>
+  <!-- DATES BAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <section class="section is-soft" style="padding: 2.5rem 0;">
+    <div class="container">
+      <div class="u-flex u-between u-items-c" style="gap: 2rem; flex-wrap: wrap;">
+        <div>
+          <span class="eyebrow is-plain" style="display:block; margin-bottom: 0.3rem;">Apertura</span>
+          <strong style="font-family: var(--ff-display); font-size: 1.2rem;">22 Novembre 2025</strong>
+        </div>
+        <div>
+          <span class="eyebrow is-plain" style="display:block; margin-bottom: 0.3rem;">Chiusura</span>
+          <strong style="font-family: var(--ff-display); font-size: 1.2rem;">26 Aprile 2026</strong>
+        </div>
+        <div>
+          <span class="eyebrow is-plain" style="display:block; margin-bottom: 0.3rem;">Sede</span>
+          <strong style="font-family: var(--ff-display); font-size: 1.2rem;">Galleria Harry Bertoia, Pordenone</strong>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="tickets-section" id="tickets">
-    <div class="ticket-container">
-
-      <div class="ticket-box">
-        <div class="ticket-price">€12 <span class="ticket-desc">Intero</span></div>
-        <div class="ticket-note">Per chiunque voglia visitare l'allestimento</div>
-        <a href="#" class="btn-ticket">Prenota ora →</a>
-      </div>
-      <div class="ticket-box">
-        <div class="ticket-price">€9 <span class="ticket-desc">Ridotto</span></div>
-        <div class="ticket-note">Under 24 · Over 65 · Disabili</div>
-        <a href="#" class="btn-ticket">Prenota ora →</a>
-      </div>
-      <div class="ticket-box">
-        <div class="ticket-price">€5 <span class="ticket-desc">Studenti</span></div>
-        <div class="ticket-note">Prezzo ridotto per studenti</div>
-        <a href="#" class="btn-ticket">Prenota ora →</a>
+  <!-- ABOUT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <section class="section" id="about">
+    <div class="container">
+      <div class="hero-full-grid">
+        <div class="reveal">
+          <span class="eyebrow">La Mostra</span>
+          <h2 class="section-title u-mt-2">La strada come <em>palcoscenico</em> dell'anima</h2>
+          <p class="section-body u-mt-2">
+            Robert Doisneau ha trasformato i marciapiedi di Parigi in una scena teatrale permanente.
+            Con discrezione e ironia, ha fissato su carta i momenti fugaci che compongono la trama
+            invisibile della vita urbana: gli amanti, i bambini, gli eccentrici, i solitari.
+          </p>
+          <p class="section-body u-mt-2">
+            Cento stampe vintage provenienti da archivi privati e istituzioni internazionali, riunite
+            per la prima volta a Pordenone in un corpus raramente esposto in questa completezza.
+          </p>
+          <div class="u-flex u-mt-4" style="gap: 3rem; flex-wrap: wrap;">
+            <div>
+              <div style="font-family: var(--ff-display); font-size: 2.6rem; color: var(--golden-glow); line-height: 1;">+100</div>
+              <div class="eyebrow u-mt-1">Fotografie originali</div>
+            </div>
+            <div>
+              <div style="font-family: var(--ff-display); font-size: 2.6rem; color: var(--golden-glow); line-height: 1;">6</div>
+              <div class="eyebrow u-mt-1">Sezioni tematiche</div>
+            </div>
+            <div>
+              <div style="font-family: var(--ff-display); font-size: 2.6rem; color: var(--golden-glow); line-height: 1;">+50</div>
+              <div class="eyebrow u-mt-1">Anni di produzione</div>
+            </div>
+          </div>
+        </div>
+        <div class="mosaic reveal">
+          <div class="mosaic-item is-tall"><img src="assets/img/doisneau/mosaic-bacio.jpg" alt="Le Baiser de l'HÃ´tel de Ville"></div>
+          <div class="mosaic-item is-sq"><img src="assets/img/doisneau/mosaic-doisneau.jpg" alt="Doisneau, ritratto"></div>
+          <div class="mosaic-item is-sq"><img src="assets/img/doisneau/mosaic-portrait.jpg" alt="Doisneau, scena di strada"></div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer>
-    <a class="footer-logo" href="../azienda.html">Silk &amp; Stack</a>
-    <!-- <ul class="footer-links">
-      <li><a href="#">Press</a></li>
-      <li><a href="#">Accessibilità</a></li>
-      <li><a href="#">Privacy</a></li>
-      <li><a href="#">Contatti</a></li>
-    </ul> -->
-    <div class="footer-copy">© 2025 Silk & Stack. Tutti i diritti riservati.</div>
-  </footer>
+  <!-- HIGHLIGHTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <section class="section is-soft" id="highlights">
+    <div class="container">
+      <div class="u-flex u-between u-items-c u-mb-2" style="flex-wrap: wrap; gap: 1rem;">
+        <h2 class="section-title">Tre nuclei <em>narrativi</em></h2>
+        <span class="eyebrow">01 â€” 03</span>
+      </div>
+      <div class="card-grid is-3 u-mt-4">
+        <a class="card-art reveal" href="mostra-index.html">
+          <div class="card-art-bg" style="background-image: url('assets/img/doisneau/card-paris.jpg');"></div>
+          <div class="card-art-overlay"></div>
+          <div class="card-art-body">
+            <span class="card-art-year">01 Â· La Parigi di tutti</span>
+            <h3 class="card-art-title">Mercati, bistrot, cortili interni</h3>
+          </div>
+        </a>
+        <a class="card-art reveal" href="mostra-index.html" style="transition-delay: .15s;">
+          <div class="card-art-bg" style="background-image: url('assets/img/doisneau/card-valse.jpg');"></div>
+          <div class="card-art-overlay"></div>
+          <div class="card-art-body">
+            <span class="card-art-year">02 Â· L'amore in strada</span>
+            <h3 class="card-art-title">Le Baiser de l'HÃ´tel de Ville</h3>
+          </div>
+        </a>
+        <a class="card-art reveal" href="mostra-index.html" style="transition-delay: .3s;">
+          <div class="card-art-bg" style="background-image: url('assets/img/doisneau/card-children.jpg');"></div>
+          <div class="card-art-overlay"></div>
+          <div class="card-art-body">
+            <span class="card-art-year">03 Â· I bambini e il gioco</span>
+            <h3 class="card-art-title">Lo sguardo sui piccoli abitanti</h3>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- QUOTE ────────────────────────────────────────────────────────────── -->
+  <section class="section u-center">
+    <div class="container">
+      <blockquote class="reveal" style="font-family: var(--ff-display); font-style: italic; font-size: clamp(1.4rem, 3vw, 2.2rem); line-height: 1.4; max-width: 880px; margin: 0 auto; color: var(--alabaster);">
+        “I miei soggetti mi sorprendevano mentre sorprendevo loro.
+        Era uno scambio di meraviglie.”
+      </blockquote>
+      <p class="eyebrow is-plain u-mt-3 reveal">Robert Doisneau — 1992</p>
+    </div>
+  </section>
+
+  <!-- LOCATION ─────────────────────────────────────────────────────────── -->
+  <section class="section is-soft" id="location">
+    <div class="container">
+      <div class="hero-full-grid">
+        <div class="reveal">
+          <span class="eyebrow">Informazioni Pratiche</span>
+          <h2 class="section-title u-mt-2">Come <em>raggiungerci</em></h2>
+          <div class="detail-meta u-mt-3">
+            <div class="detail-meta-item">
+              <span class="detail-meta-label">Dove</span>
+              <span class="detail-meta-value">Galleria Harry Bertoia<br>Corso Vittorio Emanuele II, 60<br>33170 Pordenone (PN)</span>
+            </div>
+            <div class="detail-meta-item">
+              <span class="detail-meta-label">Quando</span>
+              <span class="detail-meta-value">22 Nov 2025 — 26 Apr 2026<br>Mer–Ven · 15:00–19:00<br>Sab–Dom · 10:00–13:00 · 15:00–19:00</span>
+            </div>
+          </div>
+          <p class="section-body u-mt-3">
+            La Galleria Harry Bertoia si trova nel centro storico di Pordenone, a 5 minuti a piedi dalla
+            stazione ferroviaria. Parcheggio pubblico in Piazza della Motta.
+          </p>
+        </div>
+        <div class="reveal" style="transition-delay: .15s;">
+          <div class="detail-media" style="aspect-ratio: 4 / 3; background:
+              radial-gradient(ellipse at 50% 50%, rgba(45, 27, 161, 0.35) 0%, transparent 65%),
+              linear-gradient(135deg, #0d0d18 0%, #111117 100%);
+              position: relative; display: flex; align-items: center; justify-content: center;">
+            <div style="position: absolute; inset: 0;
+              background-image:
+                linear-gradient(rgba(200, 180, 130, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(200, 180, 130, 0.08) 1px, transparent 1px);
+              background-size: 40px 40px;"></div>
+            <div style="position: relative; text-align: center;">
+              <div style="width: 18px; height: 18px; background: var(--golden-glow);
+                border-radius: 50% 50% 50% 0; transform: rotate(-45deg); margin: 0 auto;
+                box-shadow: 0 0 0 6px rgba(200, 180, 130, 0.15), 0 0 28px rgba(200, 180, 130, 0.4);"></div>
+              <div class="eyebrow is-plain u-mt-3" style="color: var(--alabaster);">Galleria Harry Bertoia</div>
+              <div style="font-family: var(--ff-mono); font-size: 10px; color: var(--muted); letter-spacing: 0.2em; margin-top: 0.4rem;">45.9625° N · 12.6583° E</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
   <script>
-    // Scroll reveal
-    const reveals = document.querySelectorAll('.reveal');
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.15 });
-    reveals.forEach(el => obs.observe(el));
+    (async () => {
+      const user = await initApp();
+      renderNavbar('home', user);
+      renderFooter();
+    })();
   </script>
-  <script src="data.js"></script>
-  <script src="app.js"></script>
-  <script src="navbar.js"></script>
-  <script>
-    initApp().then(user => {
-      renderNavbar("home", user);
-    });
-  </script>
-
 </body>
-
 </html>
+

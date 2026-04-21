@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Nuova foto</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <header class="page-head">
+    <div class="container">
+      <a href="admin-photos.html" class="eyebrow">← Gestione foto</a>
+      <h1 class="u-mt-2">Nuova <em>foto</em></h1>
+      <p class="section-body">Carica un'opera nella mostra.</p>
+    </div>
+  </header>
+
+  <main class="container" style="padding-bottom: 5rem; max-width: 760px;">
+    <form id="photoForm" enctype="multipart/form-data" novalidate>
+      <div class="form-field">
+        <label class="form-label" for="photo">File immagine</label>
+        <input class="form-input" type="file" id="photo" name="photo" accept="image/*" required>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="title">Titolo</label>
+          <input class="form-input" type="text" id="title" name="title" required maxlength="100">
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="originalTitle">Titolo originale</label>
+          <input class="form-input" type="text" id="originalTitle" name="originalTitle" required maxlength="100">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="date">Data</label>
+          <input class="form-input" type="text" id="date" name="date" placeholder="es. 1950" maxlength="30" required>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="place">Luogo</label>
+          <input class="form-input" type="text" id="place" name="place" maxlength="100" required>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="description">Descrizione</label>
+        <textarea class="form-textarea" id="description" name="description" rows="4"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="state">Stato</label>
+          <select class="form-select" id="state" name="state" required>
+            <option value="0">Disponibile</option>
+            <option value="1">Prenotata</option>
+            <option value="2">Venduta</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="price">Prezzo (€)</label>
+          <input class="form-input" type="number" id="price" name="price" min="0" step="0.01" required>
+        </div>
+      </div>
+
+      <div class="detail-actions">
+        <button type="submit" class="btn btn-primary" id="submitBtn">Carica foto</button>
+        <a href="admin-photos.html" class="btn btn-ghost">Annulla</a>
+      </div>
+      <span class="form-error" id="err-form" style="margin-top: 1rem; display:block;"></span>
+    </form>
+  </main>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
+  <script>
+    (async () => {
+      const user = await initApp();
+      renderNavbar('admin', user);
+      renderFooter();
+      if (!requireStaff(user)) return;
+
+      const form = document.getElementById('photoForm');
+      const btn  = document.getElementById('submitBtn');
+      const errF = document.getElementById('err-form');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errF.textContent = '';
+        const fd = new FormData(form);
+        btn.disabled = true;
+        try {
+          await API.photos.upload(fd);
+          toast('Foto caricata.', 'success');
+          setTimeout(() => location.href = 'admin-photos.html', 700);
+        } catch (err) {
+          btn.disabled = false;
+          errF.textContent = err.status === 400 ? 'Dati incompleti o file mancante.'
+                           : err.status === 403 ? 'Operazione non consentita.'
+                           : 'Errore durante il caricamento.';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

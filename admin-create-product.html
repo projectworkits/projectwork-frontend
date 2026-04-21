@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Nuovo prodotto</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <header class="page-head">
+    <div class="container">
+      <a href="admin-products.html" class="eyebrow">← Gestione prodotti</a>
+      <h1 class="u-mt-2">Nuovo <em>prodotto</em></h1>
+      <p class="section-body">Aggiungi un articolo allo shop della mostra.</p>
+    </div>
+  </header>
+
+  <main class="container" style="padding-bottom: 5rem; max-width: 720px;">
+    <form id="productForm" novalidate>
+      <div class="form-field">
+        <label class="form-label" for="name">Nome</label>
+        <input class="form-input" type="text" id="name" name="name" required maxlength="255">
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="description">Descrizione</label>
+        <textarea class="form-textarea" id="description" name="description" rows="5" required></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="price">Prezzo (€)</label>
+          <input class="form-input" type="number" id="price" name="price" min="0" step="0.01" required>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="available">Disponibilità</label>
+          <input class="form-input" type="number" id="available" name="available" min="0" step="1" required value="1">
+        </div>
+      </div>
+
+      <div class="detail-actions">
+        <button type="submit" class="btn btn-primary" id="submitBtn">Crea prodotto</button>
+        <a href="admin-products.html" class="btn btn-ghost">Annulla</a>
+      </div>
+      <span class="form-error" id="err-form" style="margin-top: 1rem; display:block;"></span>
+    </form>
+  </main>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
+  <script>
+    (async () => {
+      const user = await initApp();
+      renderNavbar('admin', user);
+      renderFooter();
+      if (!requireStaff(user)) return;
+
+      const form = document.getElementById('productForm');
+      const btn  = document.getElementById('submitBtn');
+      const errF = document.getElementById('err-form');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errF.textContent = '';
+        const payload = {
+          name:        form.name.value.trim(),
+          description: form.description.value.trim(),
+          price:       parseFloat(form.price.value),
+          available:   parseInt(form.available.value, 10),
+        };
+        btn.disabled = true;
+        try {
+          await API.products.create(payload);
+          toast('Prodotto creato.', 'success');
+          setTimeout(() => location.href = 'admin-products.html', 700);
+        } catch (err) {
+          btn.disabled = false;
+          errF.textContent = err.status === 400 ? 'Dati incompleti.'
+                           : err.status === 403 ? 'Operazione non consentita.'
+                           : 'Errore durante la creazione.';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

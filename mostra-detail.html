@@ -1,207 +1,121 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fotografia — Doisneau, Lo sguardo che racconta</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="shared.css" />
-  <style>
-    .photo-detail-layout {
-      display: grid; grid-template-columns: 1.1fr 1fr; gap: 4rem;
-      padding: 3rem 2.5rem 5rem;
-    }
-    .photo-frame {
-      position: relative; background: #0d0d0d;
-      display: flex; align-items: center; justify-content: center;
-      padding: 1.5rem; box-shadow: inset 0 0 0 0.5px rgba(200,180,130,0.15);
-    }
-    .photo-frame img {
-      width: 100%; max-height: 520px; object-fit: contain;
-      filter: grayscale(30%) contrast(1.05);
-    }
-    .photo-frame-caption {
-      position: absolute; bottom: 0.6rem; right: 0.8rem;
-      font-size: 10px; letter-spacing: 0.15em; color: rgba(240,236,228,0.25);
-    }
-    .photo-info { display: flex; flex-direction: column; gap: 0; }
-    .info-row {
-      display: flex; flex-direction: column; gap: 0.25rem;
-      padding: 1rem 0; border-bottom: 0.5px solid rgba(200,180,130,0.1);
-    }
-    .info-row:first-child { padding-top: 0; }
-    .info-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #c8b482; }
-    .info-value { font-size: 16px; color: rgba(240,236,228,0.82); line-height: 1.5; }
-    .info-value.large { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 400; line-height: 1.15; }
-    .info-value.italic { font-style: italic; color: rgba(240,236,228,0.55); }
-    .info-value.price { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: #c8b482; }
-    .info-desc { font-size: 15px; line-height: 1.8; color: rgba(240,236,228,0.68); padding: 1.2rem 0; border-bottom: 0.5px solid rgba(200,180,130,0.1); }
-    .action-area { padding-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
-    .action-note { font-size: 13px; color: rgba(240,236,228,0.4); font-style: italic; }
-    .admin-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-    .back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: rgba(240,236,228,0.4); font-size: 13px; letter-spacing: 0.08em; text-decoration: none; margin: 1.5rem 2.5rem 0; transition: color 0.2s; }
-    .back-link:hover { color: #c8b482; }
-
-    body.light-mode .photo-frame { background: #f0ebe0; box-shadow: inset 0 0 0 0.5px rgba(133,121,111,0.2); }
-    body.light-mode .photo-frame-caption { color: rgba(31,31,31,0.25); }
-    body.light-mode .info-row { border-bottom-color: rgba(133,121,111,0.1); }
-    body.light-mode .info-label { color: #9a3636; }
-    body.light-mode .info-value { color: rgba(31,31,31,0.82); }
-    body.light-mode .info-value.italic { color: rgba(31,31,31,0.5); }
-    body.light-mode .info-value.price { color: #9a3636; }
-    body.light-mode .info-desc { color: rgba(31,31,31,0.68); border-bottom-color: rgba(133,121,111,0.1); }
-    body.light-mode .action-note { color: rgba(31,31,31,0.4); }
-    body.light-mode .back-link { color: rgba(31,31,31,0.4); }
-    body.light-mode .back-link:hover { color: #9a3636; }
-
-    @media (max-width: 768px) { .photo-detail-layout { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 1rem 4rem; } }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dettaglio opera · Doisneau Pordenone</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-<div class="site">
 
-  <script src="data.js"></script>
-  <script src="app.js"></script>
-  <script src="navbar.js"></script>
+  <main class="container" style="padding: 3rem 2rem 5rem;">
+    <a href="mostra-index.html" class="eyebrow" style="margin-bottom: 2rem;">← Torna alla galleria</a>
+    <div id="content"></div>
+    <div id="error" class="data-table-empty u-hidden" style="color: var(--danger);">Opera non trovata.</div>
+  </main>
 
-  <a href="mostra-index.html" class="back-link">← Torna alla galleria</a>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
+  <script>
+    (async () => {
+      const user = await initApp();
+      renderNavbar('mostra', user);
+      renderFooter();
 
-  <div id="page-content"></div>
+      const id = qs('id');
+      const root  = document.getElementById('content');
+      const errEl = document.getElementById('error');
+      if (!id) { errEl.classList.remove('u-hidden'); return; }
 
-  <footer class="footer">
-    <span>© 2026 Mostra Doisneau — Pordenone</span>
-    <span>Privacy · Accessibilità</span>
-  </footer>
+      let ph;
+      try { ph = await API.photos.get(id); }
+      catch (_) { errEl.classList.remove('u-hidden'); return; }
 
-</div>
-<script>
-const params = new URLSearchParams(location.search);
-const photoId = parseInt(params.get("id"));
-let photo = null;
+      const state = photoStateKey(ph.state);
+      const stateLabel = photoStateLabel(ph.state);
 
-function buildActions(p, user) {
-  const role = getRole(user);
-  const isMyBooking = user && p.bookedBy === user.user_id && (role === "user" || role === "collaborator");
+      const role       = getRole(user);
+      const isOwner    = user && ph.bookedBy && Number(ph.bookedBy) === Number(user.userId);
+      const isStaffU   = isStaff(user);
 
-  // Guest
-  if (role === "guest") {
-    if (p.state === "disponibile") return `<p class="action-note">Accedi come utente per prenotare.</p>`;
-    return "";
-  }
+      let actions = '';
+      if (state === 'available') {
+        actions = user
+          ? `<button class="btn btn-primary" data-act="book">Prenota quest\u2019opera</button>`
+          : `<a href="login.html?from=${encodeURIComponent(location.pathname + location.search)}" class="btn btn-primary">Accedi per prenotare</a>`;
+      } else if (state === 'booked') {
+        const parts = [];
+        if (isStaffU) {
+          parts.push(`<button class="btn btn-primary" data-act="setsold">Conferma vendita</button>`);
+          parts.push(`<button class="btn btn-danger" data-act="unbook">Annulla prenotazione</button>`);
+        } else if (isOwner) {
+          parts.push(`<button class="btn btn-danger" data-act="unbook">Annulla la mia prenotazione</button>`);
+        } else {
+          parts.push(`<span class="u-muted"><em>Opera attualmente prenotata.</em></span>`);
+        }
+        actions = parts.join('');
+      } else if (state === 'sold') {
+        actions = `<span class="u-muted"><em>Opera venduta. Non più disponibile.</em></span>`;
+      }
 
-  // Admin
-  if (role === "admin") {
-    let btns = `<div class="admin-actions">`;
-    if (p.state === "prenotata") {
-      btns += `<button class="btn btn-solid btn-sm" onclick="handleConfirmSale()">✓ Conferma vendita</button>`;
-      btns += `<button class="btn btn-danger btn-sm" onclick="handleCancelBooking()">✕ Annulla prenotazione</button>`;
-    }
-    if (p.state === "disponibile") {
-      btns += `<span class="action-note">Nessuna prenotazione attiva.</span>`;
-    }
-    if (p.state === "venduta") {
-      btns += `<span class="action-note">Fotografia venduta.</span>`;
-    }
-    btns += `</div>`;
-    return btns;
-  }
-
-  // User
-  if (p.state === "disponibile") {
-    return `<button class="btn btn-gold" onclick="handleBook()">Prenota questa fotografia</button>`;
-  }
-  if (p.state === "prenotata" && isMyBooking) {
-    return `
-      <p class="action-note">Hai prenotato questa fotografia.</p>
-      <button class="btn btn-danger btn-sm" onclick="handleCancelBooking()">Elimina prenotazione</button>`;
-  }
-  if (p.state === "prenotata" && !isMyBooking) {
-    return `<p class="action-note">Fotografia già prenotata.</p>`;
-  }
-  if (p.state === "venduta") {
-    return `<p class="action-note">Fotografia venduta.</p>`;
-  }
-  return "";
-}
-
-function render(p, user) {
-  photo = p;
-  document.title = `${p.title} — Doisneau Pordenone`;
-  document.getElementById("page-content").innerHTML = `
-    <div class="photo-detail-layout">
-      <div class="photo-frame">
-        <img src="${p.img}" alt="${p.title}">
-        <span class="photo-frame-caption">© Atelier Robert Doisneau</span>
-      </div>
-      <div class="photo-info">
-        <div class="info-row">
-          ${stateBadge(p.state)}
-        </div>
-        <div class="info-row">
-          <span class="info-label">Titolo</span>
-          <span class="info-value large">${p.title}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Titolo originale</span>
-          <span class="info-value italic">${p.originalTitle}</span>
-        </div>
-        <div class="info-row" style="display:grid;grid-template-columns:1fr 1fr;gap:0">
-          <div>
-            <span class="info-label">Anno</span>
-            <span class="info-value">${p.year}</span>
+      root.innerHTML = `
+        <div class="detail">
+          <div class="detail-media">
+            <img src="${escapeHtml(photoUrl(ph.path))}" alt="${escapeHtml(ph.title || '')}">
           </div>
-          <div>
-            <span class="info-label">Luogo</span>
-            <span class="info-value">${p.place}</span>
+          <div class="detail-body">
+            <span class="eyebrow">Opera · #${ph.photoId}</span>
+            <h1 class="u-mt-2">${escapeHtml(ph.title || 'Senza titolo')}</h1>
+            ${ph.originalTitle ? `<p style="font-style:italic; color: var(--muted); margin-top:-.5rem;">${escapeHtml(ph.originalTitle)}</p>` : ''}
+            <div style="margin: 1rem 0;">
+              <span class="state-badge is-${state}">${stateLabel}</span>
+            </div>
+            <div class="detail-meta">
+              <div class="detail-meta-item"><span class="detail-meta-label">Data</span><span class="detail-meta-value">${escapeHtml(ph.date || '—')}</span></div>
+              <div class="detail-meta-item"><span class="detail-meta-label">Luogo</span><span class="detail-meta-value">${escapeHtml(ph.place || '—')}</span></div>
+            </div>
+            ${ph.description ? `<p class="section-body">${escapeHtml(ph.description)}</p>` : ''}
+            <div class="detail-price">${fmtPrice(ph.price)}</div>
+            <div class="detail-actions" id="actions">${actions}</div>
+            <span class="form-error" id="err-form" style="margin-top: 1rem; display:block;"></span>
           </div>
-        </div>
-        <p class="info-desc">${p.description}</p>
-        <div class="info-row">
-          <span class="info-label">Prezzo</span>
-          <span class="info-value price">${formatPrice(p.price)}</span>
-        </div>
-        <div class="action-area" id="action-area">
-          ${buildActions(p, user)}
-        </div>
-      </div>
-    </div>`;
-}
+        </div>`;
 
-// Per semplicità ricarichiamo la pagina dopo azioni critiche, così ri-otteniamo lo user da initApp
-function handleBook() {
-  API.bookPhoto(photo.id).then(() => {
-    toast("Fotografia prenotata con successo");
-    setTimeout(() => location.reload(), 1000);
-  }).catch(err => toast(err, "error"));
-}
+      const actBox = document.getElementById('actions');
+      const errF   = document.getElementById('err-form');
+      if (!actBox) return;
 
-function handleCancelBooking() {
-  confirmDialog("Vuoi eliminare la prenotazione?").then(ok => {
-    if (!ok) return;
-    API.cancelPhotoBooking(photo.id).then(() => {
-      toast("Prenotazione annullata");
-      setTimeout(() => location.reload(), 1000);
-    }).catch(err => toast(err, "error"));
-  });
-}
+      actBox.addEventListener('click', async (e) => {
+        const btn = e.target.closest('button[data-act]');
+        if (!btn) return;
+        const act = btn.dataset.act;
+        errF.textContent = '';
 
-function handleConfirmSale() {
-  confirmDialog("Confermi la vendita di questa fotografia?").then(ok => {
-    if (!ok) return;
-    API.confirmSale(photo.id).then(() => {
-      toast("Vendita confermata");
-      setTimeout(() => location.reload(), 1000);
-    }).catch(err => toast(err, "error"));
-  });
-}
+        const labels = { book: 'Prenotare', unbook: 'Annullare la prenotazione', setsold: 'Confermare la vendita' };
+        const ok = await confirmModal(`${labels[act]} di "${escapeHtml(ph.title || '')}"?`, {
+          title: 'Conferma', okLabel: labels[act], danger: act !== 'book'
+        });
+        if (!ok) return;
 
-initApp().then(user => {
-  renderNavbar("mostra", user);
-  API.getPhoto(photoId).then(p => {
-    if (!p) { document.getElementById("page-content").innerHTML = '<p style="padding:3rem 2.5rem">Fotografia non trovata.</p>'; return; }
-    render(p, user);
-  }).catch(() => toast("Errore nel caricamento", "error"));
-});
-</script>
+        btn.disabled = true;
+        try {
+          if (act === 'book')    await API.photos.book(id, user.userId);
+          if (act === 'unbook')  await API.photos.unbook(id);
+          if (act === 'setsold') await API.photos.setSold(id);
+          toast('Operazione completata.', 'success');
+          setTimeout(() => location.reload(), 700);
+        } catch (err) {
+          btn.disabled = false;
+          errF.textContent = err.status === 401 ? 'Sessione scaduta. Accedi di nuovo.'
+                           : err.status === 403 ? 'Operazione non consentita.'
+                           : err.status === 404 ? 'Opera o utente non trovato.'
+                           : 'Errore. Riprova.';
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -1,75 +1,122 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prodotto — Doisneau, Lo sguardo che racconta</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="shared.css" />
-  <style>
-    .detail-layout {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
-      padding: 3rem 2.5rem 5rem; max-width: 960px;
-    }
-    .detail-img {
-      background: #111; aspect-ratio: 4/3;
-      display: flex; align-items: center; justify-content: center; overflow: hidden;
-    }
-    .detail-img img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(40%); }
-    .detail-img-placeholder { font-size: 5rem; opacity: 0.1; }
-    .detail-info { display: flex; flex-direction: column; gap: 1.2rem; }
-    .detail-avail {
-      font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(240,236,228,0.4);
-    }
-    .detail-avail.low { color: #c8a048; }
-    .detail-avail.out { color: #c84848; }
-    .detail-name { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 400; line-height: 1.2; }
-    .detail-desc { font-size: 16px; line-height: 1.8; color: rgba(240,236,228,0.72); }
-    .detail-price { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700; color: #c8b482; }
-    .booking-form { margin-top: 0.5rem; padding-top: 1.5rem; border-top: 0.5px solid rgba(200,180,130,0.15); }
-    .qty-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-    .qty-label { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #c8b482; }
-    .qty-input {
-      width: 80px; background: rgba(255,255,255,0.03);
-      border: 0.5px solid rgba(200,180,130,0.25);
-      color: #f0ece4; font-family: 'Cormorant Garamond', serif;
-      font-size: 18px; padding: 0.5rem 0.8rem; text-align: center; outline: none;
-    }
-    .qty-input:focus { border-color: #c8b482; }
-    .back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: rgba(240,236,228,0.4); font-size: 13px; letter-spacing: 0.08em; text-decoration: none; margin: 1.5rem 2.5rem 0; transition: color 0.2s; }
-    .back-link:hover { color: #c8b482; }
-    .guest-note { font-size: 13px; color: rgba(240,236,228,0.4); font-style: italic; margin-top: 0.5rem; }
-
-    body.light-mode .detail-img { background: #f0ebe0; }
-    body.light-mode .detail-avail { color: rgba(31,31,31,0.4); }
-    body.light-mode .detail-avail.low { color: #a07020; }
-    body.light-mode .detail-avail.out { color: #9a3636; }
-    body.light-mode .detail-desc { color: rgba(31,31,31,0.72); }
-    body.light-mode .detail-price { color: #9a3636; }
-    body.light-mode .booking-form { border-top-color: rgba(133,121,111,0.15); }
-    body.light-mode .qty-input { background: #fff; border-color: rgba(133,121,111,0.3); color: #1f1f1f; }
-    body.light-mode .qty-input:focus { border-color: #9a3636; }
-    body.light-mode .qty-label { color: #9a3636; }
-    body.light-mode .back-link { color: rgba(31,31,31,0.4); }
-    body.light-mode .back-link:hover { color: #9a3636; }
-    body.light-mode .guest-note { color: rgba(31,31,31,0.4); }
-
-    @media (max-width: 700px) { .detail-layout { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 1rem 4rem; } }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dettaglio prodotto · Doisneau Pordenone</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-<div class="site">
 
+  <main class="container" style="padding: 3rem 2rem 5rem;">
+    <a href="shop-index.html" class="eyebrow" style="margin-bottom: 2rem; cursor: pointer;">← Torna allo shop</a>
+
+    <div id="content"></div>
+    <div id="error" class="data-table-empty u-hidden" style="color: var(--danger);">Prodotto non trovato.</div>
+  </main>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/footer.js"></script>
   <script>
-    initApp().then(() => {
-      renderNavbar("shop");
-      API.getProduct(productId).then(p => {
-        if (!p) { document.getElementById("page-content").innerHTML = '<p style="padding:3rem 2.5rem">Prodotto non trovato.</p>'; return; }
-        document.title = `${p.name} — Doisneau Pordenone`;
-        render(p);
-      }).catch(() => toast("Errore nel caricamento", "error"));
-    });
+    (async () => {
+      const user = await initApp();
+      renderNavbar('shop', user);
+      renderFooter();
+
+      const id = qs('id');
+      const root    = document.getElementById('content');
+      const errEl   = document.getElementById('error');
+      if (!id) { errEl.classList.remove('u-hidden'); return; }
+
+      let product;
+      try { product = await API.products.get(id); }
+      catch (_) { errEl.classList.remove('u-hidden'); return; }
+
+      const avail = Number(product.available || 0);
+      const name  = escapeHtml(product.name || '');
+      const desc  = escapeHtml(product.description || '');
+      const price = fmtPrice(product.price);
+
+      root.innerHTML = `
+        <div class="detail">
+          <div class="detail-media" style="aspect-ratio: 4 / 3; display:flex; align-items:center; justify-content:center; background: var(--onyx-soft);">
+            <span class="eyebrow is-plain" style="color: var(--muted-soft);">${name}</span>
+          </div>
+          <div class="detail-body">
+            <span class="eyebrow">Prodotto</span>
+            <h1 class="u-mt-2">${name}</h1>
+            <p class="section-body u-mt-2">${desc}</p>
+            <div class="detail-meta">
+              <div class="detail-meta-item">
+                <span class="detail-meta-label">Disponibilità</span>
+                <span class="detail-meta-value" id="availVal">${avail}</span>
+              </div>
+              <div class="detail-meta-item">
+                <span class="detail-meta-label">Prezzo unitario</span>
+                <span class="detail-meta-value">${price}</span>
+              </div>
+            </div>
+
+            <form id="bookForm" ${avail <= 0 ? 'hidden' : ''}>
+              <div class="form-field" style="max-width: 220px;">
+                <label class="form-label" for="qty">Quantità</label>
+                <input class="form-input" type="number" id="qty" name="qty"
+                       min="1" max="${avail}" value="1" required>
+                <span class="form-hint">Minimo 1, massimo ${avail}.</span>
+              </div>
+              <div class="detail-actions">
+                <button type="submit" class="btn btn-primary" id="bookBtn">Prenota</button>
+                <a href="shop-index.html" class="btn btn-ghost">Annulla</a>
+              </div>
+              <span class="form-error" id="err-form" style="margin-top: 1rem; display:block;"></span>
+            </form>
+
+            ${avail <= 0 ? `
+              <p class="u-muted u-mt-3"><em>Prodotto esaurito.</em></p>
+              <a href="shop-index.html" class="btn btn-ghost u-mt-3">Torna allo shop</a>
+            ` : ''}
+          </div>
+        </div>`;
+
+      if (avail <= 0) return;
+
+      const form   = document.getElementById('bookForm');
+      const qtyEl  = document.getElementById('qty');
+      const availL = document.getElementById('availVal');
+      const btn    = document.getElementById('bookBtn');
+      const errF   = document.getElementById('err-form');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errF.textContent = '';
+        if (!user) { requireAuth(null); return; }
+
+        const qty = parseInt(qtyEl.value, 10);
+        if (!(qty >= 1 && qty <= avail)) { errF.textContent = `Quantità 1–${avail}.`; return; }
+
+        const ok = await confirmModal(
+          `Confermi la prenotazione di ${qty} × ${name} (${fmtPrice(product.price * qty)})?`,
+          { title: 'Conferma prenotazione', okLabel: 'Prenota' }
+        );
+        if (!ok) return;
+
+        btn.disabled = true;
+        try {
+          await API.products.sell(id, qty);
+          toast('Prenotazione registrata.', 'success');
+          availL.textContent = String(avail - qty);
+          setTimeout(() => { location.href = 'shop-index.html'; }, 900);
+        } catch (err) {
+          btn.disabled = false;
+          errF.textContent = err.status === 401 ? 'Devi accedere per prenotare.'
+                           : err.status === 403 ? 'Operazione non consentita.'
+                           : 'Errore. Riprova.';
+        }
+      });
+    })();
   </script>
-</script>
 </body>
 </html>
