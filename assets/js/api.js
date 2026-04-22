@@ -12,17 +12,25 @@
 
 const API_BASE = '/api';
 
-async function _request(path, opts = {}) {
+async function _fetch(path, opts, headers) {
+  return fetch(API_BASE + path, { credentials: 'include', ...opts, headers });
+}
+
+async function _request(path, opts = {}, _retried = false) {
   const isForm = opts.body instanceof FormData;
   const headers = { ...(opts.headers || {}) };
   if (!isForm && opts.body && !headers['Content-Type']) {
     headers['Content-Type'] = 'application/json';
   }
-  const res = await fetch(API_BASE + path, {
-    credentials: 'include',
-    ...opts,
-    headers,
-  });
+  let res = await _fetch(path, opts, headers);
+
+  if (res.status === 401 && !_retried && !path.startsWith('/auth/')) {
+    const refresh = await _fetch('/auth/refresh', { method: 'GET' }, {});
+    if (refresh.ok) {
+      return _request(path, opts, true);
+    }
+  }
+
   if (!res.ok) {
     let message = res.statusText;
     try {
