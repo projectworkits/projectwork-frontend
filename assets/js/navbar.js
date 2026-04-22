@@ -28,12 +28,12 @@ function renderNavbar(activePage, user) {
       <a href="#" class="nav-action" data-action="logout">Esci</a>
     `
     : `
-      <a href="login class="nav-action">Accedi</a>
+      <a href="login.html" class="nav-action">Accedi</a>
     `;
 
   const html = `
     <nav class="nav" id="siteNav">
-      <a class="nav-brand" href="index>
+      <a class="nav-brand" href="index.html">
         <span class="nav-brand-mark">Doisneau</span>
         <span class="nav-brand-sub">Pordenone · 2026</span>
       </a>

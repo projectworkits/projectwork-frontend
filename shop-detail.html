@@ -10,7 +10,7 @@
 <body>
 
   <main class="container" style="padding: 3rem 2rem 5rem;">
-    <a href="shop-index class="eyebrow" style="margin-bottom: 2rem; cursor: pointer;">← Torna allo shop</a>
+    <a href="shop-index.html" class="eyebrow" style="margin-bottom: 2rem; cursor: pointer;">← Torna allo shop</a>
 
     <div id="content"></div>
     <div id="error" class="data-table-empty u-hidden" style="color: var(--danger);">Prodotto non trovato.</div>
@@ -69,14 +69,14 @@
               </div>
               <div class="detail-actions">
                 <button type="submit" class="btn btn-primary" id="bookBtn">Prenota</button>
-                <a href="shop-index class="btn btn-ghost">Annulla</a>
+                <a href="shop-index.html" class="btn btn-ghost">Annulla</a>
               </div>
               <span class="form-error" id="err-form" style="margin-top: 1rem; display:block;"></span>
             </form>
 
             ${avail <= 0 ? `
               <p class="u-muted u-mt-3"><em>Prodotto esaurito.</em></p>
-              <a href="shop-index class="btn btn-ghost u-mt-3">Torna allo shop</a>
+              <a href="shop-index.html" class="btn btn-ghost u-mt-3">Torna allo shop</a>
             ` : ''}
           </div>
         </div>`;
