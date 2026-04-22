@@ -9,13 +9,13 @@ function renderNavbar(activePage, user) {
   const isAdminArea = role === 'admin' || role === 'collaborator';
 
   const pages = [
-    { id: 'home',    label: 'Home',     href: 'index.html' },
-    { id: 'shop',    label: 'Shop',     href: 'shop-index.html' },
-    { id: 'mostra',  label: 'Galleria', href: 'mostra-index.html' },
-    { id: 'azienda', label: 'Azienda',  href: 'azienda.html' },
+    { id: 'home',    label: 'Home',     href: 'index' },
+    { id: 'shop',    label: 'Shop',     href: 'shop-index' },
+    { id: 'mostra',  label: 'Galleria', href: 'mostra-index' },
+    { id: 'azienda', label: 'Azienda',  href: 'azienda' },
   ];
   if (isAdminArea) {
-    pages.push({ id: 'admin', label: 'Admin', href: 'admin-dashboard.html' });
+    pages.push({ id: 'admin', label: 'Admin', href: 'admin-dashboard' });
   }
 
   const links = pages.map(p => `
@@ -60,7 +60,7 @@ function renderNavbar(activePage, user) {
       e.preventDefault();
       try { await API.auth.logout(); } catch (_) { /* ignore */ }
       toast('Disconnessione effettuata', 'info');
-      setTimeout(() => { location.href = 'index.html'; }, 500);
+      setTimeout(() => { location.href = 'index'; }, 500);
     });
   }
 }
